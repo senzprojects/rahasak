@@ -10,6 +10,8 @@ android {
         targetSdkVersion 20
         versionCode 3
         versionName "1.3"
+        multiDexEnabled true
+        applicationId "com.score.chatz"
     }
 
     buildTypes {
@@ -32,4 +34,5 @@ dependencies {
     compile 'org.json:json:20141113'
     compile 'com.google.maps.android:android-maps-utils:0.4.+'
     compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:multidex:1.0.0'
 }

@@ -1,8 +1,12 @@
 package com.score.chatz.handlers;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteConstraintException;
+import android.os.CountDownTimer;
+import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -33,12 +37,27 @@ public class SenzHandler {
     private SenzHandler() {
     }
 
+    // service interface
+    private ISenzService senzService = null;
+
+    // service connection
+    private ServiceConnection senzServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("TAG", "Connected with senz service");
+            senzService = ISenzService.Stub.asInterface(service);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            senzService = null;
+            Log.d("TAG", "Disconnected from senz service");
+        }
+    };
+
+
     public static SenzHandler getInstance(Context context) {
         if (instance == null) {
             instance = new SenzHandler();
             SenzHandler.context = context.getApplicationContext();
-
-            serviceConnection = new SenzServiceConnection(context);
 
             // bind to senz service
             Intent serviceIntent = new Intent();
@@ -103,14 +122,50 @@ public class SenzHandler {
         });
     }
 
+
+
+    /**
+     * Share current sensor
+     * Need to send share query to server via web socket
+     */
+    private void shareBack(String sender) {
+        try {
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("lat", "lat");
+            senzAttributes.put("lon", "lon");
+            senzAttributes.put("msg", "msg");
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+            User receiver = new User("", sender);
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+            senzService.send(senz);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
     private void sendResponse(ISenzService senzService, User receiver, boolean isDone) {
         Log.d(TAG, "send response");
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            if (isDone) senzAttributes.put("msg", "ShareDone");
-            else senzAttributes.put("msg", "ShareFail");
+            if (isDone){
+                senzAttributes.put("msg", "ShareDone");
+                senzAttributes.put("lat", "lat");
+                senzAttributes.put("lon", "lon");
+            }else {
+                senzAttributes.put("msg", "ShareFail");
+            }
 
             String id = "_ID";
             String signature = "";
@@ -136,4 +191,7 @@ public class SenzHandler {
         // broadcast received senz
         Log.d(TAG, "Nothing to handler data senz from here, already broadcasted");
     }
+
+
+
 }

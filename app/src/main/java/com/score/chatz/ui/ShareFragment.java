@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.sqlite.SQLiteConstraintException;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -31,6 +32,7 @@ import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.NetworkUtil;
+import com.score.chatz.utils.NotificationUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -248,6 +250,19 @@ public class ShareFragment extends android.support.v4.app.Fragment {
 
                 String msg = senz.getAttributes().get("msg");
                 if (msg != null && msg.equalsIgnoreCase("ShareDone")) {
+                    // save senz in db
+                    Context context = getContext();
+                    SenzorsDbSource dbSource = new SenzorsDbSource(context);
+                    User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
+                    senz.setSender(sender);
+                    Log.d(TAG, "save senz");
+                    // if senz already exists in the db, SQLiteConstraintException should throw
+                    try {
+                        dbSource.createSenz(senz);
+                        NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "LocationZ received from @" + senz.getSender().getUsername());
+                    } catch (SQLiteConstraintException e) {
+                        Log.e(TAG, e.toString());
+                    }
                     onPostShare(senz);
                 } else {
                     String user = usernameEditText.getText().toString().trim();
