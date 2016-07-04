@@ -2,10 +2,16 @@ package com.score.chatz.db;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.receivers.DatabaseChangedReceiver;
+import com.score.chatz.ui.ChatFragment;
+import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.viewholders.Message;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
@@ -101,12 +107,50 @@ public class SenzorsDbSource {
         }
     }
 
+
+    /**
+     * Add chatz to the database
+     *
+     * @param chatz chatz object
+     */
+
+    public void createChatz (Message message) {
+        Log.d(TAG, "AddSensor: adding senz from - " + message.getSender().getUsername());
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.Chatz.COLUMN_NAME_MESSAGE, message.getText());
+        values.put(SenzorsDbContract.Chatz.COLUMN_NAME_OWNER, message.getSender().getUsername());
+
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.Chatz.TABLE_NAME, null, values);
+        db.close();
+        context.sendBroadcast(new Intent(DatabaseChangedReceiver.ACTION_DATABASE_CHANGED));
+    }
+
+    public void updateSenz(User user, String value) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, value);
+
+        // update
+        db.update(SenzorsDbContract.Senz.TABLE_NAME,
+                values,
+                SenzorsDbContract.Senz.COLUMN_NAME_USER + " = ?",
+                new String[]{String.valueOf(user.getId())});
+
+        db.close();
+    }
+
     /**
      * Add senz to the database
      *
      * @param senz senz object
      */
-    public void createSenz(Senz senz) {
+    public void createSenz (Senz senz) {
         Log.d(TAG, "AddSensor: adding senz from - " + senz.getSender());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
@@ -135,20 +179,74 @@ public class SenzorsDbSource {
         db.close();
     }
 
-    public void updateSenz(User user, String value) {
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+    /**
+     * Get all chatz, two types of sensors here
+     * 1. my sensors
+     * 2. friends sensors
+     *
+     * @return sensor list
+     */
+    public ArrayList<Message> getChatz() {
+        Log.d(TAG, "GetSensors: getting all chatz messages");
+        ArrayList<Message> chatzList = new ArrayList();
+        User currentUser;
+        try {
+            currentUser = PreferenceUtils.getUser(context);
+        } catch (NoUserException e) {
+            e.printStackTrace();
+            return chatzList;
+        }
 
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, value);
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
 
-        // update
-        db.update(SenzorsDbContract.Senz.TABLE_NAME,
-                values,
-                SenzorsDbContract.Senz.COLUMN_NAME_USER + " = ?",
-                new String[]{String.valueOf(user.getId())});
+        // join query to retrieve data
+        String query = "SELECT chatz.message, chatz.owner " +
+                "FROM chatz ";
+        Cursor cursor = db.rawQuery(query, null);
 
+        // sensor/user attributes
+        String _chatzId;
+        String _chatzMessage;
+        String _chatzOwner;
+        String _chatzUsername;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            HashMap<String, String> chatzAttributes = new HashMap<>();
+
+            // get chatz attributes
+            //_chatzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz._ID));
+            _chatzMessage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz.COLUMN_NAME_MESSAGE));
+            _chatzOwner = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz.COLUMN_NAME_OWNER));
+
+            // get user attributes
+            //_chatzUsername = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+
+            /*chatzAttributes.put(_chatzMessage, _chatzOwner);
+
+            // create senz
+            Senz chatz = new Senz();
+            chatz.setId(_chatzId);
+            chatz.setAttributes(chatzAttributes);
+            chatz.setSender(new User(_chatzOwner, _chatzUsername));*/
+            Log.d(TAG, "currentUSER id : " + currentUser.getUsername());
+            //Log.d(TAG, "currentUSER id : " + _chatzUsername);
+
+            boolean isMine = currentUser.getUsername().equalsIgnoreCase(_chatzOwner);
+            Message message = new Message(_chatzMessage, new User(_chatzOwner, _chatzOwner), isMine);
+
+
+
+            // fill senz list
+            chatzList.add(message);
+        }
+
+        // clean
+        cursor.close();
         db.close();
+
+        Log.d(TAG, "GetChatz: chatz count " + chatzList.size());
+        return chatzList;
     }
 
     /**
@@ -238,6 +336,22 @@ public class SenzorsDbSource {
         Log.d(TAG, "user count " + userList.size());
 
         return userList;
+    }
+
+    /**
+     * Delete chatz from database,
+     *
+     * @param chatz chatz
+     */
+    public void deleteChatz(Senz senz) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // delete senz of given user
+        /*db.delete(SenzorsDbContract.Chatz.TABLE_NAME,
+                SenzorsDbContract.Chatz.COLUMN_NAME_USER + "=?" + " AND " +
+                        SenzorsDbContract.Senz.COLUMN_NAME_NAME + "=?",
+                new String[]{senz.getSender().getId(), senz.getAttributes().keySet().iterator().next()});*/
+        db.close();
     }
 
     /**

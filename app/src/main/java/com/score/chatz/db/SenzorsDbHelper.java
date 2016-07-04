@@ -18,7 +18,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 20;
+    private static final int DATABASE_VERSION = 21;
     private static final String DATABASE_NAME = "Senz.db";
 
     // data types, keywords and queries
@@ -39,10 +39,19 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.User.COLOMN_NAME_IMAGE + TEXT_TYPE +
             " )";
 
+    private static final String SQL_CREATE_CHATZ =
+            "CREATE TABLE " + SenzorsDbContract.Chatz.TABLE_NAME + " (" +
+                    SenzorsDbContract.Chatz._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
+                    SenzorsDbContract.Chatz.COLUMN_NAME_MESSAGE + TEXT_TYPE +","+
+                    SenzorsDbContract.Chatz.COLUMN_NAME_OWNER + TEXT_TYPE + " NOT NULL" +
+                    " )";
+
     private static final String SQL_DELETE_SENZ =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.Senz.TABLE_NAME;
     private static final String SQL_DELETE_USER =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.User.TABLE_NAME;
+    private static final String SQL_DELETE_CHATZ =
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.Chatz.TABLE_NAME;
 
     /**
      * Init context
@@ -72,9 +81,11 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, "OnCreate: creating db helper, db version - " + DATABASE_VERSION);
         Log.d(TAG, SQL_CREATE_SENZ);
         Log.d(TAG, SQL_CREATE_USER);
+        Log.d(TAG, SQL_CREATE_CHATZ);
 
         db.execSQL(SQL_CREATE_SENZ);
         db.execSQL(SQL_CREATE_USER);
+        db.execSQL(SQL_CREATE_CHATZ);
     }
 
     /**
@@ -97,6 +108,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
         db.execSQL(SQL_DELETE_SENZ);
         db.execSQL(SQL_DELETE_USER);
+        db.execSQL(SQL_DELETE_CHATZ);
 
         onCreate(db);
     }

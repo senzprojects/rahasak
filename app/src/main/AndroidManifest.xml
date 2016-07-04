@@ -97,7 +97,16 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.ChatActivity"></activity>
+        <receiver
+            android:name=".receivers.DatabaseChangedReceiver"
+            android:enabled="true" >
+            <intent-filter>
+                <action android:name="com.score.chatz.DATABASE_CHANGED"></action>
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".ui.ChatActivity"
+            android:theme="@style/Theme.AppCompat"></activity>
     </application>
 
 </manifest>

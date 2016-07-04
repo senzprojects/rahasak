@@ -1,6 +1,6 @@
 package com.score.chatz.services;
 
-import com.score.senzc.pojos.ChatMessage;
+import com.score.chatz.viewholders.Message;
 
 import java.util.ArrayList;
 
@@ -17,20 +17,20 @@ public class DataService {
     private DataService() {
     }
 
-    private ArrayList<ChatMessage> list;
+    private ArrayList<Message> list;
 
-    public ArrayList<ChatMessage> getAllMessages(){
+    public ArrayList<Message> getAllMessages(){
         //Pretend we just downloaded featured stations from Internet
 
-        list = new ArrayList<>();
-        list.add(new ChatMessage("Hi, How are you... its me Lakmal", "Lakmal", true));
-        list.add(new ChatMessage("I;m doing fine.. its me Eranga lol", "Eranga", false));
-        list.add(new ChatMessage("NIce to hear from you mate .. :)", "Lakmal", true));
-
+        /*list = new ArrayList<>();
+        list.add(new Message("Hi, How are you... its me Lakmal", "Lakmal", true));
+        list.add(new Message("I;m doing fine.. its me Eranga lol", "Eranga", false));
+        list.add(new Message("NIce to hear from you mate .. :)", "Lakmal", true));
+*/
         return list;
     }
 
-    public void addNewItem(ChatMessage message){
+    public void addNewItem(Message message){
         list.add(message);
 
     }

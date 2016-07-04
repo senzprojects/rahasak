@@ -8,7 +8,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.senzc.pojos.ChatMessage;
+import com.score.chatz.viewholders.Message;
 
 /**
  * Created by Lakmal on 7/2/16.
@@ -28,7 +28,7 @@ public class ChatMessageViewHolder extends RecyclerView.ViewHolder{
 
     }
 
-    public void updateUI(ChatMessage message){
+    public void updateUI(Message message){
 
         String bgImage = message.getBackgroundImage();
         int resource = messageContainer.getResources().getIdentifier(bgImage, null, messageContainer.getContext().getPackageName());
@@ -36,7 +36,7 @@ public class ChatMessageViewHolder extends RecyclerView.ViewHolder{
         messageContainer.setBackground(image);
 
         _message.setText(message.getText());
-        _sender.setText(message.getSender());
+        _sender.setText(message.getSender().getUsername());
 
         RelativeLayout.LayoutParams params =
                 (RelativeLayout.LayoutParams)messageContainer.getLayoutParams();

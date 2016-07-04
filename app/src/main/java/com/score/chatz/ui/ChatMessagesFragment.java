@@ -10,7 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.score.chatz.R;
+import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.services.DataService;
+import com.score.chatz.viewholders.Message;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,6 +31,7 @@ public class ChatMessagesFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    SenzorsDbSource dbSource;
 
     public static ChatMessagesAdapter msAdapter;
 
@@ -66,13 +72,15 @@ public class ChatMessagesFragment extends Fragment {
                              Bundle savedInstanceState) {
 
 
+        dbSource = new SenzorsDbSource(getContext());
         View v = inflater.inflate(R.layout.fragment_chat_messages, container, false);
 
         RecyclerView recyclerView = (RecyclerView)v.findViewById(R.id.recycler_messages);
         recyclerView.setHasFixedSize(true);
 
 
-        ChatMessagesAdapter adapter = new ChatMessagesAdapter(DataService.getInstance().getAllMessages());
+        //ChatMessagesAdapter adapter = new ChatMessagesAdapter(DataService.getInstance().getAllMessages());
+        ChatMessagesAdapter adapter = new ChatMessagesAdapter(dbSource.getChatz());
         recyclerView.setAdapter(adapter);
         msAdapter = adapter;
 

@@ -34,6 +34,9 @@
                 <EditText
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:ellipsize="start"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textColor="@android:color/black"
                     android:hint="Enter your text here.."
                     android:layout_weight="70"
                     android:background="@drawable/chat_text_box"

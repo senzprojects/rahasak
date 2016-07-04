@@ -1,17 +1,27 @@
-package com.score.senzc.pojos;
+package com.score.chatz.viewholders;
+
+import android.os.Parcel;
+
+import com.score.senzc.enums.SenzTypeEnum;
+import com.score.senzc.pojos.Senz;
+import com.score.senzc.pojos.User;
+
+import java.util.HashMap;
 
 /**
- * Created by Lakmal on 7/2/16.
+ * Created by Lakmal on 7/3/16.
+ * ViewHolder for The recycler view of the chatActivity
+ *
  */
-public class ChatMessage {
+public class Message {
 
     private String text;
-    private String sender;
+    private User sender;
     private boolean mine;
     final String myMessageBg = "drawable/my_message_box";
     final String notMyMessageBg = "drawable/not_my_message_box";
 
-    public ChatMessage(String text, String sender, boolean mine) {
+    public Message(String text, User sender, boolean mine) {
         this.text = text;
         this.sender = sender;
         this.mine = mine;
@@ -21,7 +31,7 @@ public class ChatMessage {
         return text;
     }
 
-    public String getSender() {
+    public User getSender() {
         return sender;
     }
 
@@ -58,4 +68,3 @@ public class ChatMessage {
     }
 
 }
-

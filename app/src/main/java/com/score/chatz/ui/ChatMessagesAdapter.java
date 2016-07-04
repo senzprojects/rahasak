@@ -5,8 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.score.chatz.R;
-
-import com.score.senzc.pojos.ChatMessage;
+import com.score.chatz.viewholders.Message;
 
 import java.util.ArrayList;
 
@@ -15,15 +14,15 @@ import java.util.ArrayList;
  */
 public class ChatMessagesAdapter  extends RecyclerView.Adapter<ChatMessageViewHolder> {
 
-    private ArrayList<ChatMessage> messages;
+    private ArrayList<Message> messages;
 
-    public ChatMessagesAdapter(ArrayList<ChatMessage> messages) {
+    public ChatMessagesAdapter(ArrayList<Message> messages) {
         this.messages = messages;
     }
 
     @Override
     public void onBindViewHolder(ChatMessageViewHolder holder, int position) {
-        ChatMessage message = messages.get(position);
+        Message message = messages.get(position);
         holder.updateUI(message);
     }
 

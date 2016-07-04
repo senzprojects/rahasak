@@ -19,6 +19,13 @@ public class SenzorsDbContract {
         public static final String COLUMN_NAME_USER = "user";
     }
 
+    /* Inner class that defines sensor table contents */
+    public static abstract class Chatz implements BaseColumns {
+        public static final String TABLE_NAME = "chatz";
+        public static final String COLUMN_NAME_MESSAGE = "message";
+        public static final String COLUMN_NAME_OWNER = "owner";
+    }
+
     /* Inner class that defines the user table contents */
     public static abstract class User implements BaseColumns {
         public static final String TABLE_NAME = "user";
