@@ -5,5 +5,5 @@
         android:orderInCategory="100"
         android:showAsAction="ifRoom"
         android:icon="@drawable/accept"
-        android:title="Share"/>
+        android:title="Get Location"/>
 </menu>

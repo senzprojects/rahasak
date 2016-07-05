@@ -214,7 +214,7 @@ public class SenzListFragment extends Fragment {
         }*/
 
         Intent intent = new Intent(this.getActivity(), ChatActivity.class);
-        intent.putExtra("USER", senz.getSender());
+        intent.putExtra("USER", senz.getSender().getUsername());
         startActivity(intent);
 
 

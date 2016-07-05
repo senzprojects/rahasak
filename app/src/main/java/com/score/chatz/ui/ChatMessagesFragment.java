@@ -11,11 +11,9 @@ import android.view.ViewGroup;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.services.DataService;
 import com.score.chatz.viewholders.Message;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -32,6 +30,7 @@ public class ChatMessagesFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     SenzorsDbSource dbSource;
+    private static ArrayList<Message> messages;
 
     public static ChatMessagesAdapter msAdapter;
 
@@ -80,7 +79,8 @@ public class ChatMessagesFragment extends Fragment {
 
 
         //ChatMessagesAdapter adapter = new ChatMessagesAdapter(DataService.getInstance().getAllMessages());
-        ChatMessagesAdapter adapter = new ChatMessagesAdapter(dbSource.getChatz());
+        messages = dbSource.getChatz();
+        ChatMessagesAdapter adapter = new ChatMessagesAdapter(messages);
         recyclerView.setAdapter(adapter);
         msAdapter = adapter;
 
@@ -91,6 +91,13 @@ public class ChatMessagesFragment extends Fragment {
 
         return v;
 
+    }
+
+
+
+    public static void addMessage(Message msg){
+        messages.add(msg);
+        msAdapter.notifyDataSetChanged();
     }
 
 }

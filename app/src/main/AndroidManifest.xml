@@ -38,7 +38,7 @@
         <!-- production key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDQBL4MsO4B5qpA3VvX3HtRCQG2I09p7t0" />
+            android:value="AIzaSyAmgB9tMhAvzKcgvo-HbCHCisw6SSLjk78" />
 
         <!-- debug key -->
         <!-- <meta-data -->
@@ -97,16 +97,10 @@
             </intent-filter>
         </receiver>
 
-        <receiver
-            android:name=".receivers.DatabaseChangedReceiver"
-            android:enabled="true" >
-            <intent-filter>
-                <action android:name="com.score.chatz.DATABASE_CHANGED"></action>
-            </intent-filter>
-        </receiver>
 
         <activity android:name=".ui.ChatActivity"
-            android:theme="@style/Theme.AppCompat"></activity>
+            android:theme="@style/Theme.AppCompat"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

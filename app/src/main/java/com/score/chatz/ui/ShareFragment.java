@@ -191,6 +191,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
                 }
 
                 return true;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -207,6 +208,7 @@ public class ShareFragment extends android.support.v4.app.Fragment {
             senzAttributes.put("lat", "lat");
             senzAttributes.put("lon", "lon");
             senzAttributes.put("msg", "msg");
+            senzAttributes.put("chatzmsg", "chatzmsg");
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
             // new senz

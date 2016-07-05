@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,6 +32,7 @@ import com.google.maps.android.PolyUtil;
 import com.score.chatz.utils.LocationUtils;
 import com.score.chatz.R;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.NetworkUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -110,6 +112,24 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
         initLocationCoordinates();
         setUpMapIfNeeded();
     }
+
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+             case android.R.id.home:
+                this.finish();
+                return true;
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     /**
      * {@inheritDoc}
