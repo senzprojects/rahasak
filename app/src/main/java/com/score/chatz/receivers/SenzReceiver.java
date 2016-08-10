@@ -24,7 +24,7 @@ public class SenzReceiver extends BroadcastReceiver {
         Senz senz = intent.getExtras().getParcelable("SENZ");
 
         // handler senz from here
-        SenzHandler.getInstance(context).handleSenz(senz);
+        //SenzHandler.getInstance(context).handleSenz(senz);
 
         Log.d(TAG, "Senz received " + action);
     }

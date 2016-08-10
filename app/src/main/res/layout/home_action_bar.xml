@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/transparent">
+
+
+    <ImageView
+        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:src="@drawable/rahasak_text_icon"
+        android:layout_alignParentLeft="true"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="0dp" />
+
+
+
+    <ImageView
+        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:id="@+id/go_to_settings"
+        android:src="@drawable/settings"
+        android:layout_alignParentRight="true"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:layout_marginRight="15dp"
+        android:padding="8dp" />
+
+</RelativeLayout>

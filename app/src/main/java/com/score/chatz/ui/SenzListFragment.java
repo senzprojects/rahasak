@@ -91,7 +91,6 @@ public class SenzListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup root = (ViewGroup) inflater.inflate(R.layout.sensor_list_layout, container, false);
-
         return root;
     }
 
@@ -101,11 +100,8 @@ public class SenzListFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
-
         senzCountDownTimer = new SenzCountDownTimer(16000, 5000);
-
         initEmptyView();
         initSensorListView();
     }

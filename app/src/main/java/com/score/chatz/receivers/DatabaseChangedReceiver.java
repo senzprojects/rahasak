@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.score.chatz.ui.ChatMessagesFragment;
+import com.score.chatz.ui.ChatMessagesListFragment;
 
 /**
  * Created by Lakmal on 7/4/16.
@@ -14,7 +14,7 @@ public class DatabaseChangedReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        ChatMessagesFragment.msAdapter.notifyDataSetChanged();
+        ChatMessagesListFragment.msAdapter.notifyDataSetChanged();
 
     }
 }

@@ -329,6 +329,7 @@ public class FriendListFragment extends android.support.v4.app.Fragment implemen
     }
 
     /**
+    /**
      * Clear input fields and reset activity components
      */
     private void onPostShare(Senz senz) {

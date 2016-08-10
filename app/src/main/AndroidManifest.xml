@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.MAPS_RECEIVE" />
 
     <!-- To boot complete broadcast receiver -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -29,10 +30,10 @@
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-
+    <!--android:name=".application.SenzApplication"-->
     <application
-        android:name=".application.SenzApplication"
-        android:icon="@drawable/ic_launcher_yello"
+        android:name="android.support.multidex.MultiDexApplication"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name">
 
         <!-- production key -->
@@ -50,7 +51,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".ui.HomeActivity"
+            android:name=".ui.HomeActivityOld"
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
@@ -97,10 +98,45 @@
             </intent-filter>
         </receiver>
 
+        <activity
+            android:name=".ui.ChatActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme"/>
+        <activity
+            android:name=".ui.HomeActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme" />
+        <activity
+            android:name=".ui.AddUserActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+        <activity
+            android:name=".ui.SettingsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme" />
+        <activity android:name=".ui.PermissionControlListFragment" />
+        <activity android:name=".ui.UserProfileFragment" />
+        <activity android:name=".ui.RegistrationActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/MyMaterialTheme"></activity>
 
-        <activity android:name=".ui.ChatActivity"
-            android:theme="@style/Theme.AppCompat"
-            android:screenOrientation="portrait"></activity>
+        <service
+            android:name=".services.RemoteSenzService"
+            android:enabled="true"
+            >
+            <intent-filter>
+                <action android:name=".services.RemoteSenzService" />
+            </intent-filter>
+        </service>
+
+        <receiver android:name=".receivers.BootCompleteReceiver">
+            <intent-filter>
+                <action android:name="com.score.senz.senzservice" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+
     </application>
 
 </manifest>

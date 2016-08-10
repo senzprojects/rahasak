@@ -19,7 +19,7 @@
 
 <resources>
     <color name="pressed_sensor">#CCD0D0D2</color>
-    <color name="white">#FFFFFF</color>
+    <color name="white">#ffffff</color>
     <color name="lightg">#4a4a4a</color>
     <color name="blue">#5e7d9a</color>
     <color name="green">#588c73</color>
@@ -28,4 +28,20 @@
     <color name="light_gray">#515151</color>
     <color name="transparent">#00000000</color>
     <color name="senz_orange">#ffc027</color>
+    <color name="tab_highlight">#FFF</color>
+    <color name="black">#000</color>
+
+    <color name="colorPrimary">#000</color>
+    <color name="colorPrimaryDark">#125688</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="navigationBarColor">#000000</color>
+    <color name="colorAccent">#c8e8ff</color>
+    <color name="btn_color">#4fd9d7</color>
+    <color name="clouds">#e2e1e1</color>
+    <color name="light_blue_card_theme">#57cbc9</color>
+    <color name="chat_background">#232323</color>
+    <color name="my_message_background">#00c093</color>
+    <color name="not_my_message_background">#e67e22</color>
+
 </resources>

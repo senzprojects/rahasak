@@ -18,40 +18,65 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
     private static SenzorsDbHelper senzorsDbHelper;
 
     // If you change the database schema, you must increment the database version
-    private static final int DATABASE_VERSION = 21;
-    private static final String DATABASE_NAME = "Senz.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "Rahaz.db";
 
     // data types, keywords and queries
     private static final String TEXT_TYPE = " TEXT";
-    private static final String SQL_CREATE_SENZ =
-            "CREATE TABLE " + SenzorsDbContract.Senz.TABLE_NAME + " (" +
-                    SenzorsDbContract.Senz._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
-                    SenzorsDbContract.Senz.COLUMN_NAME_NAME + TEXT_TYPE + " NOT NULL" + ", " +
-                    SenzorsDbContract.Senz.COLUMN_NAME_VALUE + TEXT_TYPE + ", " +
-                    SenzorsDbContract.Senz.COLUMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
-                    "UNIQUE" + "(" + SenzorsDbContract.Senz.COLUMN_NAME_NAME + "," + SenzorsDbContract.Senz.COLUMN_NAME_USER + ")" +
-            ")";
+    private static final String INT_TYPE = " INTEGER";
+    private static final String SQL_CREATE_LOCATION =
+            "CREATE TABLE " + SenzorsDbContract.Location.TABLE_NAME + " (" +
+                    SenzorsDbContract.Location._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
+                    SenzorsDbContract.Location.COLUMN_NAME_NAME + TEXT_TYPE + " NOT NULL" + ", " +
+                    SenzorsDbContract.Location.COLUMN_NAME_VALUE + TEXT_TYPE + ", " +
+                    SenzorsDbContract.Location.COLUMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
+                    "UNIQUE" + "(" + SenzorsDbContract.Location.COLUMN_NAME_NAME + "," + SenzorsDbContract.Location.COLUMN_NAME_USER + ")" +
+                    ")";
     private static final String SQL_CREATE_USER =
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_NAME + TEXT_TYPE +","+
                     SenzorsDbContract.User.COLOMN_NAME_IMAGE + TEXT_TYPE +
-            " )";
-
-    private static final String SQL_CREATE_CHATZ =
-            "CREATE TABLE " + SenzorsDbContract.Chatz.TABLE_NAME + " (" +
-                    SenzorsDbContract.Chatz._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
-                    SenzorsDbContract.Chatz.COLUMN_NAME_MESSAGE + TEXT_TYPE +","+
-                    SenzorsDbContract.Chatz.COLUMN_NAME_OWNER + TEXT_TYPE + " NOT NULL" +
                     " )";
 
-    private static final String SQL_DELETE_SENZ =
-            "DROP TABLE IF EXISTS " + SenzorsDbContract.Senz.TABLE_NAME;
+    private static final String SQL_CREATE_SECRET =
+            "CREATE TABLE " + SenzorsDbContract.Secret.TABLE_NAME + " (" +
+                    SenzorsDbContract.Secret._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
+                    SenzorsDbContract.Secret.COLUMN_NAME_TEXT + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLOMN_NAME_IMAGE + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_NAME_SENDER + TEXT_TYPE + " NOT NULL" +
+                    SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER + TEXT_TYPE + " NOT NULL" +
+                    " )";
+
+    private static final String SQL_CREATE_PERMISSION =
+            "CREATE TABLE " + SenzorsDbContract.Permission.TABLE_NAME + " (" +
+                    SenzorsDbContract.Permission._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
+                    SenzorsDbContract.Permission.COLUMN_NAME_CAMERA + INT_TYPE +", "+
+                    SenzorsDbContract.Permission.COLUMN_NAME_LOCATION + INT_TYPE +", "+
+                    SenzorsDbContract.Permission.COLOMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
+                    "UNIQUE" + "(" + SenzorsDbContract.Location.COLUMN_NAME_USER + ")" +
+                    " )";
+
+    private static final String SQL_CREATE_PERMISSION_CONFIG =
+            "CREATE TABLE " + SenzorsDbContract.PermissionConfiguration.TABLE_NAME + " (" +
+                    SenzorsDbContract.Permission._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
+                    SenzorsDbContract.Permission.COLUMN_NAME_CAMERA + INT_TYPE +", "+
+                    SenzorsDbContract.Permission.COLUMN_NAME_LOCATION + INT_TYPE +", "+
+                    SenzorsDbContract.Permission.COLOMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
+                    "UNIQUE" + "(" + SenzorsDbContract.Location.COLUMN_NAME_USER + ")" +
+                    " )";
+
+    private static final String SQL_DELETE_LOCATION =
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.Location.TABLE_NAME;
     private static final String SQL_DELETE_USER =
             "DROP TABLE IF EXISTS " + SenzorsDbContract.User.TABLE_NAME;
     private static final String SQL_DELETE_CHATZ =
-            "DROP TABLE IF EXISTS " + SenzorsDbContract.Chatz.TABLE_NAME;
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.Secret.TABLE_NAME;
+    private static final String SQL_DELETE_PERMISSION =
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.Permission.TABLE_NAME;
+    private static final String SQL_DELETE_PERMISSION_CONFIG =
+            "DROP TABLE IF EXISTS " + SenzorsDbContract.PermissionConfiguration.TABLE_NAME;
 
     /**
      * Init context
@@ -79,13 +104,17 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
      */
     public void onCreate(SQLiteDatabase db) {
         Log.d(TAG, "OnCreate: creating db helper, db version - " + DATABASE_VERSION);
-        Log.d(TAG, SQL_CREATE_SENZ);
+        Log.d(TAG, SQL_CREATE_LOCATION);
         Log.d(TAG, SQL_CREATE_USER);
-        Log.d(TAG, SQL_CREATE_CHATZ);
+        Log.d(TAG, SQL_CREATE_SECRET);
+        Log.d(TAG, SQL_CREATE_PERMISSION);
+        Log.d(TAG, SQL_CREATE_PERMISSION_CONFIG);
 
-        db.execSQL(SQL_CREATE_SENZ);
+        db.execSQL(SQL_CREATE_LOCATION);
         db.execSQL(SQL_CREATE_USER);
-        db.execSQL(SQL_CREATE_CHATZ);
+        db.execSQL(SQL_CREATE_SECRET);
+        db.execSQL(SQL_CREATE_PERMISSION);
+        db.execSQL(SQL_CREATE_PERMISSION_CONFIG);
     }
 
     /**
@@ -106,9 +135,11 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         Log.d(TAG, "OnUpgrade: updating db helper, db version - " + DATABASE_VERSION);
-        db.execSQL(SQL_DELETE_SENZ);
+        db.execSQL(SQL_DELETE_LOCATION);
         db.execSQL(SQL_DELETE_USER);
         db.execSQL(SQL_DELETE_CHATZ);
+        db.execSQL(SQL_DELETE_PERMISSION);
+        db.execSQL(SQL_CREATE_PERMISSION_CONFIG);
 
         onCreate(db);
     }

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.score.chatz.ui.AddUserActivity"
+    android:background="@color/black">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/friend_id"
+        android:hint="@string/invite_user_id"
+        android:textColor="@color/white"
+        android:textColorHint="@color/lightg"
+        android:textSize="30sp"
+        android:singleLine="false"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:layout_alignRight="@+id/textView"
+        android:layout_alignEnd="@+id/textView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:text="@string/invite_button_text"
+        android:id="@+id/add_friend_btn"
+        android:textColor="@color/black"
+        android:background="@color/btn_color"
+        android:layout_below="@+id/friend_id"
+        android:layout_alignLeft="@+id/friend_id"
+        android:layout_alignStart="@+id/friend_id"
+        android:layout_marginTop="34dp"
+        android:layout_alignRight="@+id/friend_id"
+        android:layout_alignEnd="@+id/friend_id" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/invite_text_part_1"
+        android:id="@+id/textView"
+        android:textSize="28sp"
+        android:textColor="@color/white"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="61dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/invite_text_part_2"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:id="@+id/textView2"
+        android:layout_below="@+id/textView"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/invite_text_part_3"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:id="@+id/textView3"
+        android:layout_alignBottom="@+id/textView2"
+        android:layout_toRightOf="@+id/textView2"
+        android:layout_toEndOf="@+id/textView2"
+        android:layout_marginLeft="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/invite_text_part_4"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:id="@+id/textView4"
+        android:layout_below="@+id/textView2"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignStart="@+id/textView2" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/invite_text_part_5"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:id="@+id/textView5"
+        android:layout_alignBottom="@+id/textView4"
+        android:layout_toRightOf="@+id/textView4"
+        android:layout_toEndOf="@+id/textView4"
+        android:layout_marginLeft="5dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/invite_text_part_6"
+        android:textColor="@color/white"
+        android:textSize="22sp"
+        android:id="@+id/textView6"
+        android:layout_below="@+id/textView4"
+        android:layout_alignLeft="@+id/textView4"
+        android:layout_alignStart="@+id/textView4" />
+
+</RelativeLayout>

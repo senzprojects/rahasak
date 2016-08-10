@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.score.chatz.ui.AddUserActivity"
+    android:background="@color/black">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/registering_user_id"
+        android:hint="@string/register_user_id"
+        android:textColor="@color/white"
+        android:textColorHint="@color/lightg"
+        android:textSize="30sp"
+        android:singleLine="false"
+        android:layout_centerVertical="true"
+        android:layout_alignRight="@+id/welcome_text"
+        android:layout_alignLeft="@+id/welcome_text"
+        android:layout_below="@+id/welcome_text"
+        android:layout_marginTop="60dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="70dp"
+        android:text="@string/register_button_text"
+        android:id="@+id/register_btn"
+        android:textColor="@color/black"
+        android:background="@color/btn_color"
+        android:layout_below="@+id/registering_user_id"
+        android:layout_alignLeft="@+id/welcome_text"
+        android:layout_marginTop="34dp"
+        android:layout_alignRight="@+id/welcome_text"
+        android:layout_alignParentBottom="false" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/register_welcome_text"
+        android:id="@+id/welcome_text"
+        android:textSize="28sp"
+        android:textColor="@color/white"
+        android:layout_alignParentTop="false"
+        android:layout_marginTop="61dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentLeft="false"
+        android:layout_alignParentEnd="false"
+        android:gravity="center_horizontal" />
+
+
+</RelativeLayout>
+

@@ -8,10 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.receivers.DatabaseChangedReceiver;
 import com.score.chatz.ui.ChatFragment;
 import com.score.chatz.utils.PreferenceUtils;
-import com.score.chatz.viewholders.Message;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
@@ -57,6 +58,17 @@ public class SenzorsDbSource {
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
+
+        ContentValues permValues = new ContentValues();
+        permValues.put(SenzorsDbContract.Permission.COLOMN_NAME_USER, user.getUsername());
+        permValues.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, true);
+        permValues.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, false);
+
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
+        //db.insertOrThrow(SenzorsDbContract.Permission.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
+
+
         db.close();
     }
 
@@ -108,39 +120,78 @@ public class SenzorsDbSource {
     }
 
 
-    /**
-     * Add chatz to the database
-     *
-     * @param chatz chatz object
-     */
 
-    public void createChatz (Message message) {
-        Log.d(TAG, "AddSensor: adding senz from - " + message.getSender().getUsername());
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Chatz.COLUMN_NAME_MESSAGE, message.getText());
-        values.put(SenzorsDbContract.Chatz.COLUMN_NAME_OWNER, message.getSender().getUsername());
-
-        // Insert the new row, if fails throw an error
-        db.insertOrThrow(SenzorsDbContract.Chatz.TABLE_NAME, null, values);
-        db.close();
-        context.sendBroadcast(new Intent(DatabaseChangedReceiver.ACTION_DATABASE_CHANGED));
-    }
 
     public void updateSenz(User user, String value) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // content values to inset
         ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, value);
+        values.put(SenzorsDbContract.Location.COLUMN_NAME_VALUE, value);
 
         // update
-        db.update(SenzorsDbContract.Senz.TABLE_NAME,
+        db.update(SenzorsDbContract.Location.TABLE_NAME,
                 values,
-                SenzorsDbContract.Senz.COLUMN_NAME_USER + " = ?",
+                SenzorsDbContract.Location.COLUMN_NAME_USER + " = ?",
                 new String[]{String.valueOf(user.getId())});
+
+        db.close();
+    }
+
+    public void updatePermissions(User user, String camPerm, String locPerm) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        int _camPerm = 0;
+        int _locPerm = 0;
+        if(camPerm != null) {
+            _camPerm = camPerm.equalsIgnoreCase("true") ? 1 : 0;
+        }
+        if(locPerm != null) {
+            _locPerm = locPerm.equalsIgnoreCase("true") ? 1 : 0;
+        }
+        // content values to inset
+        ContentValues values = new ContentValues();
+        if(camPerm != null) {
+            values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, _camPerm);
+        }
+        if(locPerm != null) {
+            values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, _locPerm);
+        }
+
+        // update
+        db.update(SenzorsDbContract.Permission.TABLE_NAME,
+                values,
+                SenzorsDbContract.Permission.COLOMN_NAME_USER + " = ?",
+                new String[]{user.getUsername()});
+
+        db.close();
+    }
+
+
+    public void updateConfigurablePermissions(User user, String camPerm, String locPerm) {
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+        int _camPerm = 0;
+        int _locPerm = 0;
+        if(camPerm != null) {
+            _camPerm = camPerm.equalsIgnoreCase("true") ? 1 : 0;
+        }
+        if(locPerm != null) {
+            _locPerm = locPerm.equalsIgnoreCase("true") ? 1 : 0;
+        }
+        // content values to inset
+        ContentValues values = new ContentValues();
+        if(camPerm != null) {
+            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA, _camPerm);
+        }
+        if(locPerm != null) {
+            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_LOCATION, _locPerm);
+        }
+
+        // update
+        db.update(SenzorsDbContract.PermissionConfiguration.TABLE_NAME,
+                values,
+                SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + " = ?",
+                new String[]{user.getUsername()});
 
         db.close();
     }
@@ -157,7 +208,7 @@ public class SenzorsDbSource {
         // content values to inset
         ContentValues values = new ContentValues();
         if (senz.getAttributes().containsKey("lat")) {
-            values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "Location");
+            values.put(SenzorsDbContract.Location.COLUMN_NAME_NAME, "Location");
         } else if (senz.getAttributes().containsKey("gpio13") || senz.getAttributes().containsKey("gpio15")) {
             // store json string in db
             JSONObject jsonObject = new JSONObject();
@@ -165,17 +216,72 @@ public class SenzorsDbSource {
                 jsonObject.put("GPIO13", "OFF");
                 jsonObject.put("GPIO15", "OFF");
 
-                values.put(SenzorsDbContract.Senz.COLUMN_NAME_NAME, "GPIO");
-                values.put(SenzorsDbContract.Senz.COLUMN_NAME_VALUE, jsonObject.toString());
+                values.put(SenzorsDbContract.Location.COLUMN_NAME_NAME, "GPIO");
+                values.put(SenzorsDbContract.Location.COLUMN_NAME_VALUE, jsonObject.toString());
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
 
-        values.put(SenzorsDbContract.Senz.COLUMN_NAME_USER, senz.getSender().getId());
+        values.put(SenzorsDbContract.Location.COLUMN_NAME_USER, senz.getSender().getId());
 
         // Insert the new row, if fails throw an error
-        db.insertOrThrow(SenzorsDbContract.Senz.TABLE_NAME, SenzorsDbContract.Senz.COLUMN_NAME_NAME, values);
+        db.insertOrThrow(SenzorsDbContract.Location.TABLE_NAME, SenzorsDbContract.Location.COLUMN_NAME_NAME, values);
+        db.close();
+    }
+
+    public void createSecret (Secret secret) {
+        Log.d(TAG, "AddSecret, adding secret from - " + secret.getSender().getUsername());
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_TEXT, secret.getText());
+        values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE, secret.getImage());
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER, secret.getReceiver().getUsername());
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_SENDER, secret.getSender().getUsername());
+
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
+        db.close();
+    }
+
+
+    public void createPermissionsForUser(Senz senz){
+        Log.d(TAG, "Add New Permission: adding permission from - " + senz.getSender());
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        if (senz.getAttributes().containsKey("permCam")) {
+            values.put(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA, ((String)senz.getAttributes().get("permCam")).equalsIgnoreCase("true") ? 1 : 0);
+        }
+        if (senz.getAttributes().containsKey("permLoc")) {
+            values.put(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION, ((String)senz.getAttributes().get("permLoc")).equalsIgnoreCase("true") ? 1 : 0);
+        }
+        values.put(SenzorsDbContract.Permission.COLOMN_NAME_USER, senz.getSender().getUsername());
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.Permission.TABLE_NAME, null, values);
+        db.close();
+
+        createConfigurablePermissionsForUser(senz);
+    }
+
+    public void createConfigurablePermissionsForUser(Senz senz){
+        Log.d(TAG, "Add New Permission: adding permission from - " + senz.getSender());
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
+
+        // content values to inset
+        ContentValues values = new ContentValues();
+        if (senz.getAttributes().containsKey("permCam")) {
+            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA, ((String)senz.getAttributes().get("permCam")).equalsIgnoreCase("true") ? 1 : 0);
+        }
+        if (senz.getAttributes().containsKey("permLoc")) {
+            values.put(SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_LOCATION, ((String)senz.getAttributes().get("permLoc")).equalsIgnoreCase("true") ? 1 : 0);
+        }
+        values.put(SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER, senz.getSender().getUsername());
+        // Insert the new row, if fails throw an error
+        db.insertOrThrow(SenzorsDbContract.PermissionConfiguration.TABLE_NAME, null, values);
         db.close();
     }
 
@@ -186,29 +292,18 @@ public class SenzorsDbSource {
      *
      * @return sensor list
      */
-    public ArrayList<Message> getChatz() {
-        Log.d(TAG, "GetSensors: getting all chatz messages");
-        ArrayList<Message> chatzList = new ArrayList();
-        User currentUser;
-        try {
-            currentUser = PreferenceUtils.getUser(context);
-        } catch (NoUserException e) {
-            e.printStackTrace();
-            return chatzList;
-        }
-
+    public ArrayList<Secret> getSecretz(User sender, User receiver) {
+        Log.d(TAG, "Get Secrets: getting all secret messages");
+        ArrayList<Secret> secretList = new ArrayList();
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-
-        // join query to retrieve data
-        String query = "SELECT chatz.message, chatz.owner " +
-                "FROM chatz ";
-        Cursor cursor = db.rawQuery(query, null);
-
-        // sensor/user attributes
-        String _chatzId;
-        String _chatzMessage;
-        String _chatzOwner;
-        String _chatzUsername;
+        String query = "SELECT secret.text, secret.image, secret.sender, secret.receiver " +
+                "FROM secret WHERE secret.sender = ? AND secret.receiver = ?";
+        Cursor cursor = db.rawQuery(query,  new String[] { sender.getUsername(), receiver.getUsername()});
+        // secret attr
+        String _secretText;
+        String _secretImage;
+        String _secretSender;
+        String _secretReceiver;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -216,37 +311,24 @@ public class SenzorsDbSource {
 
             // get chatz attributes
             //_chatzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz._ID));
-            _chatzMessage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz.COLUMN_NAME_MESSAGE));
-            _chatzOwner = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz.COLUMN_NAME_OWNER));
+            _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
+            _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
+            _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
+            _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
 
-            // get user attributes
-            //_chatzUsername = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            // create secret
+            Secret secret = new Secret(_secretText, _secretImage, sender, receiver);
 
-            /*chatzAttributes.put(_chatzMessage, _chatzOwner);
-
-            // create senz
-            Senz chatz = new Senz();
-            chatz.setId(_chatzId);
-            chatz.setAttributes(chatzAttributes);
-            chatz.setSender(new User(_chatzOwner, _chatzUsername));*/
-            Log.d(TAG, "currentUSER id : " + currentUser.getUsername());
-            //Log.d(TAG, "currentUSER id : " + _chatzUsername);
-
-            boolean isMine = currentUser.getUsername().equalsIgnoreCase(_chatzOwner);
-            Message message = new Message(_chatzMessage, new User(_chatzOwner, _chatzOwner), isMine);
-
-
-
-            // fill senz list
-            chatzList.add(message);
+            // fill secret list
+            secretList.add(secret);
         }
 
         // clean
         cursor.close();
         db.close();
 
-        Log.d(TAG, "GetChatz: chatz count " + chatzList.size());
-        return chatzList;
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
     }
 
     /**
@@ -281,9 +363,9 @@ public class SenzorsDbSource {
             HashMap<String, String> senzAttributes = new HashMap<>();
 
             // get senz attributes
-            _senzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz._ID));
-            _senzName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_NAME));
-            _senzValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Senz.COLUMN_NAME_VALUE));
+            _senzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Location._ID));
+            _senzName = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Location.COLUMN_NAME_NAME));
+            _senzValue = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Location.COLUMN_NAME_VALUE));
 
             // get user attributes
             _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
@@ -308,6 +390,99 @@ public class SenzorsDbSource {
         Log.d(TAG, "GetSensors: sensor count " + sensorList.size());
         return sensorList;
     }
+
+
+
+
+
+    public List<UserPermission> getUsersAndTheirPermissions() {
+        Log.d(TAG, "GetSensors: getting all sensor");
+        List<UserPermission> permissionList = new ArrayList();
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+
+        // join query to retrieve data
+        String query = "SELECT user._id, user.username, permission.location, permission.camera " +
+                "FROM user " +
+                "INNER JOIN permission " +
+                "ON user.username = permission.user";
+        Cursor cursor = db.rawQuery(query, null);
+
+        // sensor/user attributes
+        String _username;
+        boolean _location;
+        boolean _camera;
+        String _userId;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            // get permission attributes
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false ;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA))== 1 ? true : false ;
+            // get user attributes
+            _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+
+            // create senz
+            User user = new User(_userId, _username);
+            UserPermission userPerm = new UserPermission(user, _camera, _location);
+            // fill senz list
+            permissionList.add(userPerm);
+        }
+        // clean
+        cursor.close();
+        db.close();
+
+        Log.d(TAG, "GetSensors: sensor count " + permissionList.size());
+        return permissionList;
+    }
+
+
+    public List<UserPermission> getUsersAndTheirConfigurablePermissions() {
+        Log.d(TAG, "GetSensors: getting all sensor");
+        List<UserPermission> permissionList = new ArrayList();
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+
+        // join query to retrieve data
+        String query = "SELECT user._id, user.username, permission_config.location, permission_config.camera " +
+                "FROM user " +
+                "INNER JOIN permission_config " +
+                "ON user.username = permission_config.user";
+        Cursor cursor = db.rawQuery(query, null);
+
+        // sensor/user attributes
+        String _username;
+        boolean _location;
+        boolean _camera;
+        String _userId;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            // get permission attributes
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false ;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA))== 1 ? true : false ;
+            // get user attributes
+            _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
+            _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+
+            // create senz
+            User user = new User(_userId, _username);
+            UserPermission userPerm = new UserPermission(user, _camera, _location);
+            // fill senz list
+            permissionList.add(userPerm);
+        }
+        // clean
+        cursor.close();
+        db.close();
+
+        Log.d(TAG, "GetSensors: sensor count " + permissionList.size());
+        return permissionList;
+    }
+
+
+
+
 
     public List<User> readAllUsers() {
         Log.d(TAG, "GetSensors: getting all sensor");
@@ -363,9 +538,9 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
         // delete senz of given user
-        db.delete(SenzorsDbContract.Senz.TABLE_NAME,
-                SenzorsDbContract.Senz.COLUMN_NAME_USER + "=?" + " AND " +
-                        SenzorsDbContract.Senz.COLUMN_NAME_NAME + "=?",
+        db.delete(SenzorsDbContract.Location.TABLE_NAME,
+                SenzorsDbContract.Location.COLUMN_NAME_USER + "=?" + " AND " +
+                        SenzorsDbContract.Location.COLUMN_NAME_NAME + "=?",
                 new String[]{senz.getSender().getId(), senz.getAttributes().keySet().iterator().next()});
         db.close();
     }

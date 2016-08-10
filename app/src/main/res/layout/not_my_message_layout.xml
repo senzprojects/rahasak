@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+    android:gravity="right">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginBottom="15dp"
+        android:layout_marginLeft="15dp"
+        android:layout_alignParentRight="false"
+        android:gravity="right"
+        android:layout_alignParentStart="false">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/message_container"
+            android:padding="20dp"
+            android:background="@drawable/not_my_message_background"
+            android:layout_alignParentEnd="true">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="l"
+            android:textColor="@color/black"
+            android:id="@+id/message"
+            android:textSize="15dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lakmal Caldera"
+            android:id="@+id/sender"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentBottom="false"
+            android:textColor="@color/black"
+            android:layout_below="@+id/message"
+            android:textStyle="italic"
+            android:textSize="12dp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/message_container"
+            android:layout_alignParentEnd="true"
+            android:layout_alignLeft="@+id/message_container"
+            android:layout_alignStart="@+id/message_container"
+            android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/seen"
+            android:id="@+id/see_icon"
+            android:contentDescription="@string/see_icon" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/chat_seen"
+            android:layout_toRightOf="@+id/see_icon"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+</RelativeLayout>

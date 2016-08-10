@@ -129,7 +129,7 @@ public class SenzParser {
                 "#msg UserCreated " +
                 "#pubkey sd23453451234sfsdfd==  " +
                 "#time 1441806897.71 " +
-                "^mysensors " +
+                "^senzswitch " +
                 "v50I88VzgvBvubCjGitTMO9";
 
         parse(senzMessage3);

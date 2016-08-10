@@ -8,7 +8,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.score.chatz.R;
-import com.score.chatz.viewholders.Message;
+import com.score.chatz.pojo.Secret;
+
 
 /**
  * Created by Lakmal on 7/2/16.
@@ -22,14 +23,13 @@ public class ChatMessageViewHolder extends RecyclerView.ViewHolder{
     public ChatMessageViewHolder(View itemView) {
         super(itemView);
 
-        this.messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
-        this._message = (TextView) itemView.findViewById(R.id.message);
-        this._sender = (TextView) itemView.findViewById(R.id.sender);
+        //this.messageContainer = (LinearLayout) itemView.findViewById(R.id.message_container);
+        //this._message = (TextView) itemView.findViewById(R.id.message);
+        //this._sender = (TextView) itemView.findViewById(R.id.sender);
 
     }
 
-    public void updateUI(Message message){
-
+    /*public void updateUI(Secret message){
         String bgImage = message.getBackgroundImage();
         int resource = messageContainer.getResources().getIdentifier(bgImage, null, messageContainer.getContext().getPackageName());
         Drawable image = messageContainer.getResources().getDrawable(resource);
@@ -48,8 +48,5 @@ public class ChatMessageViewHolder extends RecyclerView.ViewHolder{
             params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
         }
         messageContainer.setLayoutParams(params);
-
-
-
-    }
+    }*/
 }

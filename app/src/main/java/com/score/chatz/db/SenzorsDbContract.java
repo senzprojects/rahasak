@@ -12,18 +12,38 @@ public class SenzorsDbContract {
     public SenzorsDbContract() {}
 
     /* Inner class that defines sensor table contents */
-    public static abstract class Senz implements BaseColumns {
-        public static final String TABLE_NAME = "senz";
+    public static abstract class Location implements BaseColumns {
+        public static final String TABLE_NAME = "location";
         public static final String COLUMN_NAME_NAME = "name";
         public static final String COLUMN_NAME_VALUE = "value";
         public static final String COLUMN_NAME_USER = "user";
     }
 
-    /* Inner class that defines sensor table contents */
-    public static abstract class Chatz implements BaseColumns {
-        public static final String TABLE_NAME = "chatz";
-        public static final String COLUMN_NAME_MESSAGE = "message";
-        public static final String COLUMN_NAME_OWNER = "owner";
+    /* Inner class that defines secret table */
+    public static abstract class Secret implements BaseColumns {
+        public static final String TABLE_NAME = "secret";
+        public static final String COLUMN_NAME_TEXT = "text";
+        public static final String COLOMN_NAME_IMAGE = "image";
+        public static final String COLUMN_NAME_SENDER = "sender";
+        public static final String COLUMN_NAME_RECEIVER = "receiver";
+    }
+
+    /* Inner class that defines permission control for the user
+     * Add more permissions here in the future */
+    public static abstract class Permission implements BaseColumns {
+        public static final String TABLE_NAME = "permission";
+        public static final String COLUMN_NAME_LOCATION = "location";
+        public static final String COLUMN_NAME_CAMERA = "camera";
+        public static final String COLOMN_NAME_USER = "user";
+    }
+
+    /* Inner class that defines permission control for the user
+     * Add more permissions here in the future */
+    public static abstract class PermissionConfiguration implements BaseColumns {
+        public static final String TABLE_NAME = "permission_config";
+        public static final String COLUMN_NAME_LOCATION = "location";
+        public static final String COLUMN_NAME_CAMERA = "camera";
+        public static final String COLOMN_NAME_USER = "user";
     }
 
     /* Inner class that defines the user table contents */

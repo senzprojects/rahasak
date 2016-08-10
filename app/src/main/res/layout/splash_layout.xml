@@ -1,39 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:background="#000"
+android:orientation="vertical">
 
 <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_height="fill_parent"
-        android:layout_width="fill_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:background="@drawable/freee">
+    android:layout_width="wrap_content"
+    android:layout_height="0dp"
+    android:layout_weight="7"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="20"
+        android:paddingTop="30dp"
+        android:layout_gravity="center"
+        android:src="@drawable/splash_page_icon"/>
 
     <TextView
-            android:layout_marginTop="12dp"
-            android:id="@+id/splash_text"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
-            android:text="#"
-            android:gravity="center"
-            android:layout_gravity="center_horizontal"
-            android:textSize="58sp"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/circle_shape_gray">
-    </TextView>
-
-    <!--<TextView-->
-            <!--android:layout_marginTop="12dp"-->
-            <!--android:id="@+id/splash_text"-->
-            <!--android:layout_width="fill_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:text="#SenZors"-->
-            <!--android:gravity="center"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:textSize="58sp"-->
-            <!--android:textColor="#FFFFFF">-->
-    <!--</TextView>-->
-
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:textColor = "#FFF"
+        android:fontFamily="batang"
+        android:id="@+id/logoHint"
+        android:textAlignment="center"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/splash_secrets" />
 </LinearLayout>
+
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/rahasak_person_icon"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="10dp" />
+</LinearLayout>
+
+
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:gravity="center">
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor = "#FFF"
+        android:fontFamily="Helvetica"
+        android:text="@string/splash_powered_by"
+        android:textSize="10dp"
+        android:id="@+id/poweredText"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/senz_icon"
+        android:layout_alignBottom="@+id/senz_icon"
+        android:paddingRight="5dp"/>
+
+
+    <ImageView
+        android:layout_width="14dp"
+        android:layout_height="20dp"
+        android:id="@+id/senz_icon"
+        android:src="@drawable/splash_senz_icon"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:cropToPadding="false"
+        android:paddingTop="7dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/senz_icon"
+        android:paddingLeft="5dp"
+        android:textColor = "#FFF"
+        android:textSize="10dp"
+        android:fontFamily="Helvetica"
+        android:text="@string/splash_senz_platform"
+        android:id="@+id/senzPlatform"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/senz_icon"
+        android:focusableInTouchMode="false" />
+</RelativeLayout>
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:progressTint="@color/white"
+        android:layout_gravity="bottom" />
+</LinearLayout>
+
 
 
 

@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import com.score.chatz.R;
+import com.score.chatz.pojo.Secret;
 import com.score.chatz.viewholders.Message;
 
 import java.util.ArrayList;
@@ -14,15 +15,15 @@ import java.util.ArrayList;
  */
 public class ChatMessagesAdapter  extends RecyclerView.Adapter<ChatMessageViewHolder> {
 
-    private ArrayList<Message> messages;
+    private ArrayList<Secret> messages;
 
-    public ChatMessagesAdapter(ArrayList<Message> messages) {
+    public ChatMessagesAdapter(ArrayList<Secret> messages) {
         this.messages = messages;
     }
 
     @Override
     public void onBindViewHolder(ChatMessageViewHolder holder, int position) {
-        Message message = messages.get(position);
+        Secret message = messages.get(position);
         holder.updateUI(message);
     }
 
@@ -35,7 +36,7 @@ public class ChatMessagesAdapter  extends RecyclerView.Adapter<ChatMessageViewHo
     @Override
     public ChatMessageViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View message = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_layout, parent, false);
+        View message = LayoutInflater.from(parent.getContext()).inflate(R.layout.not_my_message_layout, parent, false);
         return new ChatMessageViewHolder(message);
     }
 
