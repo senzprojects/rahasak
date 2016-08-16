@@ -34,4 +34,12 @@ public class Secret {
         return image;
     }
 
+    @Override
+    public String toString() {
+        return ("Secret Text:"+this.getText()+
+                " Secret Sender: "+ this.getSender().getUsername() +
+                " Secret Receiver: "+ this.getReceiver().getUsername() +
+                " Secret Image : " + this.getImage());
+    }
+
 }

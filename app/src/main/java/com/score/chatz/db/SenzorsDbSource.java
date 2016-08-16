@@ -233,7 +233,7 @@ public class SenzorsDbSource {
     public void createSecret (Secret secret) {
         Log.d(TAG, "AddSecret, adding secret from - " + secret.getSender().getUsername());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
-
+        Log.i("SECRET", "Secret created: text - " + secret.getText() + ", sender - " + secret.getSender().getUsername() + ", receiver - " + secret.getReceiver().getUsername());
         // content values to inset
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_TEXT, secret.getText());
@@ -293,12 +293,12 @@ public class SenzorsDbSource {
      * @return sensor list
      */
     public ArrayList<Secret> getSecretz(User sender, User receiver) {
-        Log.d(TAG, "Get Secrets: getting all secret messages");
+        Log.i(TAG, "Get Secrets: getting all secret messages, sender - " + sender.getUsername() + ", receiver - " + receiver.getUsername());
         ArrayList<Secret> secretList = new ArrayList();
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT secret.text, secret.image, secret.sender, secret.receiver " +
-                "FROM secret WHERE secret.sender = ? AND secret.receiver = ?";
-        Cursor cursor = db.rawQuery(query,  new String[] { sender.getUsername(), receiver.getUsername()});
+        String query = "SELECT _id, text, image, sender, receiver " +
+                "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id DESC";
+        Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
         // secret attr
         String _secretText;
         String _secretImage;
@@ -317,7 +317,7 @@ public class SenzorsDbSource {
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
 
             // create secret
-            Secret secret = new Secret(_secretText, _secretImage, sender, receiver);
+            Secret secret = new Secret(_secretText, _secretImage, new User("", _secretSender), new User("", _secretReceiver));
 
             // fill secret list
             secretList.add(secret);
@@ -392,11 +392,45 @@ public class SenzorsDbSource {
     }
 
 
+    public UserPermission getUserPermission(User user){
+        Log.d(TAG, "GetPermission: get single permission");
+        UserPermission userPerm = null;
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+
+        // join query to retrieve data
+        String query = "SELECT permission.location, permission.camera " +
+                "FROM permission " +
+                "WHERE permission.user = ?";
+        Cursor cursor = db.rawQuery(query,  new String[] {user.getUsername()});
+
+        // user attributes
+        String _username;
+        boolean _location;
+        boolean _camera;
+        String _userId;
+
+        // extract attributes
+        if (cursor.moveToFirst()) {
+            // get permission attributes
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false ;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA))== 1 ? true : false ;
+            // create senz
+            userPerm = new UserPermission(user, _camera, _location);
+            // fill senz list
+        }
+        // clean
+        cursor.close();
+        db.close();
+
+        return userPerm;
+    }
+
 
 
 
     public List<UserPermission> getUsersAndTheirPermissions() {
-        Log.d(TAG, "GetSensors: getting all sensor");
+        Log.d(TAG, "GetPermission: getting all permissions");
         List<UserPermission> permissionList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
@@ -516,7 +550,7 @@ public class SenzorsDbSource {
     /**
      * Delete chatz from database,
      *
-     * @param chatz chatz
+     * @param
      */
     public void deleteChatz(Senz senz) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();

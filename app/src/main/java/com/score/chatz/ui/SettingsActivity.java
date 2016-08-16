@@ -75,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         //displaying custom ActionBar
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.settings_action_bar, null));
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);

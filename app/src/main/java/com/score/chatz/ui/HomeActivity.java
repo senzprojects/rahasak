@@ -42,7 +42,6 @@ public class HomeActivity extends AppCompatActivity {
 
         //displaying custom ActionBar
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.home_action_bar, null));
-        //getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
 
         viewPager = (ViewPager) findViewById(R.id.pager);

@@ -50,6 +50,7 @@ import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
@@ -75,6 +76,7 @@ import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Remote service which handles UDP related functions
@@ -84,11 +86,6 @@ import java.util.HashMap;
 public class RemoteSenzService extends Service implements ShareSenzListener {
 
     private static final String TAG = RemoteSenzService.class.getName();
-
-    // senz service host and port
-    private static final String SENZ_HOST = "52.5.201.100";
-    private static final int SENZ_PORT = 7070;
-    PrintWriter out;
 
     // we are listing for UDP socket
     //private DatagramSocket socket;
@@ -102,15 +99,14 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo netInfo = cm.getActiveNetworkInfo();
-
-            Log.d(TAG, "Network status changed");
-
             //should check null because in air plan mode it will be null
-            if (netInfo != null && netInfo.isConnected()) {
+            if (NetworkUtil.isAvailableNetwork(getApplicationContext())) {
                 // send ping from here
-                sendPingMessage();
+                Log.d(TAG, "Network status changed: AVAILABLE");
+                reinitiateTCP();
+            }else{
+
+                Log.d(TAG, "Network status changed: NOT AVAILABLE");
             }
         }
     };
@@ -138,6 +134,11 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         public void send(Senz senz) throws RemoteException {
             Log.d(TAG, "Senz service call with senz " + senz.getId());
             sendSenzMessage(senz);
+        }
+
+        @Override
+        public void sendInOrder(List<Senz> senzList) throws RemoteException {
+            sendSenz(senzList);
         }
     };
 
@@ -177,9 +178,12 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         //initPingSender();
         //initUdpListener();
         //initTCPConnection();
-        if(conn == null) {
-            conn = new ConnectTask();
-            conn.execute("");
+        if(NetworkUtil.isAvailableNetwork(getApplicationContext())) {
+            if (conn == null || mTcpClient == null) {
+                reinitiateTCP();
+            }
+        }else{
+            Toast.makeText(getApplicationContext(), "No network connection available", Toast.LENGTH_LONG).show();
         }
 
 
@@ -242,71 +246,24 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
 
 
     /**
-     * Start thread for listen to UDP socket, all the incoming messages receives from
-     * here, when message receives it should be broadcast or delegate to appropriate message
-     * handler
-     */
-    private void initTCPConnection() {
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    if (socket == null || socket.isClosed()) {
-                        socket = new Socket(InetAddress.getByName(SENZ_HOST), SENZ_PORT);
-                    } else {
-                        Log.e(TAG, "Socket already initialized");
-                    }
-                    out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
-                    //sendPingMessage();
-                    while (true) {
-                        BufferedReader inFromClient = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                        String senz = inFromClient.readLine();
-                        if(senz != null) {
-                            Log.d(TAG, "SenZ received: " + senz);
-                            SenzHandler.getInstance(getApplicationContext()).handleSenz(senz);
-                            inFromClient.close();
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    out.close();
-                }
-                out.close();
-            }
-        }).start();
-    }
-
-
-    /**
      * Send ping message to server
      */
     private void sendPingMessage() {
         new Thread(new Runnable() {
             public void run() {
                 if (NetworkUtil.isAvailableNetwork(RemoteSenzService.this)) {
+
+
                     try {
-                        /*String message;
-                        PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
-                        User user = PreferenceUtils.getUser(RemoteSenzService.this);
-
-                        // create senz attributes
-                        HashMap<String, String> senzAttributes = new HashMap<>();
-                        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-
-                        // new senz object
-                        Senz senz = new Senz();
-                        senz.setSenzType(SenzTypeEnum.PING);
-                        senz.setSender(new User("", user.getUsername()));
-                        senz.setReceiver(new User("", "senzswitch"));
-                        senz.setAttributes(senzAttributes);
-
-                        // get digital signature of the senz
-                        String senzPayload = SenzParser.getSenzPayload(senz);
-                        String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
-                        message = SenzParser.getSenzMessage(senzPayload, senzSignature);*/
+                        PreferenceUtils.getUser(getApplicationContext());
+                    }catch (NoUserException e){
+                        e.printStackTrace();
+                        Log.e(TAG, "Cannot send ping, No Registered User");
+                        return;
+                    }
 
 
-
-                        // first create create senz
+                    try {
                         String message;
                         PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
                         User user = PreferenceUtils.getUser(RemoteSenzService.this);
@@ -331,9 +288,10 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                         Log.d(TAG, "Ping(#SHARE) to be send: " + message);
 
                         //sends the message to the server
-                        if (mTcpClient != null) {
-                            mTcpClient.sendMessage(message);
+                        if (mTcpClient == null) {
+                            reinitiateTCP();
                         }
+                        mTcpClient.sendMessage(message);
                     } catch ( NoSuchAlgorithmException | NoUserException | SignatureException | InvalidKeyException | InvalidKeySpecException e) {
                         e.printStackTrace();
                     }
@@ -345,6 +303,17 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     }
 
 
+    private void reinitiateTCP(){
+        if (NetworkUtil.isAvailableNetwork(getApplicationContext())) {
+            if (mTcpClient != null)
+                mTcpClient.closeSocketAndClean();
+
+
+            conn = new ConnectTask();
+            conn.execute("");
+        }
+
+    }
 
 
     /**
@@ -372,18 +341,58 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                         String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
                         String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
                         Log.d(TAG, "Senz to be send: " + message);
-                        // send message
-                        /*if (out != null && !out.checkError()) {
-                            out.println(message);
-                            out.flush();
-                        }*/
+
 
                         //sends the message to the server
-                        if (mTcpClient != null) {
-                            mTcpClient.sendMessage(message);
+                        if (mTcpClient == null) {
+                            reinitiateTCP();
                         }
+                        mTcpClient.sendMessage(message);
+
 
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        } else {
+            Log.e(TAG, "Cannot send senz, No connection available");
+        }
+    }
+
+
+    public void sendSenz(final List<Senz> senzList) {
+        if (NetworkUtil.isAvailableNetwork(RemoteSenzService.this)) {
+            new Thread(new Runnable() {
+                public void run() {
+                    try {
+
+                        PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
+
+
+                        for(Senz senz : senzList) {
+
+                            // if sender not already set find user(sender) and set it to senz first
+                            if (senz.getSender() == null || senz.getSender().toString().isEmpty())
+                                senz.setSender(PreferenceUtils.getUser(getBaseContext()));
+
+                            // get digital signature of the senz
+                            String senzPayload = SenzParser.getSenzPayload(senz);
+                            String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                            String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
+                            Log.d(TAG, "Senz to be send: " + message);
+
+
+                            //sends the message to the server
+                            if (mTcpClient == null) {
+                                reinitiateTCP();
+                            }
+                            mTcpClient.sendMessage(message);
+                            Thread.sleep(2000);
+                        }
+
+
+                    } catch (InterruptedException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
                         e.printStackTrace();
                     }
                 }
@@ -400,12 +409,10 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
 
 
 
-
-
-
     private TCPClient mTcpClient;
     private ConnectTask conn;
     public class ConnectTask extends AsyncTask<String,String,TCPClient> {
+
 
         @Override
         protected TCPClient doInBackground(String... message) {
@@ -415,8 +422,6 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                 @Override
                 //here the messageReceived method is implemented
                 public void onMessageReceived(String senz) {
-                    //this method calls the onProgressUpdate
-                    //publishProgress(message);
                     Log.e(TAG, "Message from TCP " + senz);
                     SenzHandler.getInstance(getApplicationContext()).handleSenz(senz);
                 }
@@ -424,18 +429,13 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                 @Override
                 //here the messageReceived method is implemented
                 public void onConnectionDropped() {
-                    //this method calls the onProgressUpdate
-                    //publishProgress(message);
-                    Log.e(TAG, "Sending PING TO reinitiate TCP connection");
-                    sendPingMessage();
+                    Log.e(TAG, "Connection Dropped. Re-initiating socket.");
+                    reinitiateTCP();
                 }
 
                 @Override
                 //here the messageReceived method is implemented
                 public void onConnectionEstablished() {
-                    //this method calls the onProgressUpdate
-                    //publishProgress(message);
-                    Log.e(TAG, "Sending PING TO reinitiate TCP connection");
                     sendPingMessage();
                 }
 
@@ -443,19 +443,10 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
             });
             mTcpClient.run();
 
+
             return null;
         }
 
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-
-            /*//in the arrayList we add the messaged received from server
-            arrayList.add(values[0]);
-            // notify the adapter that the data set has changed. This means that new message received
-            // from server was added to the list
-            mAdapter.notifyDataSetChanged();*/
-        }
     }
 
 

@@ -9,12 +9,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Editable;
 import android.text.Html;
+import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,20 +31,26 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
+import com.score.chatz.exceptions.InvalidInputFieldsException;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.services.LocationAddressReceiver;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,12 +71,16 @@ public class ChatFragment extends Fragment {
     private EditText text_message;
     private ImageButton sendBtn;
     private ImageButton getLocBtn;
+    private ImageButton getCamBtn;
+
     SenzorsDbSource dbSource;
     User currentUser;
     private ListView listView;
     // custom font
     private Typeface typeface;
     boolean isServiceBound = false;
+    private ArrayList<Secret> secretMessageList;
+    private ChatFragmentListAdapter adapter;
 
     // service interface
     private ISenzService senzService = null;
@@ -102,7 +116,7 @@ public class ChatFragment extends Fragment {
         ChatFragment fragment = new ChatFragment();
         Bundle args = new Bundle();
         args.putString(RECEIVER, receiver.getUsername());
-        args.putString(SENDER, receiver.getUsername());
+        args.putString(SENDER, sender.getUsername());
         fragment.setArguments(args);
         return fragment;
     }
@@ -122,9 +136,14 @@ public class ChatFragment extends Fragment {
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.chatz_menu, menu);
+        //inflater.inflate(R.menu.chatz_menu, menu);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        displayMessagesList();
+    }
 
     @Override
     public void onStart() {
@@ -133,12 +152,13 @@ public class ChatFragment extends Fragment {
         // bind to senz service
         if (!isServiceBound) {
             Intent intent = new Intent();
-            intent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
+            intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
             getActivity().bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             isServiceBound = true;
         }
 
-        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("com.score.senz.DATA_SENZ"));
+        getActivity().registerReceiver(senzMessageReceiver, new IntentFilter("com.score.chatz.DATA_SENZ"));
+        getActivity().registerReceiver(updateReceiver, new IntentFilter("com.score.chatz.USER_UPDATE"));
     }
 
     @Override
@@ -152,6 +172,7 @@ public class ChatFragment extends Fragment {
         }
 
         getActivity().unregisterReceiver(senzMessageReceiver);
+        getActivity().unregisterReceiver(updateReceiver);
     }
 
     @Override
@@ -159,14 +180,21 @@ public class ChatFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         FragmentManager fm = getActivity().getSupportFragmentManager();
-        ChatMessagesListFragment chatMessagesListFragment = ChatMessagesListFragment.newInstance(sender, receiver);
-        fm.beginTransaction().add(R.id.text_messages_container, chatMessagesListFragment).commit();
+        //ChatMessagesListFragment chatMessagesListFragment = ChatMessagesListFragment.newInstance(sender, receiver);
+        //fm.beginTransaction().add(R.id.text_messages_container, chatMessagesListFragment).commit();
 
         dbSource = new SenzorsDbSource(getContext());
         text_message = (EditText) view.findViewById(R.id.text_message);
+
         sendBtn = (ImageButton) view.findViewById(R.id.sendBtn);
+        getCamBtn = (ImageButton) view.findViewById(R.id.getCamBtn);
+        getLocBtn = (ImageButton) view.findViewById(R.id.getLocBtn);
+
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
         listView = (ListView) view.findViewById(R.id.messages_list_view);
+
+
+
 
         try {
             currentUser = PreferenceUtils.getUser(getContext());
@@ -177,18 +205,67 @@ public class ChatFragment extends Fragment {
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(text_message.getText().length() != 0)
                 sendMessage();
             }
         });
 
-        sendBtn.setOnClickListener(new View.OnClickListener() {
+        getLocBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //getSenz();
+                if(getLocBtn.isEnabled())
+                    getSenz(new User("", sender));
             }
         });
 
+        getCamBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(getCamBtn.isEnabled())
+                    getPhoto(new User("", sender));
+            }
+        });
+
+        updateMainBtnUi();
+
+
+        /*text_message.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(text_message.length() == 0) {
+                    text_message.setText("");
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });*/
+
+
         return view;
+    }
+
+    private void displayMessagesList() {
+        // get User from db
+        secretMessageList = dbSource.getSecretz(new User("", sender), new User("", receiver));
+
+        // construct list adapter
+        if (secretMessageList.size() > 0) {
+            adapter = new ChatFragmentListAdapter(getContext(), secretMessageList);
+            listView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        } else {
+            adapter = new ChatFragmentListAdapter(getContext(), secretMessageList);
+            listView.setAdapter(adapter);
+            //sensorListView.setEmptyView(emptyView);
+        }
     }
 
     private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
@@ -198,6 +275,21 @@ public class ChatFragment extends Fragment {
             handleMessage(intent);
         }
     };
+
+    private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got new user from Senz service");
+            update();
+        }
+    };
+
+
+    private void update(){
+        displayMessagesList();
+        updateMainBtnUi();
+    }
+
 
 
 
@@ -216,13 +308,13 @@ public class ChatFragment extends Fragment {
             String id = "_ID";
             String signature = "_SIGNATURE";
             SenzTypeEnum senzType = SenzTypeEnum.DATA;
-            User _receiver = new User("", receiver.trim());
-            Senz senz = new Senz(id, signature, senzType, null, _receiver, senzAttributes);
+            User _sender = new User("", sender.trim());
+            Senz senz = new Senz(id, signature, senzType, null, _sender, senzAttributes);
 
             senzService.send(senz);
         } catch (RemoteException e) {
             e.printStackTrace();
-        }
+       }
     }
 
 
@@ -237,6 +329,7 @@ public class ChatFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
     }
 
 
@@ -249,47 +342,49 @@ public class ChatFragment extends Fragment {
     private void handleMessage(Intent intent) {
         String action = intent.getAction();
 
-        if (action.equalsIgnoreCase("com.score.senz.DATA_SENZ")) {
+        if (action.equalsIgnoreCase("com.score.chatz.DATA_SENZ")) {
             Senz senz = intent.getExtras().getParcelable("SENZ");
 
             if (senz.getAttributes().containsKey("msg")) {
-
-                    String msg = senz.getAttributes().get("msg");
-                    if (msg != null && msg.equalsIgnoreCase("MsgSent")) {
-                        // save senz in db
-                        Log.d(TAG, "save sent chatz");
-                        Secret newSecret = new Secret(text_message.getText().toString(), null, senz.getSender(), new User("", receiver));
-                        dbSource.createSecret(newSecret);
-                        ChatMessagesListFragment.addMessage(newSecret);
-                        text_message.setText("");
-                    } else {
-                        String message = "<font color=#000000>Seems we couldn't share the chatz with </font> <font color=#eada00>" + "<b>" + receiver + "</b>" + "</font>";
-                        displayInformationMessageDialog("#Share Fail", message);
-                    }
-
-            }else if (senz.getAttributes().containsKey("chatzmsg")) {
-                    Log.d(TAG, "save incoming chatz");
-                    String msg = senz.getAttributes().get("chatzmsg");
-                    Secret newSecret = new Secret(msg, null, senz.getSender(), new User("", receiver));
+                String msg = senz.getAttributes().get("msg");
+                if (msg != null && msg.equalsIgnoreCase("MsgSent")) {
+                    // save senz in db
+                    Log.d(TAG, "save sent chatz");
+                    Log.d(TAG, "reeiver: " + receiver + ", " + "senz.getSender() : " + senz.getSender().getUsername());
+                    /*
+                     *  senz.getSender - you who are sending the message
+                     *  receiver - other person
+                     *
+                     */
+                    Secret newSecret = new Secret(text_message.getText().toString(), null,new User("", receiver), senz.getSender());
+                    SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
                     dbSource.createSecret(newSecret);
-                    ChatMessagesListFragment.addMessage(newSecret);
-
-                    try {
-                        // create senz attributes
-                        HashMap<String, String> senzAttributes = new HashMap<>();
-                        senzAttributes.put("msg", "MsgSent");
-                        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-
-                        // new senz
-                        String id = "_ID";
-                        String signature = "_SIGNATURE";
-                        SenzTypeEnum senzType = SenzTypeEnum.DATA;
-                        Senz _senz = new Senz(id, signature, senzType, null, senz.getSender(), senzAttributes);
-
-                        senzService.send(_senz);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+                    text_message.setText("");
+                    displayMessagesList();
+                } else if(msg != null && msg.equalsIgnoreCase("MsgSentFail")) {
+                    Toast.makeText(getActivity(), "User seems to be offline.", Toast.LENGTH_SHORT).show();
+                }
+            } else if(senz.getAttributes().containsKey("chatzphoto")){
+                    // save senz in db
+                    Log.d(TAG, "save sent PHOTO");
+                    //Log.d(TAG, "reeiver: " + receiver + ", " + "senz.getSender() : " + senz.getSender().getUsername() + ", PHOT) : " + senz.getAttributes().get("chatzphoto"));
+                    /*
+                     *  senz.getSender - you who are sending the message
+                     *  receiver - other person
+                     *
+                     */
+                Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"),new User("", receiver), senz.getSender());
+                SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
+                dbSource.createSecret(newSecret);
+                displayMessagesList();
+                /*ImageView image = (ImageView)findViewById(R.id.ImageView);
+                Bitmap imgBitmap=BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);
+                image.setImageBitmap(imgBitmap);
+                    Secret newSecret = new Secret(null, ,new User("", receiver), senz.getSender());
+                    SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
+                    dbSource.createSecret(newSecret);
+                    text_message.setText("");
+                    displayMessagesList();*/
 
             }else if (senz.getAttributes().containsKey("lat")) {
                 // location response received
@@ -371,6 +466,49 @@ public class ChatFragment extends Fragment {
             senzService.send(senz);
         } catch (RemoteException e) {
             e.printStackTrace();
+        }
+    }
+
+
+    /*
+     * Get photo of user
+     */
+    private void getPhoto(User receiver){
+        try {
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("chatzphoto", "chatzphoto");
+
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.GET;
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+            senzService.send(senz);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateMainBtnUi(){
+        Log.i(TAG, "Getting permission of user - " + sender);
+        UserPermission userPerm = dbSource.getUserPermission(new User("", sender));
+        if(userPerm.getCamPerm() == true){
+            getCamBtn.setBackgroundResource(R.drawable.chat_message_btn);
+            getCamBtn.setEnabled(true);
+        }else{
+            getCamBtn.setBackgroundResource(R.drawable.chat_message_btn_disabled);
+            getCamBtn.setEnabled(false);
+        }
+
+        if(userPerm.getLocPerm() == true){
+            getLocBtn.setBackgroundResource(R.drawable.chat_message_btn);
+            getLocBtn.setEnabled(true);
+        }else{
+            getLocBtn.setBackgroundResource(R.drawable.chat_message_btn_disabled);
+            getLocBtn.setEnabled(false);
         }
     }
 }

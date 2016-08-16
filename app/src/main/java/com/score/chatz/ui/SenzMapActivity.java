@@ -9,9 +9,11 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,7 +57,7 @@ import java.util.List;
  * Time: 3:06 PM
  * To change this template use File | Settings | File Templates.
  */
-public class SenzMapActivity extends FragmentActivity implements LocationListener {
+public class SenzMapActivity extends AppCompatActivity implements LocationListener {
 
     private static final String TAG = SenzMapActivity.class.getName();
 
@@ -70,6 +72,7 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
     private GoogleMap map;
     private Marker marker;
     private Circle circle;
+    private ImageView backBtn;
 
     Polyline line;
 
@@ -108,9 +111,29 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
             }
         });
 
+        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.location_action_bar, null));
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+
         setUpActionBar();
         initLocationCoordinates();
         setUpMapIfNeeded();
+        setupBackBtn();
+    }
+
+    private void setupBackBtn() {
+        backBtn = (ImageView) findViewById(R.id.goBackToHomeImg);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                goBackToHome();
+            }
+        });
+    }
+
+
+    private void goBackToHome(){
+        Log.d(TAG, "go home clicked");
+        this.finish();
     }
 
 
@@ -160,15 +183,15 @@ public class SenzMapActivity extends FragmentActivity implements LocationListene
      */
     private void setUpActionBar() {
         ActionBar actionBar = getActionBar();
-        int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
-        TextView actionBarTitle = (TextView) (this.findViewById(titleId));
+        //int titleId = getResources().getIdentifier("action_bar_title", "id", "android");
+        //TextView actionBarTitle = (TextView) (this.findViewById(titleId));
 
-        Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
-        actionBarTitle.setTextColor(getResources().getColor(R.color.white));
-        actionBarTitle.setTypeface(typefaceThin);
+        //Typeface typefaceThin = Typeface.createFromAsset(this.getAssets(), "fonts/vegur_2.otf");
+        //actionBarTitle.setTextColor(getResources().getColor(R.color.white));
+        //actionBarTitle.setTypeface(typefaceThin);
 
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setTitle("#Location");
+        //actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setTitle("#Location");
     }
 
     /**

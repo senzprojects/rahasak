@@ -24,7 +24,7 @@ public class ChatMessagesAdapter  extends RecyclerView.Adapter<ChatMessageViewHo
     @Override
     public void onBindViewHolder(ChatMessageViewHolder holder, int position) {
         Secret message = messages.get(position);
-        holder.updateUI(message);
+        //holder.updateUI(message);
     }
 
     @Override

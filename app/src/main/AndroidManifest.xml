@@ -26,11 +26,23 @@
     <!-- Use to read contact list -->
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
+    <!-- access to camera -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+
+
+    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
+
+
     <!-- Maps API needs OpenGL ES 2.0. -->
     <uses-feature
         android:glEsVersion="0x00020000"
         android:required="true" />
-    <!--android:name=".application.SenzApplication"-->
+
+    <!-- android:name=".application.SenzApplication" -->
     <application
         android:name="android.support.multidex.MultiDexApplication"
         android:icon="@drawable/ic_launcher"
@@ -39,7 +51,7 @@
         <!-- production key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyAmgB9tMhAvzKcgvo-HbCHCisw6SSLjk78" />
+            android:value="AIzaSyCqn55xNTOJXT6DMHBiupuYOcYXhdbp_wU" />
 
         <!-- debug key -->
         <!-- <meta-data -->
@@ -85,7 +97,7 @@
             android:configChanges="orientation"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.Yello"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:windowSoftInputMode="stateHidden" />
 
         <service
@@ -101,7 +113,7 @@
         <activity
             android:name=".ui.ChatActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme"/>
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <activity
             android:name=".ui.HomeActivity"
             android:screenOrientation="portrait"
@@ -116,14 +128,14 @@
             android:theme="@style/MyMaterialTheme" />
         <activity android:name=".ui.PermissionControlListFragment" />
         <activity android:name=".ui.UserProfileFragment" />
-        <activity android:name=".ui.RegistrationActivity"
+        <activity
+            android:name=".ui.RegistrationActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme"></activity>
+            android:theme="@style/MyMaterialTheme" />
 
         <service
             android:name=".services.RemoteSenzService"
-            android:enabled="true"
-            >
+            android:enabled="true">
             <intent-filter>
                 <action android:name=".services.RemoteSenzService" />
             </intent-filter>
@@ -136,7 +148,8 @@
             </intent-filter>
         </receiver>
 
-
+        <activity android:name=".ui.PhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" ></activity>
     </application>
 
 </manifest>

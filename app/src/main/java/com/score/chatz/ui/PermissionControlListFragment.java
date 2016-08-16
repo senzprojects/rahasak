@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
@@ -47,13 +48,22 @@ public class PermissionControlListFragment extends ListFragment implements Adapt
     public void onDestroy() {
         super.onDestroy();
         getContext().unregisterReceiver(userSharedReceiver);
+        if (senzDataReceiver != null) getContext().unregisterReceiver(senzDataReceiver);
     }
 
     private BroadcastReceiver userSharedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "Got message from Senz service");
+            Log.d(TAG, "Got user shared intent from Senz service");
             handleSharedUser(intent);
+        }
+    };
+
+    private BroadcastReceiver senzDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Got message from Senz service");
+            handleMessage(intent);
         }
     };
 
@@ -74,7 +84,10 @@ public class PermissionControlListFragment extends ListFragment implements Adapt
         getListView().setOnItemClickListener(this);
         getListView().setDividerHeight(5);
         getListView().setOnItemClickListener(this);
+        //Register for new users added
         getContext().registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_SHARED"));
+        //Register for fail messages, incase other user is not online
+        getContext().registerReceiver(senzDataReceiver, new IntentFilter("com.score.chatz.DATA_SENZ")); //Incoming data share
     }
 
     @Override
@@ -108,25 +121,26 @@ public class PermissionControlListFragment extends ListFragment implements Adapt
         }
     }
 
-
-    /**
-     * Handle broadcast message receives
-     * Need to handle registration success failure here
-     *
-     * @param intent intent
-     */
-    private void handleSharedUser(Intent intent) {
-        /*String action = intent.getAction();
-        if (action.equalsIgnoreCase("com.score.chatz.USER_SHARED")) {
+    private void handleMessage(Intent intent) {
+        String action = intent.getAction();
+        if (action.equalsIgnoreCase("com.score.chatz.DATA_SENZ")) {
             Senz senz = intent.getExtras().getParcelable("SENZ");
-            UserPermission userPerm = new UserPermission(senz.getSender(), false, false);
-            userPermissionList.add(userPerm);
-            adapter.notifyDataSetChanged();
-        }*/
-        displayUserList();
+            if (senz.getAttributes().containsKey("msg")) {
+                // msg response received
+                ActivityUtils.cancelProgressDialog();
+                String msg = senz.getAttributes().get("msg");
+                if (msg != null && msg.equalsIgnoreCase("USER_NOT_ONLINE")) {
+                    //Reset display
+                    displayUserList();
+                }
+            }
+        }
     }
 
 
+    private void handleSharedUser(Intent intent) {
+        displayUserList();
+    }
 
 
 }

@@ -9,4 +9,6 @@ interface ISenzService {
 
     // get registered user via this function
     String getUser();
+
+    void sendInOrder(in List<Senz> senzList);
 }

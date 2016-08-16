@@ -20,7 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/message_container"
-            android:padding="20dp"
+            android:padding="10dp"
             android:background="@drawable/not_my_message_background"
             android:layout_alignParentEnd="true">
         <TextView

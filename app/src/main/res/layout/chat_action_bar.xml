@@ -38,7 +38,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12dp"
+            android:textSize="9sp"
             android:text="(Secrets)"
             android:textColor="@color/white"
             android:id="@+id/header_sub_text"

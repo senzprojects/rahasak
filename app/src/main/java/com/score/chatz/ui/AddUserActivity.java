@@ -59,6 +59,7 @@ public class AddUserActivity extends AppCompatActivity {
     protected Typeface typeface;
     protected Typeface typefaceThin;
     protected Typeface typefaceUltraThin;
+    private  boolean isServiceBound;
 
 
 
@@ -70,10 +71,12 @@ public class AddUserActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("TAG", "Connected with senz service");
             senzService = ISenzService.Stub.asInterface(service);
+            isServiceBound = true;
         }
 
         public void onServiceDisconnected(ComponentName className) {
             senzService = null;
+            isServiceBound = false;
             Log.d("TAG", "Disconnected from senz service");
         }
     };
@@ -84,7 +87,7 @@ public class AddUserActivity extends AppCompatActivity {
         setContentView(R.layout.add_user_activity);
         getSupportActionBar().setCustomView(R.layout.add_user_action_bar);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         headerTitle = (TextView) findViewById(R.id.header_center_text);
 
         /*
@@ -202,27 +205,34 @@ public class AddUserActivity extends AppCompatActivity {
      * Need to send share query to server via web socket
      */
     private void share() {
-        try {
-            // create senz attributes
-            HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("lat", "lat");
-            senzAttributes.put("lon", "lon");
-            senzAttributes.put("msg", "msg");
-            senzAttributes.put("chatzmsg", "chatzmsg");
-            senzAttributes.put("camPerm", "false"); //Default Values, later in ui allow user to configure this on share
-            senzAttributes.put("locPerm", "false"); //Dafault Values
-            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
-            // new senz
-            String id = "_ID";
-            String signature = "_SIGNATURE";
-            SenzTypeEnum senzType = SenzTypeEnum.SHARE;
-            User receiver = new User("", editTextUserId.getText().toString().trim());
-            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
 
-            senzService.send(senz);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        if(isServiceBound == true) {
+            try {
+                // create senz attributes
+                HashMap<String, String> senzAttributes = new HashMap<>();
+                senzAttributes.put("lat", "lat");
+                senzAttributes.put("lon", "lon");
+                senzAttributes.put("msg", "msg");
+                senzAttributes.put("chatzphoto", "chatzphoto");
+                senzAttributes.put("chatzmsg", "chatzmsg");
+                senzAttributes.put("camPerm", "false"); //Default Values, later in ui allow user to configure this on share
+                senzAttributes.put("locPerm", "false"); //Dafault Values
+                senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+
+                // new senz
+                String id = "_ID";
+                String signature = "_SIGNATURE";
+                SenzTypeEnum senzType = SenzTypeEnum.SHARE;
+                User receiver = new User("", editTextUserId.getText().toString().trim());
+                Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+                senzService.send(senz);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }else{
+            Toast.makeText(getApplicationContext(), "Establishing connection to server. Please wait.", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -243,7 +253,6 @@ public class AddUserActivity extends AppCompatActivity {
                 ActivityUtils.cancelProgressDialog();
                 String msg = senz.getAttributes().get("msg");
                 if (msg != null && msg.equalsIgnoreCase("ShareDone")) {
-
                     onPostShare(senz);
                 } else {
                     String user = editTextUserId.getText().toString().trim();
@@ -320,9 +329,13 @@ public class AddUserActivity extends AppCompatActivity {
         okButton.setTypeface(null, Typeface.BOLD);
         okButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                dialog.cancel();
-                ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
-                share();
+                if (NetworkUtil.isAvailableNetwork(AddUserActivity.this)) {
+                    dialog.cancel();
+                    ActivityUtils.showProgressDialog(AddUserActivity.this, "Please wait...");
+                    share();
+                } else {
+                    Toast.makeText(AddUserActivity.this, "No network connection available", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
