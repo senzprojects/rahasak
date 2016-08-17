@@ -16,8 +16,8 @@ public class TCPClient {
 
     private static final String TAG = TCPClient.class.getName();
     private String serverMessage;
-    public static final String SERVERIP = "52.5.201.100";
-    //private static final String SERVERIP = "192.168.1.102";
+    //public static final String SERVERIP = "52.5.201.100";
+    private static final String SERVERIP = "192.168.1.102";
     public static final int SERVERPORT = 7070;
     private OnMessageReceived mMessageListener = null;
     private boolean mRun = false;
@@ -84,27 +84,27 @@ public class TCPClient {
                     //Log.i(TAG, serverMessage);
                     //Log.i(TAG, "----------");
 
-                        Senz senz = null;
-                        try {
-                            senz = SenzParser.parse(serverMessage);
-                        }catch(Exception ex){
-                            //parse error
-                            // streaming
-                        }
+                    Senz senz = null;
+                    try {
+                        senz = SenzParser.parse(serverMessage);
+                    }catch(Exception ex){
+                        //parse error
+                        // streaming
+                    }
 
-                        if(senz != null && senz.getAttributes().containsKey("stream") && senz.getAttributes().get("stream").equalsIgnoreCase("on")){
-                            isStreaming = true;
-                            bufferedData = new StringBuilder();
-                         }else if(senz != null && (senz.getAttributes().containsKey("stream") && senz.getAttributes().get("stream").equalsIgnoreCase("off"))){
-                            //Continue flow, end of stream
-                            isStreaming = false;
-                            serverMessage = bufferedData.toString();
-                        }
+                    if(senz != null && senz.getAttributes().containsKey("stream") && senz.getAttributes().get("stream").equalsIgnoreCase("on")){
+                        isStreaming = true;
+                        bufferedData = new StringBuilder();
+                    }else if(senz != null && (senz.getAttributes().containsKey("stream") && senz.getAttributes().get("stream").equalsIgnoreCase("off"))){
+                        //Continue flow, end of stream
+                        isStreaming = false;
+                        serverMessage = bufferedData.toString();
+                    }
 
 
                     if(isStreaming == true){
                         if(serverMessage != null && !serverMessage.isEmpty())
-                        bufferedData.append(serverMessage);
+                            bufferedData.append(serverMessage);
                         continue;
                     }
 

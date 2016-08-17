@@ -33,6 +33,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -56,17 +57,6 @@ public class SenzHandler {
 
     private SenzHandler() {
     }
-
-    /*
-    public static SenzHandler getInstance(Context context, ShareSenzListener listener) {
-        if (instance == null) {
-            instance = new SenzHandler();
-            SenzHandler.context = context;
-            SenzHandler.listener = listener;
-        }
-        return instance;
-    }*/
-
 
     public static SenzHandler getInstance(Context context) {
         if (instance == null) {
@@ -598,10 +588,6 @@ public class SenzHandler {
         Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
         return _senz;
     }
-
-
-
-
 
 }
 

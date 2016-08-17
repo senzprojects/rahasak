@@ -11,4 +11,6 @@ interface ISenzService {
     String getUser();
 
     void sendInOrder(in List<Senz> senzList);
+
+
 }

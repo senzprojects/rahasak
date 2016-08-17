@@ -1,89 +1,91 @@
 package com.score.chatz.services;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.util.Log;
 
-import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
-import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
+        import android.app.AlarmManager;
+        import android.app.PendingIntent;
+        import android.app.Service;
+        import android.content.BroadcastReceiver;
+        import android.content.Context;
+        import android.content.Intent;
+        import android.content.IntentFilter;
+        import android.net.ConnectivityManager;
+        import android.net.NetworkInfo;
+        import android.os.AsyncTask;
+        import android.os.IBinder;
+        import android.os.RemoteException;
+        import android.util.Log;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
+        import com.score.senz.ISenzService;
+        import com.score.senzc.enums.SenzTypeEnum;
+        import com.score.senzc.pojos.Senz;
+        import com.score.senzc.pojos.User;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.IBinder;
-import android.os.RemoteException;
-import android.util.Log;
-import android.widget.Toast;
+        import java.io.BufferedReader;
+        import java.io.BufferedWriter;
+        import java.io.DataOutputStream;
+        import java.io.IOException;
+        import java.io.InputStreamReader;
+        import java.io.OutputStreamWriter;
+        import java.io.PrintWriter;
+        import java.net.DatagramPacket;
+        import java.net.DatagramSocket;
+        import java.net.InetAddress;
+        import java.net.Socket;
+        import java.net.SocketException;
+        import java.security.InvalidKeyException;
+        import java.security.NoSuchAlgorithmException;
+        import java.security.PrivateKey;
+        import java.security.SignatureException;
+        import java.security.spec.InvalidKeySpecException;
+        import java.util.HashMap;
 
-import com.score.chatz.exceptions.NoUserException;
-import com.score.chatz.handlers.SenzHandler;
-import com.score.chatz.listeners.ShareSenzListener;
+        import android.app.AlarmManager;
+        import android.app.PendingIntent;
+        import android.app.Service;
+        import android.content.BroadcastReceiver;
+        import android.content.Context;
+        import android.content.Intent;
+        import android.content.IntentFilter;
+        import android.net.ConnectivityManager;
+        import android.net.NetworkInfo;
+        import android.os.IBinder;
+        import android.os.RemoteException;
+        import android.util.Log;
+        import android.widget.Toast;
+
+        import com.score.chatz.exceptions.NoUserException;
+        import com.score.chatz.handlers.SenzHandler;
+        import com.score.chatz.listeners.ShareSenzListener;
 //import com.score.chatz.receivers.AlarmReceiver;
-import com.score.chatz.utils.NetworkUtil;
-import com.score.chatz.utils.PreferenceUtils;
-import com.score.chatz.utils.RSAUtils;
-import com.score.chatz.utils.SenzParser;
-import com.score.senz.ISenzService;
-import com.score.senzc.enums.SenzTypeEnum;
-import com.score.senzc.pojos.Senz;
-import com.score.senzc.pojos.User;
+        import com.score.chatz.utils.NetworkUtil;
+        import com.score.chatz.utils.PreferenceUtils;
+        import com.score.chatz.utils.RSAUtils;
+        import com.score.chatz.utils.SenzParser;
+        import com.score.senz.ISenzService;
+        import com.score.senzc.enums.SenzTypeEnum;
+        import com.score.senzc.pojos.Senz;
+        import com.score.senzc.pojos.User;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.SignatureException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.HashMap;
-import java.util.List;
+        import java.io.IOException;
+        import java.net.DatagramPacket;
+        import java.net.DatagramSocket;
+        import java.net.InetAddress;
+        import java.net.SocketException;
+        import java.security.InvalidKeyException;
+        import java.security.NoSuchAlgorithmException;
+        import java.security.PrivateKey;
+        import java.security.SignatureException;
+        import java.security.spec.InvalidKeySpecException;
+        import java.util.HashMap;
+        import java.util.LinkedList;
+        import java.util.List;
 
 /**
  * Remote service which handles UDP related functions
  *
  * @author eranga herath(erangaeb@gamil.com)
  */
-public class RemoteSenzService extends Service implements ShareSenzListener {
+public class RemoteSenzService extends Service {
 
     private static final String TAG = RemoteSenzService.class.getName();
 
@@ -93,6 +95,7 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
 
     // server address
     private InetAddress address;
+    private LinkedList<String> sendingSenzQueue;
 
 
     // broadcast receiver to check network status changes
@@ -215,17 +218,17 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     /**
      * Start thread to send initial PING messages to server
      * We initialize UDP connection from here
-    private void initUdpSender() {
-        if (socket != null) {
-            new Thread(new Runnable() {
-                public void run() {
-                    sendPingMessage();
-                }
-            }).start();
-        } else {
-            Log.e(TAG, "Socket not connected");
-        }
-    }
+     private void initUdpSender() {
+     if (socket != null) {
+     new Thread(new Runnable() {
+     public void run() {
+     sendPingMessage();
+     }
+     }).start();
+     } else {
+     Log.e(TAG, "Socket not connected");
+     }
+     }
      */
 
 
@@ -233,13 +236,13 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
     /**
      * Start thread to send PING message to server in every 28 minutes
 
-    private void initPingSender() {
-        // register ping alarm receiver
-        Intent intentAlarm = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-    }
+     private void initPingSender() {
+     // register ping alarm receiver
+     Intent intentAlarm = new Intent(this, AlarmReceiver.class);
+     PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+     AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+     alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+     }
      */
 
 
@@ -291,7 +294,8 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
                         if (mTcpClient == null) {
                             reinitiateTCP();
                         }
-                        mTcpClient.sendMessage(message);
+                        addToSendingQueue(message);
+                        //mTcpClient.sendMessage(message);
                     } catch ( NoSuchAlgorithmException | NoUserException | SignatureException | InvalidKeyException | InvalidKeySpecException e) {
                         e.printStackTrace();
                     }
@@ -311,6 +315,9 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
 
             conn = new ConnectTask();
             conn.execute("");
+
+            if(writeTask != null && writeTask.isCancelled())
+            writeTask = new WritingFromQueueTask();
         }
 
     }
@@ -402,10 +409,7 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
         }
     }
 
-    @Override
-    public void onShareSenz(Senz senz) {
-        sendSenzMessage(senz);
-    }
+
 
 
 
@@ -447,6 +451,31 @@ public class RemoteSenzService extends Service implements ShareSenzListener {
             return null;
         }
 
+    }
+
+
+
+    private void addToSendingQueue(String message){
+            sendingSenzQueue.add(message);
+    }
+
+
+
+    private WritingFromQueueTask writeTask;
+    public class WritingFromQueueTask extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            while(true){
+                String message = null;
+                if(!sendingSenzQueue.isEmpty()){
+                    message = sendingSenzQueue.pop();
+                }
+                if(mTcpClient != null)
+                    mTcpClient.sendMessage(message);
+            }
+
+        }
     }
 
 
