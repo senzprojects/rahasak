@@ -175,7 +175,8 @@ android:layout_height="match_parent"
     <com.github.siyamed.shapeimageview.CircularImageView
         android:layout_width="86dp"
         android:layout_height="117dp"
-        android:src="@drawable/user"
+        android:src="@drawable/default_user"
+        android:id="@+id/user_image"
         android:layout_gravity="center_horizontal" />
 
 </FrameLayout>
