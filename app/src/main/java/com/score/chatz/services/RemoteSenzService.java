@@ -1,6 +1,8 @@
 package com.score.chatz.services;
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,9 +16,11 @@ import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
+import com.score.chatz.receivers.AlarmReceiver;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.chatz.utils.RSAUtils;
 import com.score.chatz.utils.SenzParser;
+import com.score.chatz.utils.SenzUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.pojos.Senz;
 
@@ -84,8 +88,8 @@ public class RemoteSenzService extends Service {
 
             //should check null because in air plan mode it will be null
             if (netInfo != null && netInfo.isConnected()) {
-                // TODO send ping from here
-
+                // send ping
+                sendPing();
             }
         }
     };
@@ -96,7 +100,8 @@ public class RemoteSenzService extends Service {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Ping alarm received in senz service");
 
-            // TODO ping senz
+            // ping senz
+            sendPing();
         }
     };
 
@@ -135,22 +140,30 @@ public class RemoteSenzService extends Service {
         registerReceiver(networkStatusReceiver, filter);
 
         // register local ping alarm receiver
-//        IntentFilter alarmFilter = new IntentFilter();
-//        alarmFilter.addAction("PING_ALARM");
-//        registerReceiver(pingAlarmReceiver, alarmFilter);
+        IntentFilter alarmFilter = new IntentFilter();
+        alarmFilter.addAction("PING_ALARM");
+        registerReceiver(pingAlarmReceiver, alarmFilter);
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
-        //unregisterReceiver(pingAlarmReceiver);
+        unregisterReceiver(pingAlarmReceiver);
+    }
+
+    private void initPing() {
+        // register ping alarm receiver
+        Intent intentAlarm = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 5 * 60, pendingIntent);
     }
 
     private void initComm() {
         new Thread(new Runnable() {
             public void run() {
                 if (socket == null || !socket.isConnected()) initSoc();
-                //initPing();
+                initPing();
                 initReader();
             }
         }).start();
@@ -184,6 +197,11 @@ public class RemoteSenzService extends Service {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendPing() {
+        Senz senz = SenzUtils.getPingSenz(RemoteSenzService.this);
+        if (senz != null) writeSenz(senz);
     }
 
     private void writeSenz(final Senz senz) {

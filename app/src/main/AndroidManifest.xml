@@ -127,6 +127,10 @@
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
 
+        <activity android:name=".ui.PhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
+        </activity>
+
         <service
             android:name=".services.RemoteSenzService"
             android:enabled="true">
@@ -142,9 +146,11 @@
             </intent-filter>
         </receiver>
 
-        <activity android:name=".ui.PhotoActivity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
-        </activity>
+        <receiver
+            android:name=".receivers.AlarmReceiver"
+            android:process=":remote">
+        </receiver>
+
     </application>
 
 </manifest>
