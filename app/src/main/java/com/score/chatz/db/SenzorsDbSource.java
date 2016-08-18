@@ -10,7 +10,6 @@ import android.util.Log;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
-import com.score.chatz.receivers.DatabaseChangedReceiver;
 import com.score.chatz.ui.ChatFragment;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.Senz;

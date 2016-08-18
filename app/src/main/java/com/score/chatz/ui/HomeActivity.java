@@ -28,6 +28,7 @@ public class HomeActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private ImageView settingsBtn;
+    private FloatingActionButton fab;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,17 +44,48 @@ public class HomeActivity extends AppCompatActivity {
         //displaying custom ActionBar
         getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.home_action_bar, null));
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
 
-        viewPager = (ViewPager) findViewById(R.id.pager);
-        setupViewPager(viewPager);
-
+        setupViewPager();
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         setupTabLayouts();
         initFloatingButton();
-        initSettingsBtn();
+        //initSettingsBtn();
+
 
     }
+
+    private void setupViewPager(){
+        viewPager = (ViewPager) findViewById(R.id.pager);
+        setupViewPager(viewPager);
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+
+            @Override
+            public void onPageScrolled(int pos, float arg1, int arg2) {
+                if(pos == 0){
+                    fab.setVisibility(View.INVISIBLE);
+                }else{
+                    fab.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onPageSelected(int pos) {
+                if(pos == 0){
+                    fab.setVisibility(View.INVISIBLE);
+                }else{
+                    fab.setVisibility(View.VISIBLE);
+                }
+            }
+
+        });
+    }
+
 
     private void initSettingsBtn(){
         settingsBtn = (ImageView) findViewById(R.id.go_to_settings);
@@ -71,7 +103,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void initFloatingButton() {
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,6 +112,7 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        fab.setVisibility(View.INVISIBLE);
     }
 
     private void setupTabLayouts() {
@@ -89,8 +122,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new RecentFriendListFragment(), getResources().getString(R.string.recent_tab));
-        adapter.addFragment(new AllFriendListFragment(), getResources().getString(R.string.all_friends_tab));
+        adapter.addFragment(new RecentFriendListFragment(), getResources().getString(R.string.home_page_tab_one));
+        adapter.addFragment(new AllFriendListFragment(), getResources().getString(R.string.home_page_tab_two));
         viewPager.setAdapter(adapter);
     }
 
@@ -122,6 +155,8 @@ public class HomeActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+
+
     }
 
 

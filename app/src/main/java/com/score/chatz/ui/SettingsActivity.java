@@ -11,8 +11,8 @@ import android.database.sqlite.SQLiteConstraintException;
 import android.graphics.Typeface;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.TabLayout;
+//import android.support.design.widget.FloatingActionButton;
+//import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -42,7 +42,7 @@ import java.util.List;
 public class SettingsActivity extends AppCompatActivity {
     private static final String TAG = SplashActivity.class.getName();
     private Toolbar toolbar;
-    private TabLayout tabLayout;
+    //private TabLayout tabLayout;
     private ViewPager viewPager;
     private TextView headerTitle;
     private ImageView backBtn;
@@ -80,9 +80,9 @@ public class SettingsActivity extends AppCompatActivity {
         viewPager = (ViewPager) findViewById(R.id.pager);
         setupViewPager(viewPager);
 
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        /*tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
-        setupTabLayouts();
+        setupTabLayouts();*/
 
         headerTitle = (TextView) findViewById(R.id.header_center_text);
         setupFonts();
@@ -91,8 +91,8 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void setupTabLayouts() {
-        tabLayout.getTabAt(0).setCustomView(R.layout.settings_permission_tab);
-        tabLayout.getTabAt(1).setCustomView(R.layout.settings_person_tab);
+        //tabLayout.getTabAt(0).setCustomView(R.layout.settings_permission_tab);
+        //tabLayout.getTabAt(1).setCustomView(R.layout.settings_person_tab);
     }
 
     private void setupViewPager(ViewPager viewPager) {

@@ -51,6 +51,12 @@
     <string name="register_button_text">Register</string>
     <string name="register_user_id">Username</string>
 
+
+
+    <string name="home_page_tab_one">Rahas</string>
+    <string name="home_page_tab_two">Friends</string>
+
+
     <string name="no_registered_user">No Registered User. You must be a registered User to use this App.</string>
 
 </resources>

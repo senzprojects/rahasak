@@ -116,12 +116,12 @@
 
     </style>
 
-    <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="MyMaterialTheme.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/android_grey</item>
+        <item name="colorPrimaryDark">@color/android_grey</item>
+        <item name="colorAccent">@color/android_grey</item>
         <item name="windowActionBarOverlay">false</item>
     </style>
 

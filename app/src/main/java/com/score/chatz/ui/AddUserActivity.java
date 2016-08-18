@@ -14,6 +14,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -89,6 +90,13 @@ public class AddUserActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
         headerTitle = (TextView) findViewById(R.id.header_center_text);
+        getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+        Toolbar toolbar=(Toolbar) getSupportActionBar().getCustomView().getParent();
+        toolbar.setContentInsetsAbsolute(0, 0);
+        toolbar.getContentInsetEnd();
+        toolbar.setPadding(0, 0, 0, 0);
+
 
         /*
          * Main text on the page is broken down into parts for customization.

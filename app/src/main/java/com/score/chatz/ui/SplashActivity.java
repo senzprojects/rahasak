@@ -30,7 +30,7 @@ import com.score.chatz.utils.PreferenceUtils;
  * @author eranga herath(erangaeb@gmail.com)
  */
 public class SplashActivity extends Activity{
-    private final int SPLASH_DISPLAY_LENGTH = 5000;
+    private final int SPLASH_DISPLAY_LENGTH = 3000;
     private static final String TAG = SplashActivity.class.getName();
 
     /**
@@ -60,28 +60,36 @@ public class SplashActivity extends Activity{
             startActivity(intent);
         } catch (NoUserException e) {
             e.printStackTrace();
-            initLoader();
+            navigateToSplash();
         }
     }
+
+
+    /**
+     * Switch to home activity
+     * This method will be call after successful login
+     */
+    private void navigateToSplash() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                navigateRegistration();
+            }
+        }, SPLASH_DISPLAY_LENGTH);
+    }
+
+
 
     private void navigateRegistration(){
         // no user, so move to registration
         Intent intent = new Intent(this, RegistrationActivity.class);
+        intent.putExtra("SENDER", "Lakmal");
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         finish();
         startActivity(intent);
     }
 
 
-
-
-    /*
-     * Start stripe loader
-     */
-
-    private void initLoader(){
-        new AsyncLoader().execute();
-    }
 
     /**
      * {@inheritDoc}
@@ -165,54 +173,6 @@ public class SplashActivity extends Activity{
         });
 
         dialog.show();
-    }
-
-    /*
-     * Async Loader to show a loader to start the remote service
-     */
-    class AsyncLoader extends AsyncTask<Void, Integer, Void> {
-        private ProgressBar progressBar;
-        private final int SPLASH_PROGRESS_BAR_DISPLAY_LENGTH = 5; //Seconds
-        int currentPosition;
-        int total;
-
-        @Override
-        protected void onPreExecute() {
-            progressBar = (ProgressBar) findViewById(R.id.progressBar);
-            progressBar.setProgress(0);
-            progressBar.setMax(SPLASH_PROGRESS_BAR_DISPLAY_LENGTH);
-            progressBar.setVisibility(ProgressBar.VISIBLE);
-            currentPosition= 0;
-            total = SPLASH_PROGRESS_BAR_DISPLAY_LENGTH;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            progressBar.setVisibility(ProgressBar.GONE);
-            navigateRegistration();
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... value) {
-            progressBar.setProgress(value[0]);
-        }
-
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            while (currentPosition<total) {
-                try {
-                    currentPosition++;
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                publishProgress(currentPosition);
-            }
-            return null;
-        }
     }
 
 

@@ -20,7 +20,6 @@ public class TCPClient {
     private static final String SERVERIP = "192.168.1.102";
     public static final int SERVERPORT = 7070;
     private OnMessageReceived mMessageListener = null;
-    private boolean mRun = false;
     private boolean isStreaming = false;
     private StringBuilder bufferedData = null;
 
@@ -54,8 +53,6 @@ public class TCPClient {
 
     public void run() {
 
-        mRun = true;
-
         try {
             //here you must put your computer's IP address.
             InetAddress serverAddr = InetAddress.getByName(SERVERIP);
@@ -77,9 +74,9 @@ public class TCPClient {
 
                 //in this while the client listens for the messages sent by the server
 
-                while (mRun) {
-                    //serverMessage = in.readLine().replaceAll("\n", "").replaceAll("\n", "");
-                    serverMessage = in.readLine();
+                while (in.readLine() != null && in.readLine() != null) {
+                    serverMessage = in.readLine().replaceAll("\n", "").replaceAll("\n", "");
+                    //serverMessage = in.readLine();
 
                     //Log.i(TAG, serverMessage);
                     //Log.i(TAG, "----------");
@@ -90,6 +87,7 @@ public class TCPClient {
                     }catch(Exception ex){
                         //parse error
                         // streaming
+                        Log.d(TAG, "Error - " + ex.toString());
                     }
 
                     if(senz != null && senz.getAttributes().containsKey("stream") && senz.getAttributes().get("stream").equalsIgnoreCase("on")){
@@ -142,7 +140,6 @@ public class TCPClient {
     }
 
     public void closeSocketAndClean(){
-        mRun = false;
         if(socket != null && !socket.isClosed()){
             try {
                 socket.close();

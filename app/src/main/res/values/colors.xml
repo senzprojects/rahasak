@@ -43,5 +43,7 @@
     <color name="chat_background">#232323</color>
     <color name="my_message_background">#00c093</color>
     <color name="not_my_message_background">#e67e22</color>
+    <color name="android_grey">#636363</color>
+    <color name="android_green">#a9d063</color>
 
 </resources>

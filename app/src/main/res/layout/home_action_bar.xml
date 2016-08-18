@@ -2,18 +2,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/transparent">
+    android:background="@color/android_grey">
 
 
     <ImageView
         android:layout_height="wrap_content"
-        android:layout_width="80dp"
-        android:src="@drawable/rahasak_text_icon"
+        android:layout_width="35dp"
+        android:src="@drawable/rlogo_launcher"
         android:layout_alignParentLeft="true"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="0dp" />
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="5dp" />
 
 
 
@@ -26,6 +27,7 @@
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
         android:layout_marginRight="15dp"
-        android:padding="8dp" />
+        android:padding="8dp"
+        android:visibility="gone"/>
 
 </RelativeLayout>
