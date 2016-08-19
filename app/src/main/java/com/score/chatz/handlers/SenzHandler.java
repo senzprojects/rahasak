@@ -3,23 +3,17 @@ package com.score.chatz.handlers;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteConstraintException;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.hardware.Camera;
 import android.os.RemoteException;
 import android.util.Base64;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
-import com.score.chatz.listeners.ShareSenzListener;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.services.SenzServiceConnection;
-
 import com.score.chatz.ui.PhotoActivity;
-import com.score.chatz.utils.CameraController;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.senz.ISenzService;
@@ -27,33 +21,29 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
-import java.io.ByteArrayOutputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**
  * Handle All senz messages from here
- * <p>
+ * <p/>
  * SENZ RECEIVERS
- * <p>
+ * <p/>
  * 1. SENZ_SHARE
  */
 public class SenzHandler {
     private static final String TAG = SenzHandler.class.getName();
 
     private static Context context;
-    private static ShareSenzListener listener;
-
     private static SenzHandler instance;
-
     private static SenzServiceConnection serviceConnection;
     private static SenzorsDbSource dbSource;
+
+    private SenzStream senzStream;
 
     private SenzHandler() {
     }
@@ -87,8 +77,8 @@ public class SenzHandler {
                     break;
                 case SHARE:
                     Log.d(TAG, "SHARE received");
-                        Log.d(TAG, "#lat #lon SHARE received");
-                        handleShareSenz(senz);
+                    Log.d(TAG, "#lat #lon SHARE received");
+                    handleShareSenz(senz);
                     break;
                 case GET:
                     Log.d(TAG, "GET received");
@@ -198,15 +188,12 @@ public class SenzHandler {
             intent.putExtra("Senz", senz);
             context.startActivity(intent);
 
-        }else if(senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")){
+        } else if (senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")) {
             Intent serviceIntent = new Intent(context, LocationService.class);
             serviceIntent.putExtra("USER", senz.getSender());
             context.startService(serviceIntent);
         }
     }
-
-
-
 
     private void handleDataSenz(Senz senz) {
 
@@ -245,7 +232,7 @@ public class SenzHandler {
              * New permission, set a user, is notified to be updated correctly, success message.
              */
             //Add New Permission
-            if(senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("sharePermDone")){
+            if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("sharePermDone")) {
                 // save senz in db
                 User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
                 senz.setSender(sender);
@@ -256,11 +243,10 @@ public class SenzHandler {
                     Log.e(TAG, e.toString());
                 }
                 //TODO Indicate to the user if success
-            }else{
+            } else {
                 //TODO Indicate to the user if fail
             }
-
-        } else  if (senz.getAttributes().containsKey("chatzmsg")) {
+        } else if (senz.getAttributes().containsKey("chatzmsg")) {
             /*
              * Any new chatz message, incoming, save straight to db
              */
@@ -270,23 +256,40 @@ public class SenzHandler {
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
 
-        } else if(senz.getAttributes().containsKey("chatzphoto")){
+        } else if (senz.getAttributes().containsKey("stream")) {
+            // handle streaming
+            if (senz.getAttributes().get("stream").equalsIgnoreCase("ON")) {
+                Log.d(TAG, "Stream ON from " + senz.getSender().getUsername());
 
-            /*
-             *  New photo received. Saving to db.
-             */
+                senzStream = new SenzStream(true, senz.getSender().getUsername(), new StringBuffer());
+            } else if (senz.getAttributes().get("stream").equalsIgnoreCase("OFF")) {
+                // stream off
+                senzStream.setIsActive(false);
 
-            try {
-                Log.i(TAG, "SENDER OF PHOTO : " + senz.getSender());
-                dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver()));
-            }catch(SQLiteConstraintException e){
-                Log.e(TAG, e.toString());
+                Log.d(TAG, "Stream OFF from " + senz.getSender().getUsername());
+
+                // save stream to db
+                try {
+                    Log.i(TAG, "SENDER OF PHOTO : " + senz.getSender());
+                    dbSource.createSecret(new Secret(null, senzStream.getStream(), senz.getSender(), senz.getReceiver()));
+                } catch (SQLiteConstraintException e) {
+                    Log.e(TAG, e.toString());
+                }
+
+                // broadcast
+                Intent intent = new Intent("com.score.chatz.DATA_SENZ");
+                intent.putExtra("SENZ", senz);
+                context.sendBroadcast(intent);
             }
-            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
-            intent.putExtra("SENZ", senz);
-            context.sendBroadcast(intent);
-
-        }  else{
+        } else if (senz.getAttributes().containsKey("chatzphoto")) {
+            if (senzStream != null && senzStream.isActive()) {
+                // streaming ON
+                Log.d(TAG, "Stream ON, chatzphoto received from " + senz.getSender().getUsername());
+                senzStream.putStream(senz.getAttributes().get("chatzphoto"));
+            } else {
+                Log.e(TAG, "Stream OFF, chatzphoto received from " + senz.getSender().getUsername());
+            }
+        } else {
             /*
              * Default cases, handle such as registration success or, any other scenarios where need to specifically handle in the Activity.
              */
@@ -302,7 +305,7 @@ public class SenzHandler {
 
     }
 
-    private void handleSharedPermission(final Senz senz){
+    private void handleSharedPermission(final Senz senz) {
         //call back after service bind
         serviceConnection.executeAfterServiceConnected(new Runnable() {
             @Override
@@ -313,18 +316,18 @@ public class SenzHandler {
                 // save senz in db
                 User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
                 try {
-                SenzorsDbSource dbSource = new SenzorsDbSource(context);
+                    SenzorsDbSource dbSource = new SenzorsDbSource(context);
 
-                if(senz.getAttributes().containsKey("locPerm")){
-                    dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("locPerm"));
-                }
-                if(senz.getAttributes().containsKey("camPerm")) {
-                    dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), null);
-                }
+                    if (senz.getAttributes().containsKey("locPerm")) {
+                        dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("locPerm"));
+                    }
+                    if (senz.getAttributes().containsKey("camPerm")) {
+                        dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), null);
+                    }
 
-                senz.setSender(sender);
-                Log.d(TAG, "save permissions");
-                // if senz already exists in the db, SQLiteConstraintException should throw
+                    senz.setSender(sender);
+                    Log.d(TAG, "save permissions");
+                    // if senz already exists in the db, SQLiteConstraintException should throw
 
                     NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "New permissions received from @" + senz.getSender().getUsername());
                     sharePermBackToUser(senzService, senz, sender, true);
@@ -337,7 +340,7 @@ public class SenzHandler {
         });
     }
 
-    private void sharePermBackToUser(ISenzService senzService, Senz senz, User receiver, boolean isDone){
+    private void sharePermBackToUser(ISenzService senzService, Senz senz, User receiver, boolean isDone) {
         Log.d(TAG, "send response(shareback) for permission");
         try {
             // create senz attributes
@@ -345,10 +348,10 @@ public class SenzHandler {
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             if (isDone) {
                 senzAttributes.put("msg", "SharePermDone");
-                if(senz.getAttributes().containsKey("locPerm")){
+                if (senz.getAttributes().containsKey("locPerm")) {
                     senzAttributes.put("locPerm", senz.getAttributes().get("locPerm"));
                 }
-                if(senz.getAttributes().containsKey("camPerm")) {
+                if (senz.getAttributes().containsKey("camPerm")) {
                     senzAttributes.put("camPerm", senz.getAttributes().get("camPerm"));
                 }
 
@@ -367,7 +370,7 @@ public class SenzHandler {
         }
     }
 
-    private void handleSharedMessages(final Senz senz){
+    private void handleSharedMessages(final Senz senz) {
         //call back after service bind
         serviceConnection.executeAfterServiceConnected(new Runnable() {
             @Override
@@ -393,14 +396,14 @@ public class SenzHandler {
                     shareMessageBackToUser(senzService, senz, sender, senz.getReceiver(), true);
                     handleDataChanges(senz);
                 } catch (SQLiteConstraintException e) {
-                    shareMessageBackToUser(senzService, senz, sender,  senz.getReceiver(), false);
+                    shareMessageBackToUser(senzService, senz, sender, senz.getReceiver(), false);
                     Log.e(TAG, e.toString());
                 }
             }
         });
     }
 
-    private void shareMessageBackToUser(ISenzService senzService, Senz senz, User sender,User receiver, boolean isDone){
+    private void shareMessageBackToUser(ISenzService senzService, Senz senz, User sender, User receiver, boolean isDone) {
         Log.d(TAG, "send response(share back) for message");
 
         try {
@@ -408,7 +411,7 @@ public class SenzHandler {
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             if (isDone) {
-            senzAttributes.put("msg", "MsgSent");
+                senzAttributes.put("msg", "MsgSent");
             } else {
                 senzAttributes.put("msg", "MsgSentFail");
             }
@@ -452,14 +455,7 @@ public class SenzHandler {
     }
 
 
-
-
-
-
-
-
-
-    public void sendPhoto(final byte[] image, final Senz senz){
+    public void sendPhoto(final byte[] image, final Senz senz) {
         serviceConnection.executeAfterServiceConnected(new Runnable() {
             @Override
             public void run() {
@@ -504,12 +500,11 @@ public class SenzHandler {
     }
 
 
-
-    private Senz getPhotoStreamingSenz(Senz senz, byte[] image){
+    private Senz getPhotoStreamingSenz(Senz senz, byte[] image) {
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
         senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        String imageAsString= Base64.encodeToString(image, Base64.DEFAULT);
+        String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
         senzAttributes.put("chatzphoto", imageAsString);
 
 
@@ -519,12 +514,12 @@ public class SenzHandler {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType,senz.getReceiver(), senz.getSender(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
         return _senz;
     }
 
 
-    private Senz getStartPhotoSharingSenze(Senz senz){
+    private Senz getStartPhotoSharingSenze(Senz senz) {
         //senz is the original senz
         // create senz attributes
         HashMap<String, String> senzAttributes = new HashMap<>();
@@ -537,12 +532,12 @@ public class SenzHandler {
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
         Log.i(TAG, "Senz receiver - " + senz.getReceiver());
         Log.i(TAG, "Senz sender - " + senz.getSender());
-        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(),  senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
         return _senz;
     }
 
 
-    private Senz getStopPhotoSharingSenz(Senz senz){
+    private Senz getStopPhotoSharingSenz(Senz senz) {
         // create senz attributes
         //senz is the original senz
         HashMap<String, String> senzAttributes = new HashMap<>();
