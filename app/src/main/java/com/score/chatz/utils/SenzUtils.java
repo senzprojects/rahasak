@@ -29,7 +29,7 @@ public class SenzUtils {
 
             // new senz object
             Senz senz = new Senz();
-            senz.setSenzType(SenzTypeEnum.DATA);
+            senz.setSenzType(SenzTypeEnum.PING);
             senz.setSender(new User("", user.getUsername()));
             senz.setReceiver(new User("", "senzswitch"));
             senz.setAttributes(senzAttributes);

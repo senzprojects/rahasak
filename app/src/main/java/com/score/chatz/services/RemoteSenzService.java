@@ -186,13 +186,17 @@ public class RemoteSenzService extends Service {
     private void initReader() {
         try {
             String line;
-            while ((line = reader.readLine()) != null && !line.isEmpty()) {
-                String senz = line.replaceAll("\n", "").replaceAll("\r", "");
+            while ((line = reader.readLine()) != null) {
+                if (!line.isEmpty()) {
+                    String senz = line.replaceAll("\n", "").replaceAll("\r", "");
 
-                Log.d(TAG, "Senz received " + senz);
+                    Log.d(TAG, "Senz received " + senz);
 
-                // handle senz
-                SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
+                    // handle senz
+                    SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
+                } else {
+                    Log.e(TAG, "empty senz recived");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
