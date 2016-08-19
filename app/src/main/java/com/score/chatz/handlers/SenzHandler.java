@@ -474,7 +474,7 @@ public class SenzHandler {
                     Senz startSenz = getStartPhotoSharingSenze(senz);
                     //senzService.send(startSenz);
 
-                    Senz photoSenz = getPhotoStreamingSenz(senz, image);
+                    ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image);
                     //senzService.send(photoSenz);
 
                     Senz stopSenz = getStopPhotoSharingSenz(senz);
@@ -483,7 +483,7 @@ public class SenzHandler {
 
                     ArrayList<Senz> senzList = new ArrayList<Senz>();
                     senzList.add(startSenz);
-                    senzList.add(photoSenz);
+                    senzList.addAll(photoSenzList);
                     senzList.add(stopSenz);
                     senzService.sendInOrder(senzList);
 
@@ -500,22 +500,38 @@ public class SenzHandler {
     }
 
 
-    private Senz getPhotoStreamingSenz(Senz senz, byte[] image) {
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+    private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image) {
         String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
-        senzAttributes.put("chatzphoto", imageAsString);
-
 
         //Save photo to db before sending
         new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, senz.getSender(), senz.getReceiver()));
-        // new senz
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
-        return _senz;
+
+
+        ArrayList<Senz> senzList = new ArrayList<>();
+        String[] imgs = split(imageAsString, 1024);
+        for (int i = 0; i < imgs.length; i++) {
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.DATA;
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("chatzphoto", imgs[i].trim());
+
+            Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+            senzList.add(_senz);
+        }
+
+        return senzList;
+    }
+
+    public String[] split(String src, int len) {
+        String[] result = new String[(int) Math.ceil((double) src.length() / (double) len)];
+        for (int i = 0; i < result.length; i++)
+            result[i] = src.substring(i * len, Math.min(src.length(), (i + 1) * len));
+        return result;
     }
 
 

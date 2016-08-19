@@ -81,7 +81,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
 
 
-                SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 2), originalSenz);
+                SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 6), originalSenz);
 
                 //camera.stopPreview();
                 //camera.release();

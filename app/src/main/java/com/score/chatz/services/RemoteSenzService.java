@@ -256,7 +256,12 @@ public class RemoteSenzService extends Service {
 
                         // get digital signature of the senz
                         String senzPayload = SenzParser.getSenzPayload(senz);
-                        String senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        String senzSignature;
+                        if (senz.getAttributes().containsKey("stream")) {
+                            senzSignature = RSAUtils.getDigitalSignature(senzPayload.replaceAll(" ", ""), privateKey);
+                        } else {
+                            senzSignature = "SIGNATURE";
+                        }
                         String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
 
                         Log.d(TAG, "Senz to be send: " + message);
@@ -265,8 +270,10 @@ public class RemoteSenzService extends Service {
                         if (socket == null || !socket.isConnected()) initSoc();
                         writer.println(message);
                         writer.flush();
+
+                        Thread.currentThread().sleep(100);
                     }
-                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeyException | SignatureException | InvalidKeySpecException e) {
+                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
