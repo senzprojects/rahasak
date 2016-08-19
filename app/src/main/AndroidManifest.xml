@@ -142,11 +142,19 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".receivers.AlarmReceiver"
-            android:process=":remote"></receiver>
 
-        <activity android:name=".ui.UserProfileActivity"
+        <receiver android:name=".receivers.AlarmReceiver">
+        </receiver>
+
+        <receiver
+            android:name=".receivers.DeathWatchReceiver">
+            <intent-filter>
+                <action android:name="senz.action.RESTART" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".ui.UserProfileActivity"
             android:theme="@style/MyMaterialTheme"></activity>
     </application>
 

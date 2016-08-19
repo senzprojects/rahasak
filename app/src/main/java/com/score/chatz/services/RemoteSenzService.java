@@ -12,6 +12,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
@@ -116,7 +117,7 @@ public class RemoteSenzService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand executed");
 
-        //initComm();
+        initComm();
 
         return Service.START_STICKY;
     }
@@ -130,25 +131,25 @@ public class RemoteSenzService extends Service {
         // restart service again
         // its done via broadcast receiver
         Intent intent = new Intent("senz.action.RESTART");
-        sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(RemoteSenzService.this).sendBroadcast(intent);
     }
 
     private void registerReceivers() {
         // Register network status receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkStatusReceiver, filter);
+        LocalBroadcastManager.getInstance(RemoteSenzService.this).registerReceiver(networkStatusReceiver, filter);
 
         // register local ping alarm receiver
         IntentFilter alarmFilter = new IntentFilter();
         alarmFilter.addAction("PING_ALARM");
-        registerReceiver(pingAlarmReceiver, alarmFilter);
+        LocalBroadcastManager.getInstance(RemoteSenzService.this).registerReceiver(pingAlarmReceiver, filter);
     }
 
     private void unRegisterReceivers() {
         // un register receivers
-        unregisterReceiver(networkStatusReceiver);
-        unregisterReceiver(pingAlarmReceiver);
+        LocalBroadcastManager.getInstance(RemoteSenzService.this).unregisterReceiver(networkStatusReceiver);
+        LocalBroadcastManager.getInstance(RemoteSenzService.this).unregisterReceiver(pingAlarmReceiver);
     }
 
     private void initPing() {
@@ -162,9 +163,14 @@ public class RemoteSenzService extends Service {
     private void initComm() {
         new Thread(new Runnable() {
             public void run() {
-                if (socket == null || !socket.isConnected()) initSoc();
-                initPing();
-                initReader();
+                if (socket == null || !socket.isConnected()) {
+                    initSoc();
+                    initPing();
+                    sendPing();
+                    initReader();
+                } else {
+                    sendPing();
+                }
             }
         }).start();
     }
@@ -211,7 +217,7 @@ public class RemoteSenzService extends Service {
     private void writeSenz(final Senz senz) {
         new Thread(new Runnable() {
             public void run() {
-                if (socket == null || !socket.isConnected()) initSoc();
+                //if (socket == null || !socket.isConnected()) initSoc();
 
                 // sign and write senz
                 try {

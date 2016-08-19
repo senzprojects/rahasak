@@ -3,6 +3,7 @@ package com.score.chatz.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 /**
@@ -16,6 +17,6 @@ public class AlarmReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         Log.d(TAG, "Alarm received");
         Intent alarmIntent = new Intent("PING_ALARM");
-        context.sendBroadcast(alarmIntent);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(alarmIntent);
     }
 }
