@@ -161,7 +161,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_height"
+        android:layout_height="45dp"
         android:background="@android:color/transparent" />
 
         <FrameLayout
@@ -173,7 +173,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/default_user"
-                android:background="@color/black"
+                android:background="#FFF"
                 android:adjustViewBounds="false"
                 android:focusableInTouchMode="false"
                 android:scaleType="centerCrop"
@@ -184,7 +184,8 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            android:layout_weight="6">
+            android:layout_weight="6"
+            android:background="#FFF">
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -203,6 +204,7 @@
                 android:layout_marginRight="40dp"
                 android:background="@color/android_green"
                 android:text="Share a secret!"
+                android:id="@+id/share_secret_btn"
                 android:textColor="@color/android_grey" />
 
             <LinearLayout
@@ -223,18 +225,18 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:maxWidth="20dp"
-                        android:layout_weight="2"
+                        android:layout_weight="10"
                         android:adjustViewBounds="true"
                         android:src="@drawable/perm_locations_active"
                         android:baselineAlignBottom="false"
                         android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="6"
+                        android:layout_weight="3"
                         android:text="@string/perm_location"
-                        android:textColor="@color/white"
+                        android:textColor="@color/android_grey"
                         android:textSize="13dp"
                         android:layout_marginLeft="10dp" />
 
@@ -242,8 +244,8 @@
                         android:id="@+id/perm_location_switch"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:layout_marginLeft="40dp" />
+                        android:layout_weight="26"
+                        android:layout_marginLeft="10dp" />
 
 
 
@@ -262,18 +264,18 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:maxWidth="20dp"
-                        android:layout_weight="2"
+                        android:layout_weight="10"
                         android:adjustViewBounds="true"
                         android:src="@drawable/perm_camera_active"
                         android:baselineAlignBottom="false"
                         android:layout_gravity="center_vertical" />
 
                     <TextView
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="6"
+                        android:layout_weight="3"
                         android:text="@string/perm_camera"
-                        android:textColor="@color/white"
+                        android:textColor="@color/android_grey"
                         android:textSize="13dp"
                         android:layout_marginLeft="10dp" />
 
@@ -281,8 +283,8 @@
                         android:id="@+id/perm_camera_switch"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="5"
-                        android:layout_marginLeft="40dp" />
+                        android:layout_weight="26"
+                        android:layout_marginLeft="10dp" />
                 </LinearLayout>
             </LinearLayout>
 

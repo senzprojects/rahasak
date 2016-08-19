@@ -91,7 +91,7 @@ public class RecentFriendListFragment extends ListFragment implements AdapterVie
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Intent intent = new Intent(this.getActivity(), ChatActivity.class);
+        Intent intent = new Intent(this.getActivity(), UserProfileActivity.class);
         intent.putExtra("SENDER", userPermissionList.get(position).getUser().getUsername());
         startActivity(intent);
     }

@@ -138,7 +138,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new RecentFriendListFragment(), getResources().getString(R.string.home_page_tab_one));
-        adapter.addFragment(new AllFriendListFragment(), getResources().getString(R.string.home_page_tab_two));
+        adapter.addFragment(new RecentFriendListFragment(), getResources().getString(R.string.home_page_tab_two));
         viewPager.setAdapter(adapter);
     }
 
