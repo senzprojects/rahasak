@@ -67,7 +67,8 @@ public class AllFriendListFragment  extends ListFragment implements AdapterView.
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(getActivity(), "Item " + position, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this.getActivity(), UserProfileActivity.class);
+        startActivity(intent);
     }
 
     @Override

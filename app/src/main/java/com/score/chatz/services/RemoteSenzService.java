@@ -116,7 +116,7 @@ public class RemoteSenzService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand executed");
 
-        initComm();
+        //initComm();
 
         return Service.START_STICKY;
     }

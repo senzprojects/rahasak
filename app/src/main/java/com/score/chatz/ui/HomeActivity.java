@@ -12,11 +12,17 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import com.score.chatz.R;
+import com.score.chatz.db.SenzorsDbContract;
+import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.utils.PreferenceUtils;
+import com.score.senzc.pojos.User;
 
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +57,15 @@ public class HomeActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         setupTabLayouts();
         initFloatingButton();
+
+        try {
+            User user = PreferenceUtils.getUser(this);
+            Log.i(TAG, "Registered User on Home page - " + user.getUsername());
+            ((TextView)getSupportActionBar().getCustomView().findViewById(R.id.user_name)).setText(user.getUsername());
+        }catch(NoUserException ex){
+            Log.d(TAG, "No Registered User");
+        }
+
         //initSettingsBtn();
 
 

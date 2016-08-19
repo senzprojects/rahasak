@@ -31,11 +31,9 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
-
-
-    <uses-feature android:name="android.hardware.camera.front" android:required="false" />
-
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
 
     <!-- Maps API needs OpenGL ES 2.0. -->
     <uses-feature
@@ -120,16 +118,15 @@
             android:name=".ui.SettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-        <activity android:name=".ui.PermissionControlListFragment" />
-        <activity android:name=".ui.UserProfileFragment" />
+        <!--<activity android:name=".ui.PermissionControlListFragment" />
+        <activity android:name=".ui.UserProfileFragment" />-->
         <activity
             android:name=".ui.RegistrationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-
-        <activity android:name=".ui.PhotoActivity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
-        </activity>
+        <activity
+            android:name=".ui.PhotoActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <service
             android:name=".services.RemoteSenzService"
@@ -145,12 +142,12 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
         <receiver
             android:name=".receivers.AlarmReceiver"
-            android:process=":remote">
-        </receiver>
+            android:process=":remote"></receiver>
 
+        <activity android:name=".ui.UserProfileActivity"
+            android:theme="@style/MyMaterialTheme"></activity>
     </application>
 
 </manifest>

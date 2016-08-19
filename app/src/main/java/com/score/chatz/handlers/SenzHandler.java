@@ -115,6 +115,10 @@ public class SenzHandler {
     private void handleShareSenz(final Senz senz) {
         Log.d("Tag", senz.getSender() + " : " + senz.getSenzType().toString());
 
+        /*
+         *  Is called when you receive an invitation/share from another person
+         */
+
         //call back after service bind
         serviceConnection.executeAfterServiceConnected(new Runnable() {
             @Override
@@ -133,7 +137,7 @@ public class SenzHandler {
                 // if senz already exists in the db, SQLiteConstraintException should throw
                 try {
                     dbSource.createSenz(senz);
-                    NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "LocationZ received from @" + senz.getSender().getUsername());
+                    NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "You have received an invitation from @" + senz.getSender().getUsername());
                     shareBackToUser(senzService, sender, true);
                     handleDataChanges(senz);
                 } catch (SQLiteConstraintException e) {
@@ -143,14 +147,15 @@ public class SenzHandler {
             }
         });
 
-
-        /*Intent intent = new Intent("com.score.chatz.SENZ_SHARE");
-        intent.putExtra("SENZ", senz);
-        context.sendBroadcast(intent);*/
     }
 
     private void shareBackToUser(ISenzService senzService, User receiver, boolean isDone) {
         Log.d(TAG, "send response");
+
+        /*
+         * After receive invitation from someone, you send back a share message to the user, with your permissions.
+         */
+
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
@@ -178,36 +183,13 @@ public class SenzHandler {
     private void handleGetSenz(final Senz senz) {
         Log.d(TAG, senz.getSender() + " : " + senz.getSenzType().toString());
 
+        /*
+         * Requesting your camra
+         * Launch camera activity
+         */
 
 
         if (senz.getAttributes().containsKey("chatzphoto")) {
-            //Toast.makeText(context, "Image snapped!! :p",Toast.LENGTH_LONG).show();
-            //final Camera cam;
-            //Take photo and send back to user.
-
-            /*cam = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-            Camera.Parameters params=cam.getParameters();
-            params.setFlashMode(Camera.Parameters.FLASH_MODE_AUTO);
-            params.setJpegQuality(10);
-            cam.setParameters(params);
-            cam.startPreview();
-            cam.takePicture(null, null, new Camera.PictureCallback(){
-                @Override
-                public void onPictureTaken(byte[] bytes, Camera camera) {
-                    camera.stopPreview();
-                    /*Bitmap imgBitmap= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                    Log.i(TAG, "imgBitmap count before reduction " + imgBitmap.getByteCount());
-                    imgBitmap = getResizedBitmap(imgBitmap, 1);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    imgBitmap.compress(Bitmap.CompressFormat.JPEG, 5, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    Log.i(TAG, "imgBitmap count before reduction " + imgBitmap.getByteCount());
-                    sendPhoto(bytes, senz);
-                    camera.release();
-                }
-            });
-            //cam.stopPreview();
-            //cam.release();*/
 
             Intent intent = new Intent();
             intent.setClass(context, PhotoActivity.class);
@@ -215,41 +197,6 @@ public class SenzHandler {
             //To pass:
             intent.putExtra("Senz", senz);
             context.startActivity(intent);
-
-            /*final CameraController newCamera = new CameraController(context);
-            if(newCamera.hasCamera() == true){
-                final Camera cam = newCamera.getCameraInstance();
-                new java.util.Timer().schedule(
-                        new java.util.TimerTask() {
-                            @Override
-                            public void run() {
-                                cam.takePicture(null, null, new Camera.PictureCallback(){
-                                    @Override
-                                    public void onPictureTaken(byte[] bytes, Camera camera) {
-                                        camera.stopPreview();
-
-                                        sendPhoto(bytes, senz);
-                                        camera.release();
-                                    }
-                                });
-                            }
-                        },
-                        5000
-                );
-
-            }*/
-
-
-
-            /*Bitmap imgBitmap= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-                    Log.i(TAG, "imgBitmap count before reduction " + imgBitmap.getByteCount());
-                    imgBitmap = getResizedBitmap(imgBitmap, 1);
-                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    imgBitmap.compress(Bitmap.CompressFormat.JPEG, 5, stream);
-                    byte[] byteArray = stream.toByteArray();
-                    Log.i(TAG, "imgBitmap count before reduction " + imgBitmap.getByteCount());*/
-
-
 
         }else if(senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")){
             Intent serviceIntent = new Intent(context, LocationService.class);
@@ -264,6 +211,9 @@ public class SenzHandler {
     private void handleDataSenz(Senz senz) {
 
         if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("ShareDone")) {
+            /*
+             * Share message from other user, to whom you send a share to.
+             */
             //Add New User
             // save senz in db
             User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
@@ -281,12 +231,19 @@ public class SenzHandler {
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
         } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("newPerm")) {
+            /*
+             * New access permission you received from an a friend
+             * Send permission accepted message to indicate to other user, update was succesfull
+             */
             //Add New Permission
             handleSharedPermission(senz);
             Intent intent = new Intent("com.score.chatz.DATA_SENZ");
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
         } else if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("sharePermDone")) {
+            /*
+             * New permission, set a user, is notified to be updated correctly, success message.
+             */
             //Add New Permission
             if(senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("sharePermDone")){
                 // save senz in db
@@ -298,12 +255,15 @@ public class SenzHandler {
                 } catch (SQLiteConstraintException e) {
                     Log.e(TAG, e.toString());
                 }
-                //Indicate to the user if success
+                //TODO Indicate to the user if success
             }else{
-                //Indicate to the user if fail
+                //TODO Indicate to the user if fail
             }
 
         } else  if (senz.getAttributes().containsKey("chatzmsg")) {
+            /*
+             * Any new chatz message, incoming, save straight to db
+             */
             //Add chat message
             handleSharedMessages(senz);
             Intent intent = new Intent("com.score.chatz.DATA_SENZ");
@@ -311,7 +271,11 @@ public class SenzHandler {
             context.sendBroadcast(intent);
 
         } else if(senz.getAttributes().containsKey("chatzphoto")){
-            //Add chat message
+
+            /*
+             *  New photo received. Saving to db.
+             */
+
             try {
                 Log.i(TAG, "SENDER OF PHOTO : " + senz.getSender());
                 dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver()));
@@ -323,13 +287,17 @@ public class SenzHandler {
             context.sendBroadcast(intent);
 
         }  else{
-            //Registration
+            /*
+             * Default cases, handle such as registration success or, any other scenarios where need to specifically handle in the Activity.
+             */
             Intent intent = new Intent("com.score.chatz.DATA_SENZ");
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
         }
 
-        //Update app for availability of new data
+        /*
+         * The following method is used to notify all list view to update.
+         */
         handleDataChanges(senz);
 
     }
