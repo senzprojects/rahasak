@@ -81,7 +81,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
 
 
-                SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 2), originalSenz);
+                SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 1), originalSenz);
 
                 //camera.stopPreview();
                 //camera.release();
@@ -98,7 +98,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         Bitmap resizeBitmap =  Bitmap.createScaledBitmap(bitmap, width/raducingFactor, height/raducingFactor, true);
 
         ByteArrayOutputStream baos= new ByteArrayOutputStream();
-        resizeBitmap.compress(Bitmap.CompressFormat.JPEG, 10, baos);
+        resizeBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
 
         return baos.toByteArray();
     }

@@ -475,6 +475,7 @@ public class SenzHandler {
                     //senzService.send(startSenz);
 
                     ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image);
+                    //Senz photoSenz = getPhotoSenz(senz, image);
                     //senzService.send(photoSenz);
 
                     Senz stopSenz = getStopPhotoSharingSenz(senz);
@@ -500,6 +501,24 @@ public class SenzHandler {
     }
 
 
+    private Senz getPhotoSenz(Senz senz, byte[] image) {
+        String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
+
+        //Save photo to db before sending
+        new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, senz.getSender(), senz.getReceiver()));
+
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("chatzphoto", imageAsString);
+
+        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
+    }
+
     private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image) {
         String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
 
@@ -508,7 +527,7 @@ public class SenzHandler {
 
 
         ArrayList<Senz> senzList = new ArrayList<>();
-        String[] imgs = split(imageAsString, 1024);
+        String[] imgs = split(imageAsString, 2048);
         for (int i = 0; i < imgs.length; i++) {
             // new senz
             String id = "_ID";
@@ -551,7 +570,6 @@ public class SenzHandler {
         Senz _senz = new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
         return _senz;
     }
-
 
     private Senz getStopPhotoSharingSenz(Senz senz) {
         // create senz attributes
