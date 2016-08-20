@@ -35,8 +35,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final String TAG = CameraPreview.class.getName();;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private int pictureWidth = 800;
-    private int pictureHeight = 800;
+    private int pictureWidth = 500;
+    private int pictureHeight = 500;
 
     //Constructor that obtains context and camera
     public CameraPreview(Context _context, Camera camera) {
@@ -76,7 +76,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
-                SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 1), originalSenz);
+                SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 2), originalSenz);
 
                 activity.finish();
             }

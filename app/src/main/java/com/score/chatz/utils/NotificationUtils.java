@@ -55,7 +55,7 @@ public class NotificationUtils {
      */
     public static void showNotification(Context context, String title, String message) {
         // display notification
-        Notification notification = NotificationUtils.getNotification(context, R.drawable.notif, title, message);
+        Notification notification = NotificationUtils.getNotification(context, R.drawable.rlogo_launcher, title, message);
         notification.flags |= Notification.FLAG_AUTO_CANCEL;
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.notify(NotificationUtils.MESSAGE_NOTIFICATION_ID, notification);
