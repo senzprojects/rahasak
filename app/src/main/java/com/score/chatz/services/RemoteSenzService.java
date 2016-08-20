@@ -46,7 +46,8 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    public static final String SENZ_HOST = "192.168.1.102";
+    //public static final String SENZ_HOST = "192.168.1.102";
+    public static final String SENZ_HOST = "udp.mysensors.info";
     public static final int SENZ_PORT = 7070;
 
     // senz socket
@@ -271,7 +272,7 @@ public class RemoteSenzService extends Service {
                         writer.println(message);
                         writer.flush();
 
-                        Thread.currentThread().sleep(100);
+                        Thread.currentThread().sleep(10);
                     }
                 } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException | InterruptedException e) {
                     e.printStackTrace();
