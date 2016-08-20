@@ -87,6 +87,7 @@ public class RecentFriendListFragment extends ListFragment implements AdapterVie
         getListView().setOnItemClickListener(this);
         getContext().registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_UPDATE"));
         //getContext().registerReceiver(permissionSharedReceiver, new IntentFilter("com.score.chatz.USER_PERMISSION"));
+        getListView().setDividerHeight(1);
     }
 
     @Override

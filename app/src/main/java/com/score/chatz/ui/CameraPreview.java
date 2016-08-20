@@ -8,6 +8,7 @@ import android.hardware.Camera;
 import android.os.RemoteException;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Size;
 import android.view.ContextMenu;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -24,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by lakmalcaldera on 8/16/16.
@@ -33,8 +35,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final String TAG = CameraPreview.class.getName();;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private static SenzServiceConnection serviceConnection;
-    //private static Context context;
+    private int pictureWidth = 800;
+    private int pictureHeight = 800;
 
     //Constructor that obtains context and camera
     public CameraPreview(Context _context, Camera camera) {
@@ -46,12 +48,6 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         this.mSurfaceHolder.addCallback(this); // we get notified when underlying surface is created and destroyed
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //this is a deprecated method, is not requierd after 3.0
 
-        /*serviceConnection = new SenzServiceConnection(context);
-        // bind to senz service
-        Intent serviceIntent = new Intent();
-        //serviceIntent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
-        serviceIntent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
-        CameraPreview.context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);*/
     }
 
     @Override
@@ -59,10 +55,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         if(mCamera != null)
         mCamera.release();
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        Camera.Parameters params = mCamera.getParameters();
+        params.setPictureSize(pictureWidth, pictureHeight);
 
         try {
             mCamera.setPreviewDisplay(surfaceHolder);
-
             mCamera.setDisplayOrientation(90);
 
             mCamera.startPreview();
@@ -79,17 +76,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
-
-
                 SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 1), originalSenz);
 
-                //camera.stopPreview();
-                //camera.release();
-                ;
                 activity.finish();
             }
         });
-    }
+
+        Camera.Parameters params = mCamera.getParameters();
+
+        List<Camera.Size> sizes = params.getSupportedPictureSizes();
+        Size mSize;
+        for (Camera.Size size : sizes) {
+            Log.i(TAG, "Available resolution: "+size.width+" "+size.height);
+            //mSize = size;
+        }
+}
 
     public byte[] getResizedBitmap(byte[] image, int raducingFactor) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(image , 0, image.length);
@@ -99,6 +100,23 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         ByteArrayOutputStream baos= new ByteArrayOutputStream();
         resizeBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+
+        return baos.toByteArray();
+    }
+
+    public byte[] scaleDown(Bitmap realImage, float maxImageSize,
+                                   boolean filter) {
+        float ratio = Math.min(
+                (float) maxImageSize / realImage.getWidth(),
+                (float) maxImageSize / realImage.getHeight());
+        int width = Math.round((float) ratio * realImage.getWidth());
+        int height = Math.round((float) ratio * realImage.getHeight());
+
+        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
+                height, filter);
+
+        ByteArrayOutputStream baos= new ByteArrayOutputStream();
+        newBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
 
         return baos.toByteArray();
     }

@@ -126,6 +126,7 @@
             android:theme="@style/MyMaterialTheme" />
         <activity
             android:name=".ui.PhotoActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
         <service
@@ -155,6 +156,7 @@
 
         <activity
             android:name=".ui.UserProfileActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat"></activity>
     </application>
 

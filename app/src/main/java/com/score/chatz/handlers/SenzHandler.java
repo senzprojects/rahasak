@@ -210,7 +210,7 @@ public class SenzHandler {
             // if senz already exists in the db, SQLiteConstraintException should throw
             try {
                 dbSource.createSenz(senz);
-                NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "Permission to share with @" + senz.getSender().getUsername());
+                //NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "Permission to share with @" + senz.getSender().getUsername());
             } catch (SQLiteConstraintException e) {
                 Log.e(TAG, e.toString());
             }

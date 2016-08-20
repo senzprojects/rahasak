@@ -61,7 +61,7 @@ public class HomeActivity extends AppCompatActivity {
         try {
             User user = PreferenceUtils.getUser(this);
             Log.i(TAG, "Registered User on Home page - " + user.getUsername());
-            ((TextView)getSupportActionBar().getCustomView().findViewById(R.id.user_name)).setText(user.getUsername());
+            ((TextView)getSupportActionBar().getCustomView().findViewById(R.id.user_name)).setText("@"+user.getUsername());
         }catch(NoUserException ex){
             Log.d(TAG, "No Registered User");
         }

@@ -193,7 +193,9 @@
                 android:layout_height="wrap_content"
                 android:text="Tap on the above image to request a user picture."
                 android:layout_gravity="center_horizontal"
-                android:textSize="9sp" />
+                android:textSize="9sp"
+                android:textColor="@color/android_grey"
+                android:id="@+id/tap_image_text" />
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

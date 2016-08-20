@@ -10,6 +10,7 @@ import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
+import android.hardware.Camera;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
@@ -52,6 +53,7 @@ public class UserProfileActivity extends AppCompatActivity {
     UserPermission userzPerm;
     UserPermission currentUserGivenPerm;
     Button shareSecretBtn;
+    TextView tapImageText;
 
     // service interface
     private ISenzService senzService = null;
@@ -96,21 +98,30 @@ public class UserProfileActivity extends AppCompatActivity {
         setupUserPermissions();
         registerAllReceivers();
         setupActionBar();
+        setupGetProfileImageBtn();
         setupClickableImage();
 
 
     }
 
+    private void setupGetProfileImageBtn(){
+        tapImageText = (TextView) findViewById(R.id.tap_image_text);
+        ImageButton imgBtn = (ImageButton) findViewById(R.id.clickable_image);
+        imgBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
     private void setupClickableImage(){
+        //Update permissions
+        currentUserGivenPerm = getUserAndPermission(user);
         if(currentUserGivenPerm.getCamPerm() == true) {
-
-            ImageButton imgBtn = (ImageButton) findViewById(R.id.clickable_image);
-            imgBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
+            tapImageText.setVisibility(View.VISIBLE);
+        }else{
+            tapImageText.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -191,7 +202,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     private void setupGoToChatViewBtn(){
-
         shareSecretBtn = (Button) findViewById(R.id.share_secret_btn);
         shareSecretBtn.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
@@ -247,7 +257,14 @@ public class UserProfileActivity extends AppCompatActivity {
                     setupUserPermissions();
                 }
             }
+            updateActivity();
         }
+    }
+
+
+    private void updateActivity() {
+        setupUserPermissions();
+        setupClickableImage();
     }
 
     private void unregisterAllReceivers(){
@@ -274,8 +291,7 @@ public class UserProfileActivity extends AppCompatActivity {
     };
 
     private void handleSharedUser(Intent intent) {
-        setupUserPermissions();
-        setupClickableImage();
+        updateActivity();
     }
 
     @Override

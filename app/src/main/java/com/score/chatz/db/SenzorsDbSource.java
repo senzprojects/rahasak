@@ -68,7 +68,7 @@ public class SenzorsDbSource {
         //db.insertOrThrow(SenzorsDbContract.Permission.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
 
 
-        db.close();
+        //db.close();
     }
 
     /**
@@ -99,7 +99,7 @@ public class SenzorsDbSource {
 
             // clear
             cursor.close();
-            db.close();
+            //db.close();
 
             Log.d(TAG, "have user, so return it: " + username);
             return new User(_id, _username);
@@ -111,7 +111,7 @@ public class SenzorsDbSource {
 
             // inset data
             long id = db.insert(SenzorsDbContract.User.TABLE_NAME, SenzorsDbContract.User.COLUMN_NAME_USERNAME, values);
-            db.close();
+            //db.close();
 
             Log.d(TAG, "no user, so user created: " + username + " " + id);
             return new User(Long.toString(id), username);
@@ -134,7 +134,7 @@ public class SenzorsDbSource {
                 SenzorsDbContract.Location.COLUMN_NAME_USER + " = ?",
                 new String[]{String.valueOf(user.getId())});
 
-        db.close();
+        //db.close();
     }
 
     public void updatePermissions(User user, String camPerm, String locPerm) {
@@ -162,7 +162,7 @@ public class SenzorsDbSource {
                 SenzorsDbContract.Permission.COLOMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
 
-        db.close();
+        //db.close();
     }
 
 
@@ -192,7 +192,7 @@ public class SenzorsDbSource {
                 SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + " = ?",
                 new String[]{user.getUsername()});
 
-        db.close();
+        //db.close();
     }
 
     /**
@@ -226,7 +226,7 @@ public class SenzorsDbSource {
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Location.TABLE_NAME, SenzorsDbContract.Location.COLUMN_NAME_NAME, values);
-        db.close();
+        //db.close();
     }
 
     public void createSecret (Secret secret) {
@@ -242,7 +242,7 @@ public class SenzorsDbSource {
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
-        db.close();
+        //db.close();
     }
 
 
@@ -261,7 +261,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Permission.COLOMN_NAME_USER, senz.getSender().getUsername());
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Permission.TABLE_NAME, null, values);
-        db.close();
+        //db.close();
 
         createConfigurablePermissionsForUser(senz);
     }
@@ -281,7 +281,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER, senz.getSender().getUsername());
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.PermissionConfiguration.TABLE_NAME, null, values);
-        db.close();
+        //db.close();
     }
 
 
@@ -322,7 +322,7 @@ public class SenzorsDbSource {
 
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
         return secretList;
@@ -374,7 +374,7 @@ public class SenzorsDbSource {
 
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
         return secretList;
@@ -384,8 +384,8 @@ public class SenzorsDbSource {
     public ArrayList<Secret> getAllOtherSercets(User sender) {
         ArrayList<Secret> secretList = new ArrayList();
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, text, image, sender, receiver " +
-                "FROM secret WHERE sender != ? ORDER BY _id DESC";
+        String query = "SELECT MAX(_id), text, image, sender, receiver " +
+                "FROM secret WHERE sender != ? GROUP BY sender ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername()});
         // secret attr
         String _secretText;
@@ -413,7 +413,7 @@ public class SenzorsDbSource {
 
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
         return secretList;
@@ -473,7 +473,7 @@ public class SenzorsDbSource {
 
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         Log.d(TAG, "GetSensors: sensor count " + sensorList.size());
         return sensorList;
@@ -512,7 +512,7 @@ public class SenzorsDbSource {
         }
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         return userPerm;
     }
@@ -548,7 +548,7 @@ public class SenzorsDbSource {
         }
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         return userPerm;
     }
@@ -584,7 +584,7 @@ public class SenzorsDbSource {
         }
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         return userPerm;
     }
@@ -628,7 +628,7 @@ public class SenzorsDbSource {
         }
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         Log.d(TAG, "GetSensors: sensor count " + permissionList.size());
         return permissionList;
@@ -671,7 +671,7 @@ public class SenzorsDbSource {
         }
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         Log.d(TAG, "GetSensors: sensor count " + permissionList.size());
         return permissionList;
@@ -703,7 +703,7 @@ public class SenzorsDbSource {
 
         // clean
         cursor.close();
-        db.close();
+        //db.close();
 
         Log.d(TAG, "user count " + userList.size());
 
@@ -723,7 +723,7 @@ public class SenzorsDbSource {
                 SenzorsDbContract.Chatz.COLUMN_NAME_USER + "=?" + " AND " +
                         SenzorsDbContract.Senz.COLUMN_NAME_NAME + "=?",
                 new String[]{senz.getSender().getId(), senz.getAttributes().keySet().iterator().next()});*/
-        db.close();
+        //db.close();
     }
 
     /**
@@ -739,7 +739,7 @@ public class SenzorsDbSource {
                 SenzorsDbContract.Location.COLUMN_NAME_USER + "=?" + " AND " +
                         SenzorsDbContract.Location.COLUMN_NAME_NAME + "=?",
                 new String[]{senz.getSender().getId(), senz.getAttributes().keySet().iterator().next()});
-        db.close();
+        //db.close();
     }
 
     public void insertImageToDB(String username, String encodedImage) {
@@ -773,7 +773,7 @@ public class SenzorsDbSource {
                 // get  the  data into array,or class variable
             } while (cursor.moveToNext());
         }
-        db.close();
+        //db.close();
         return image;
 
     }

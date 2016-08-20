@@ -18,11 +18,11 @@
 
         <RelativeLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="300dp"
             android:id="@+id/message_container"
             android:padding="5dp"
             android:background="@color/not_my_message_background"
-            android:layout_alignParentEnd="true">
+            android:layout_alignParentEnd="false">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -30,7 +30,8 @@
                 android:src="@drawable/refresh"
                 android:layout_alignParentEnd="false"
                 android:layout_alignParentStart="false"
-                android:foregroundGravity="center_vertical" />
+                android:foregroundGravity="center_vertical"
+                android:scaleType="centerCrop" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

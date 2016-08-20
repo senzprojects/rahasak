@@ -26,7 +26,7 @@ import java.util.ArrayList;
 /**
  * Created by lakmalcaldera on 8/19/16.
  */
-public class AllChatListFragment  extends ListFragment {
+public class AllChatListFragment  extends ListFragment implements AdapterView.OnItemClickListener {
 
     private static final String TAG = AllChatListFragment.class.getName();
     private ArrayList<Secret> allSecretsList;
@@ -57,6 +57,8 @@ public class AllChatListFragment  extends ListFragment {
         //adapter = new UserPermissionListAdapter(getContext(), userPermissionList);
         //setListAdapter(adapter);
         getContext().registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_UPDATE"));
+        getListView().setOnItemClickListener(this);
+        getListView().setDividerHeight(1);
     }
 
     private BroadcastReceiver userSharedReceiver = new BroadcastReceiver() {
@@ -101,6 +103,13 @@ public class AllChatListFragment  extends ListFragment {
             getListView().setAdapter(adapter);
             //sensorListView.setEmptyView(emptyView);
         }
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Intent intent = new Intent(this.getActivity(), ChatActivity.class);
+        intent.putExtra("SENDER", allSecretsList.get(position).getSender().getUsername());
+        startActivity(intent);
     }
 
 
