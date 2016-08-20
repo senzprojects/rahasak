@@ -85,12 +85,14 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
                     view = mInflater.inflate(R.layout.rahas_image_row_layout, viewGroup, false);
                     holder.image = (ImageView) view.findViewById(R.id.image);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.userImage = (ImageView) view.findViewById(R.id.user_image);
                     holder.messageType = IMAGE_MESSAGE;
                     break;
                 case TEXT_MESSAGE:
                     view = mInflater.inflate(R.layout.rahas_row_layout, viewGroup, false);
                     holder.message = (TextView) view.findViewById(R.id.message);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.userImage = (ImageView) view.findViewById(R.id.user_image);
                     holder.messageType = TEXT_MESSAGE;
                     break;
             }
@@ -115,6 +117,16 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
             viewHolder.image.setImageBitmap(imgBitmap);
             viewHolder.image.setRotation(-90);
         }
+
+        //Extracting user image
+        if(secret.getSender().getUserImage() != null) {
+            byte[] imageAsBytes = Base64.decode(secret.getSender().getUserImage().getBytes(), Base64.DEFAULT);
+            Bitmap imgBitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+            viewHolder.userImage.setImageBitmap(imgBitmap);
+            viewHolder.userImage.setRotation(-90);
+        }
+
+        //User name
         viewHolder.sender.setText(secret.getSender().getUsername());
     }
 
@@ -126,6 +138,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
         TextView sender;
         Integer messageType;
         ImageView image;
+        ImageView userImage;
 
     }
 }
