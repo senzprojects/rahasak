@@ -158,18 +158,19 @@
         android:orientation="vertical"
         android:layout_alignParentTop="true">
 
-    <android.support.v7.widget.Toolbar
+    <!--<android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:background="@android:color/transparent" />
+        android:background="@android:color/transparent" />-->
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="4"
-            android:layout_gravity="top">
-            <ImageView
+            android:layout_gravity="top"
+            >
+            <ImageButton
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/default_user"
@@ -177,7 +178,8 @@
                 android:adjustViewBounds="false"
                 android:focusableInTouchMode="false"
                 android:scaleType="centerCrop"
-                android:layout_gravity="top" />
+                android:layout_gravity="top"
+                android:id="@+id/clickable_image"/>
         </FrameLayout>
 
         <LinearLayout
@@ -187,15 +189,22 @@
             android:layout_weight="6"
             android:background="#FFF">
             <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tap on the above image to request a user picture."
+                android:layout_gravity="center_horizontal"
+                android:textSize="9sp" />
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/user_name"
                 android:layout_marginLeft="40dp"
-                android:layout_marginTop="40dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginRight="40dp"
                 android:text="Lakmal"
                 android:textSize="20dp"
-                android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:textColor="@color/android_grey" />
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
@@ -208,7 +217,7 @@
                 android:textColor="@color/android_grey" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="280dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:layout_gravity="center_horizontal"
@@ -225,7 +234,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:maxWidth="20dp"
-                        android:layout_weight="10"
+                        android:layout_weight="5"
                         android:adjustViewBounds="true"
                         android:src="@drawable/perm_locations_active"
                         android:baselineAlignBottom="false"
@@ -238,14 +247,16 @@
                         android:text="@string/perm_location"
                         android:textColor="@color/android_grey"
                         android:textSize="13dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="center_vertical" />
 
                     <Switch
                         android:id="@+id/perm_location_switch"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="26"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="center_vertical" />
 
 
 
@@ -264,7 +275,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:maxWidth="20dp"
-                        android:layout_weight="10"
+                        android:layout_weight="5"
                         android:adjustViewBounds="true"
                         android:src="@drawable/perm_camera_active"
                         android:baselineAlignBottom="false"
@@ -277,14 +288,16 @@
                         android:text="@string/perm_camera"
                         android:textColor="@color/android_grey"
                         android:textSize="13dp"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="center_vertical" />
 
                     <Switch
                         android:id="@+id/perm_camera_switch"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="26"
-                        android:layout_marginLeft="10dp" />
+                        android:layout_marginLeft="10dp"
+                        android:layout_gravity="center_vertical" />
                 </LinearLayout>
             </LinearLayout>
 

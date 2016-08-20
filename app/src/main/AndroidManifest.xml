@@ -105,7 +105,7 @@
         <activity
             android:name=".ui.ChatActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+            android:theme="@style/Theme.AppCompat" />
         <activity
             android:name=".ui.HomeActivity"
             android:screenOrientation="portrait"
@@ -155,7 +155,7 @@
 
         <activity
             android:name=".ui.UserProfileActivity"
-            android:theme="@style/MyMaterialTheme"></activity>
+            android:theme="@style/Theme.AppCompat"></activity>
     </application>
 
 </manifest>

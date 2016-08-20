@@ -13,12 +13,17 @@ import android.os.Parcelable;
 public class User implements Parcelable {
     String id;
     String username;
+    String image;
 
     public User(String id, String username) {
         this.id = id;
         this.username = username;
     }
 
+    public User(String id, String username, String image) {
+        this.id = id;
+        this.username = username;
+    }
     /**
      * Use when reconstructing User object from parcel
      * This will be used only by the 'CREATOR'
@@ -80,8 +85,16 @@ public class User implements Parcelable {
         return username;
     }
 
+    public String getUserImage() {
+        return image;
+    }
+
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setUserImage(String username) {
+        this.image = image;
     }
 
     @Override

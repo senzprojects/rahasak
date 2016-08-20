@@ -1,12 +1,15 @@
 package com.score.chatz.ui;
 
+import android.app.ActionBar;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
@@ -14,9 +17,12 @@ import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -44,6 +50,7 @@ public class UserProfileActivity extends AppCompatActivity {
     Switch cameraSwitch;
     Switch locationSwitch;
     UserPermission userzPerm;
+    UserPermission currentUserGivenPerm;
     Button shareSecretBtn;
 
     // service interface
@@ -72,35 +79,58 @@ public class UserProfileActivity extends AppCompatActivity {
         user = new User("", senderString);
 
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        /*toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setCollapsible(false);
         toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);*/
 
         username = (TextView) findViewById(R.id.user_name);
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
 
-        userzPerm = getUserPerm(user);
+        userzPerm = getUserConfigPerm(user);
+        currentUserGivenPerm = getUserAndPermission(user);
 
 
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        //displaying custom ActionBar
-        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.user_profile_action_bar, null));
-        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
-
-        Toolbar toolbar=(Toolbar) getSupportActionBar().getCustomView().getParent();
-        toolbar.setContentInsetsAbsolute(0, 0);
-        toolbar.getContentInsetEnd();
-        toolbar.setPadding(0, 0, 0, 0);
-
-        setupBackBtn();
-        setupFontForActioBar();
         setupGoToChatViewBtn();
         setupUserPermissions();
         registerAllReceivers();
+        setupActionBar();
+        setupClickableImage();
 
+
+    }
+
+    private void setupClickableImage(){
+        if(currentUserGivenPerm.getCamPerm() == true) {
+
+            ImageButton imgBtn = (ImageButton) findViewById(R.id.clickable_image);
+            imgBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+        }
+    }
+
+    private void setupActionBar(){
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        getSupportActionBar().setTitle("Profile");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_arrow);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -124,7 +154,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void setupUserPermissions(){
-        username.setText(user.getUsername());
+        username.setText(userzPerm.getUser().getUsername());
         cameraSwitch.setChecked(userzPerm.getCamPerm());
         locationSwitch.setChecked(userzPerm.getLocPerm());
         cameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -151,29 +181,14 @@ public class UserProfileActivity extends AppCompatActivity {
         });
     }
 
-    private UserPermission getUserPerm(User user){
-        return new SenzorsDbSource(this).getUserPermission(user);
+    private UserPermission getUserConfigPerm(User user){
+        return new SenzorsDbSource(this).getUserConfigPermission(user);
     }
 
-    private void setupFontForActioBar(){
-        TextView headerTitle = (TextView) findViewById(R.id.header_center_text);
-        Typeface typefaceThin = Typeface.createFromAsset(getAssets(), "fonts/HelveticaNeue-Light.otf");
-        headerTitle.setTypeface(typefaceThin, Typeface.NORMAL);
+    private UserPermission getUserAndPermission(User user){
+        return new SenzorsDbSource(this).getUserAndPermission(user);
     }
 
-    private void setupBackBtn(){
-        backBtn = (ImageView) findViewById(R.id.goBackToHomeImg);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                goBackToHome();
-            }
-        });
-    }
-
-    private void goBackToHome(){
-        Log.d(TAG, "go home clicked");
-        this.finish();
-    }
 
     private void setupGoToChatViewBtn(){
 
@@ -260,6 +275,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void handleSharedUser(Intent intent) {
         setupUserPermissions();
+        setupClickableImage();
     }
 
     @Override

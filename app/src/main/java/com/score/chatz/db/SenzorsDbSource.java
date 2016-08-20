@@ -284,6 +284,56 @@ public class SenzorsDbSource {
         db.close();
     }
 
+
+
+
+
+
+    public ArrayList<Secret> getAllSecretz(User sender, User receiver) {
+        Log.i(TAG, "Get Secrets: getting all secret messages, sender - " + sender.getUsername() + ", receiver - " + receiver.getUsername());
+        ArrayList<Secret> secretList = new ArrayList();
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT _id, text, image, sender, receiver " +
+                "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id DESC";
+        Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
+        // secret attr
+        String _secretText;
+        String _secretImage;
+        String _secretSender;
+        String _secretReceiver;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            HashMap<String, String> chatzAttributes = new HashMap<>();
+
+            // get chatz attributes
+            //_chatzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz._ID));
+            _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
+            _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
+            _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
+            _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
+
+            // create secret
+            Secret secret = new Secret(_secretText, _secretImage, new User("", _secretSender), new User("", _secretReceiver));
+
+            // fill secret list
+            secretList.add(secret);
+        }
+
+        // clean
+        cursor.close();
+        db.close();
+
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
+    }
+
+
+
+
+
+
+
     /**
      * Get all chatz, two types of sensors here
      * 1. my sensors
@@ -298,6 +348,45 @@ public class SenzorsDbSource {
         String query = "SELECT _id, text, image, sender, receiver " +
                 "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
+        // secret attr
+        String _secretText;
+        String _secretImage;
+        String _secretSender;
+        String _secretReceiver;
+
+        // extract attributes
+        while (cursor.moveToNext()) {
+            HashMap<String, String> chatzAttributes = new HashMap<>();
+
+            // get chatz attributes
+            //_chatzId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Chatz._ID));
+            _secretText = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_TEXT));
+            _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
+            _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
+            _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
+
+            // create secret
+            Secret secret = new Secret(_secretText, _secretImage, new User("", _secretSender), new User("", _secretReceiver));
+
+            // fill secret list
+            secretList.add(secret);
+        }
+
+        // clean
+        cursor.close();
+        db.close();
+
+        Log.d(TAG, "GetSecretz: secrets count " + secretList.size());
+        return secretList;
+    }
+
+
+    public ArrayList<Secret> getAllOtherSercets(User sender) {
+        ArrayList<Secret> secretList = new ArrayList();
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        String query = "SELECT _id, text, image, sender, receiver " +
+                "FROM secret WHERE sender != ? ORDER BY _id DESC";
+        Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername()});
         // secret attr
         String _secretText;
         String _secretImage;
@@ -391,6 +480,45 @@ public class SenzorsDbSource {
     }
 
 
+
+    public UserPermission getUserAndPermission(User user){
+        Log.d(TAG, "GetPermission: get single permission");
+        UserPermission userPerm = null;
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+
+        // join query to retrieve data
+        String query = "SELECT permission.camera, permission.location, user.image " +
+                "FROM user " +
+                "INNER JOIN permission " +
+                "ON user.username = permission.user WHERE permission.user = ?";
+        Cursor cursor = db.rawQuery(query,  new String[] {user.getUsername()});
+
+        // user attributes
+        String _userimage;
+        boolean _location;
+        boolean _camera;
+
+        // extract attributes
+        if (cursor.moveToFirst()) {
+            // get permission attributes
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA))== 1 ? true : false ;
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false ;
+            // create senz
+            _userimage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
+            user.setUserImage(_userimage);
+            userPerm = new UserPermission(user, _camera, _location);
+            // fill senz list
+        }
+        // clean
+        cursor.close();
+        db.close();
+
+        return userPerm;
+    }
+
+
+
     public UserPermission getUserPermission(User user){
         Log.d(TAG, "GetPermission: get single permission");
         UserPermission userPerm = null;
@@ -401,6 +529,42 @@ public class SenzorsDbSource {
         String query = "SELECT permission.location, permission.camera " +
                 "FROM permission " +
                 "WHERE permission.user = ?";
+        Cursor cursor = db.rawQuery(query,  new String[] {user.getUsername()});
+
+        // user attributes
+        String _username;
+        boolean _location;
+        boolean _camera;
+        String _userId;
+
+        // extract attributes
+        if (cursor.moveToFirst()) {
+            // get permission attributes
+            _location = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_LOCATION)) == 1 ? true : false ;
+            _camera = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Permission.COLUMN_NAME_CAMERA))== 1 ? true : false ;
+            // create senz
+            userPerm = new UserPermission(user, _camera, _location);
+            // fill senz list
+        }
+        // clean
+        cursor.close();
+        db.close();
+
+        return userPerm;
+    }
+
+
+
+    public UserPermission getUserConfigPermission(User user){
+        Log.d(TAG, "GetPermission: get single permission");
+        UserPermission userPerm = null;
+
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+
+        // join query to retrieve data
+        String query = "SELECT permission_config.location, permission_config.camera " +
+                "FROM permission_config " +
+                "WHERE permission_config.user = ?";
         Cursor cursor = db.rawQuery(query,  new String[] {user.getUsername()});
 
         // user attributes

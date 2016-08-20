@@ -2,11 +2,15 @@ package com.score.chatz.ui;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -43,20 +47,40 @@ public class ChatActivity extends AppCompatActivity {
         toolbar.setCollapsible(false);
         toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
         setSupportActionBar(toolbar);*/
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+       /* getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
 
         //displaying custom ActionBar
-        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.chat_action_bar, null));
-
+        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.chat_action_bar, null));*/
+        setupActionBar();
 
         if (mainFragment == null) {
             mainFragment = ChatFragment.newInstance(sender, receiver);
             fm.beginTransaction().add(R.id.container_main, mainFragment).commit();
         }
 
-        setupBackBtn();
+
+    }
+
+
+    private void setupActionBar(){
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#636363")));
+        getSupportActionBar().setTitle("Rahas");
+        getSupportActionBar().setHomeButtonEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //getSupportActionBar().setHomeAsUpIndicator(R.drawable.back_arrow);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                this.finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -75,20 +99,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    private void setupBackBtn() {
-        backBtn = (ImageView) findViewById(R.id.goBackToHomeImg);
-        backBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                goBackToHome();
-            }
-        });
-    }
 
 
-    private void goBackToHome(){
-        Log.d(TAG, "go home clicked");
-        this.finish();
-    }
 
 
 }
