@@ -31,6 +31,7 @@ public class SenzStream {
     }
 
     public void putStream(String stream) {
+
         this.streamBuffer.append(stream);
     }
 

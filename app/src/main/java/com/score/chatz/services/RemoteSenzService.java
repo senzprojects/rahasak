@@ -1,6 +1,5 @@
 package com.score.chatz.services;
 
-
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -46,8 +45,8 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    public static final String SENZ_HOST = "192.168.1.102";
-    //public static final String SENZ_HOST = "udp.mysensors.info";
+    //public static final String SENZ_HOST = "10.2.2.49";
+    public static final String SENZ_HOST = "udp.mysensors.info";
     public static final int SENZ_PORT = 7070;
 
     // senz socket
@@ -268,11 +267,15 @@ public class RemoteSenzService extends Service {
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
-                        if (socket == null || !socket.isConnected()) initSoc();
-                        writer.println(message);
-                        writer.flush();
+                        if (socket != null && socket.isConnected()) {
+                            writer.println(message);
+                            writer.flush();
+                        } else {
+                            Log.e(TAG, "Socket disconnected");
+                        }
 
-                        Thread.currentThread().sleep(10);
+                        if (senzList.indexOf(senz) == 0)
+                            Thread.currentThread().sleep(100);
                     }
                 } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException | InterruptedException e) {
                     e.printStackTrace();

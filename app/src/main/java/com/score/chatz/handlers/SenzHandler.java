@@ -58,7 +58,6 @@ public class SenzHandler {
 
             // bind to senz service
             Intent serviceIntent = new Intent();
-            //serviceIntent.setClassName("com.score.senz", "com.score.senz.services.RemoteSenzService");
             serviceIntent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
             SenzHandler.context.bindService(serviceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
         }
@@ -69,25 +68,29 @@ public class SenzHandler {
     public void handleSenz(String senzMessage) {
         // parse and verify senz
         try {
-            Senz senz = SenzParser.parse(senzMessage);
-            verifySenz(senz);
-            switch (senz.getSenzType()) {
-                case PING:
-                    Log.d(TAG, "PING received");
-                    break;
-                case SHARE:
-                    Log.d(TAG, "SHARE received");
-                    Log.d(TAG, "#lat #lon SHARE received");
-                    handleShareSenz(senz);
-                    break;
-                case GET:
-                    Log.d(TAG, "GET received");
-                    handleGetSenz(senz);
-                    break;
-                case DATA:
-                    Log.d(TAG, "DATA received");
-                    handleDataSenz(senz);
-                    break;
+            if (senzStream != null && senzStream.isActive()) {
+                handleStream(senzMessage);
+            } else {
+                Senz senz = SenzParser.parse(senzMessage);
+                verifySenz(senz);
+                switch (senz.getSenzType()) {
+                    case PING:
+                        Log.d(TAG, "PING received");
+                        break;
+                    case SHARE:
+                        Log.d(TAG, "SHARE received");
+                        Log.d(TAG, "#lat #lon SHARE received");
+                        handleShareSenz(senz);
+                        break;
+                    case GET:
+                        Log.d(TAG, "GET received");
+                        handleGetSenz(senz);
+                        break;
+                    case DATA:
+                        Log.d(TAG, "DATA received");
+                        handleDataSenz(senz);
+                        break;
+                }
             }
         } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
@@ -104,10 +107,6 @@ public class SenzHandler {
 
     private void handleShareSenz(final Senz senz) {
         Log.d("Tag", senz.getSender() + " : " + senz.getSenzType().toString());
-
-        /*
-         *  Is called when you receive an invitation/share from another person
-         */
 
         //call back after service bind
         serviceConnection.executeAfterServiceConnected(new Runnable() {
@@ -196,7 +195,6 @@ public class SenzHandler {
     }
 
     private void handleDataSenz(Senz senz) {
-
         if (senz.getAttributes().containsKey("msg") && senz.getAttributes().get("msg").equalsIgnoreCase("ShareDone")) {
             /*
              * Share message from other user, to whom you send a share to.
@@ -255,7 +253,6 @@ public class SenzHandler {
             Intent intent = new Intent("com.score.chatz.DATA_SENZ");
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
-
         } else if (senz.getAttributes().containsKey("stream")) {
             // handle streaming
             if (senz.getAttributes().get("stream").equalsIgnoreCase("ON")) {
@@ -281,14 +278,6 @@ public class SenzHandler {
                 intent.putExtra("SENZ", senz);
                 context.sendBroadcast(intent);
             }
-        } else if (senz.getAttributes().containsKey("chatzphoto")) {
-            if (senzStream != null && senzStream.isActive()) {
-                // streaming ON
-                Log.d(TAG, "Stream ON, chatzphoto received from " + senz.getSender().getUsername());
-                senzStream.putStream(senz.getAttributes().get("chatzphoto"));
-            } else {
-                Log.e(TAG, "Stream OFF, chatzphoto received from " + senz.getSender().getUsername());
-            }
         } else {
             /*
              * Default cases, handle such as registration success or, any other scenarios where need to specifically handle in the Activity.
@@ -303,6 +292,20 @@ public class SenzHandler {
          */
         handleDataChanges(senz);
 
+    }
+
+    private void handleStream(String stream) {
+        if (senzStream != null && senzStream.isActive()) {
+            // streaming ON
+            Log.d(TAG, "Stream ON, chatzphoto ");
+            senzStream.putStream(stream);
+            if (stream.contains("#stream off")) {
+                Log.d(TAG, "Stream OFFFFFFFFFFFF ");
+                senzStream.setIsActive(false);
+            }
+        } else {
+            Log.e(TAG, "Stream OFF, chatzphoto ");
+        }
     }
 
     private void handleSharedPermission(final Senz senz) {
@@ -527,7 +530,7 @@ public class SenzHandler {
 
 
         ArrayList<Senz> senzList = new ArrayList<>();
-        String[] imgs = split(imageAsString, 2048);
+        String[] imgs = split(imageAsString, 1024);
         for (int i = 0; i < imgs.length; i++) {
             // new senz
             String id = "_ID";
