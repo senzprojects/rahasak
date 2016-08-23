@@ -20,7 +20,7 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="30dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="7dp"
         android:layout_marginRight="15dp"
         android:layout_alignParentRight="true">
 
@@ -32,7 +32,7 @@
         android:textColor="@color/android_green"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textSize="14dp" />
+        android:textSize="20dp" />
     </RelativeLayout>
 
 

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
@@ -17,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +30,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbHelper;
@@ -52,8 +56,10 @@ public class UserProfileActivity extends AppCompatActivity {
     Switch locationSwitch;
     UserPermission userzPerm;
     UserPermission currentUserGivenPerm;
+    User currentUser;
     Button shareSecretBtn;
     TextView tapImageText;
+    ImageButton userImage;
 
     // service interface
     private ISenzService senzService = null;
@@ -87,12 +93,18 @@ public class UserProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);*/
 
         username = (TextView) findViewById(R.id.user_name);
+        userImage = (ImageButton) findViewById(R.id.clickable_image);
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
 
         userzPerm = getUserConfigPerm(user);
         currentUserGivenPerm = getUserAndPermission(user);
 
+        try {
+            currentUser = PreferenceUtils.getUser(this);
+        }catch (NoUserException ex){
+            Log.e(TAG, "No registered user.");
+        }
 
         setupGoToChatViewBtn();
         setupUserPermissions();
@@ -110,9 +122,35 @@ public class UserProfileActivity extends AppCompatActivity {
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if(currentUserGivenPerm.getCamPerm() == true) {
+                    getPhoto(userzPerm.getUser());
+                }else{
+                    //Toast.makeText(UserProfileActivity.this, "Sorry. This user has not shared camera permissions with you.", Toast.LENGTH_LONG).show();
+                }
             }
         });
+    }
+
+    /*
+     * Get photo of user
+     */
+    private void getPhoto(User receiver){
+        try {
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("profilezphoto", "profilezphoto");
+
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.GET;
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+            senzService.send(senz);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void setupClickableImage(){
@@ -166,6 +204,12 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void setupUserPermissions(){
         username.setText(userzPerm.getUser().getUsername());
+        if(userzPerm.getUser().getUserImage() != null) {
+            byte[] imageAsBytes = Base64.decode(userzPerm.getUser().getUserImage().getBytes(), Base64.DEFAULT);
+            Bitmap imgBitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+            userImage.setImageBitmap(imgBitmap);
+            userImage.setRotation(-90);
+        }
         cameraSwitch.setChecked(userzPerm.getCamPerm());
         locationSwitch.setChecked(userzPerm.getLocPerm());
         cameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
