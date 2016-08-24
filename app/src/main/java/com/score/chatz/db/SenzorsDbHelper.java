@@ -45,6 +45,8 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Secret._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
                     SenzorsDbContract.Secret.COLUMN_NAME_TEXT + TEXT_TYPE +", "+
                     SenzorsDbContract.Secret.COLOMN_NAME_IMAGE + TEXT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_NAME_DELETE + INT_TYPE +", "+
+                    SenzorsDbContract.Secret.COLUMN_TIMESTAMP + INT_TYPE +", "+
                     SenzorsDbContract.Secret.COLUMN_NAME_SENDER + TEXT_TYPE + " NOT NULL" + "," +
                     SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER + TEXT_TYPE + " NOT NULL" +
                     " )";

@@ -6,88 +6,28 @@
     android:background="@color/white"
     android:id="@+id/parent_container">
 
-    <!--<RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="bottom">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="90"
-                android:id="@+id/text_messages_container"></FrameLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:orientation="horizontal"
-                android:background="@drawable/chat_controls_container"
-                android:layout_marginBottom="0dp"
-                android:baselineAligned="false"
-                android:minHeight="20dp">
-
-                <EditText
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:ellipsize="start"
-                    android:textColorHint="@android:color/darker_gray"
-                    android:textColor="@android:color/black"
-                    android:hint="Enter your text here.."
-                    android:layout_weight="70"
-                    android:background="@drawable/chat_text_box"
-                    android:layout_margin="4dp"
-                    android:padding="7dp"
-                    android:id="@+id/text_message" />
-
-                <Button
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="30"
-                    android:text="Send"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginBottom="3dp"
-                    android:layout_marginRight="3dp"
-                    android:layout_marginTop="0dp"
-                    android:id="@+id/sendBtn" />
-
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-    </RelativeLayout>-->
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="#3498db">
+        android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="8"
             android:padding="5dp"
-            android:id="@+id/text_messages_container"
-            android:background="@color/android_grey">
+            android:id="@+id/text_messages_container">
 
             <ListView
                 android:layout_width="match_parent"
-                android:layout_height="fill_parent"
+                android:layout_height="match_parent"
                 android:id="@+id/messages_list_view"
-                android:padding="5dp"
-                android:layout_gravity="top|bottom"
-                android:background="#ecf0f1"></ListView>
+                android:padding="0dp"
+                android:layout_gravity="right"></ListView>
 
         </FrameLayout>
 
-        <FrameLayout
+        <!--<FrameLayout
             android:layout_width="match_parent"
             android:layout_height="110dp"
             android:layout_weight="0"
@@ -127,12 +67,6 @@
                             android:layout_weight="5"
                             android:orientation="horizontal">
 
-                            <!--<Button
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_weight="5"
-                                android:background="@color/light_blue_card_theme"
-                                android:layout_margin="3dp" />-->
 
                             <ImageButton
                                 android:layout_width="match_parent"
@@ -147,12 +81,7 @@
                                 android:padding="8dp"
                                 android:id="@+id/getLocBtn"/>
 
-                            <!--<Button
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_weight="5"
-                                android:background="@color/light_blue_card_theme"
-                                android:layout_margin="3dp" />-->
+
 
                             <ImageButton
                                 android:layout_width="match_parent"
@@ -173,10 +102,7 @@
                             android:layout_height="0dp"
                             android:layout_weight="5">
 
-                            <!--<Button
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:layout_margin="3dp" />-->
+
                             <ImageButton
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
@@ -196,7 +122,102 @@
                 </FrameLayout>
 
             </LinearLayout>
+        </FrameLayout>-->
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="0"
+            android:background="#ecf0f1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="5dp"
+                android:background="#ecf0f1">
+            <EditText
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textColorHint="@android:color/darker_gray"
+                android:textColor="@color/android_grey"
+                android:hint="@string/enter_secret_here_hint"
+                android:padding="7dp"
+                android:id="@+id/text_message"
+                android:layout_marginRight="5dp"
+                android:backgroundTint="#c5c5c5" />
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/send_black"
+                    android:layout_centerHorizontal="true"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:padding="11dp"
+                    android:baselineAlignBottom="false"
+                    android:id="@+id/sendBtn"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/chat_message_btn" />
+
+            </LinearLayout>
+
         </FrameLayout>
+
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="37dp"
+            android:layout_weight="0"
+            android:background="#ecf0f1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:layout_marginBottom="7dp">
+                <FrameLayout
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:background="#ecf0f1">
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/perm_locations_active"
+                        android:background="@drawable/chat_message_btn_disabled"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:id="@+id/getLocBtn"
+                        android:alpha="1"
+                        android:backgroundTint="#ecf0f1" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content">
+                    <ImageButton
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/perm_camera_deactive"
+                        android:background="@drawable/chat_message_btn_disabled"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerInside"
+                        android:id="@+id/getCamBtn"
+                        android:layout_gravity="top"
+                        android:backgroundTint="#ecf0f1" />
+                </FrameLayout>
+
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+
+
 
 
     </LinearLayout>

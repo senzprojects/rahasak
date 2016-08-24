@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -228,27 +229,6 @@ public class ChatFragment extends Fragment {
 
         updateMainBtnUi();
 
-
-        /*text_message.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(text_message.length() == 0) {
-                    text_message.setText("");
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });*/
-
-
         return view;
     }
 
@@ -318,21 +298,12 @@ public class ChatFragment extends Fragment {
     }
 
 
-
-
-
-
-
-
-
-
     @Override
     public void onDestroy() {
         super.onDestroy();
 
     }
-
-
+    
     /**
      * Handle broadcast message receives
      * Need to handle registration success failure here
@@ -496,19 +467,38 @@ public class ChatFragment extends Fragment {
         Log.i(TAG, "Getting permission of user - " + sender);
         UserPermission userPerm = dbSource.getUserPermission(new User("", sender));
         if(userPerm.getCamPerm() == true){
-            getCamBtn.setBackgroundResource(R.drawable.chat_message_btn);
+            getCamBtn.setImageResource(R.drawable.perm_camera_active);
             getCamBtn.setEnabled(true);
         }else{
-            getCamBtn.setBackgroundResource(R.drawable.chat_message_btn_disabled);
+            getCamBtn.setImageResource(R.drawable.perm_camera_deactive);
             getCamBtn.setEnabled(false);
         }
 
         if(userPerm.getLocPerm() == true){
-            getLocBtn.setBackgroundResource(R.drawable.chat_message_btn);
+            getLocBtn.setImageResource(R.drawable.perm_locations_active);
             getLocBtn.setEnabled(true);
         }else{
-            getLocBtn.setBackgroundResource(R.drawable.chat_message_btn_disabled);
+            getLocBtn.setImageResource(R.drawable.perm_locations_deactive);
             getLocBtn.setEnabled(false);
+        }
+    }
+
+
+
+    private class MessagesDeleteTask extends AsyncTask<Secret,Secret,Secret> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected void onPostExecute(Secret secret) {
+            super.onPostExecute(secret);
+        }
+
+        @Override
+        protected Secret doInBackground(Secret... params) {
+            return null;
         }
     }
 }

@@ -10,6 +10,9 @@ public class Secret {
     private String image;
     private User sender;
     private User receiver;
+    private boolean isDelete;
+    private Long timeStamp;
+    private String id;
 
     public Secret(String text, String image,User sender, User receiver) {
         this.text = text;
@@ -32,6 +35,30 @@ public class Secret {
 
     public String getImage() {
         return image;
+    }
+
+    public void setDelete(boolean val){
+        isDelete = val;
+    }
+
+    public void setTimeStamp(Long ts){
+        timeStamp = ts;
+    }
+
+    public boolean isDelete(){
+        return isDelete;
+    }
+
+    public Long getTimeStamp(){
+        return timeStamp;
+    }
+
+    public void setID(String val){
+        id = val;
+    }
+
+    public String getID(){
+        return id;
     }
 
     @Override

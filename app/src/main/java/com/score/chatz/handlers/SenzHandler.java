@@ -119,6 +119,7 @@ public class SenzHandler {
                 SenzorsDbSource dbSource = new SenzorsDbSource(context);
                 User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
                 dbSource.createPermissionsForUser(senz);
+                dbSource.createConfigurablePermissionsForUser(senz);
                 senz.setSender(sender);
 
                 Log.d(TAG, "save senz");
@@ -201,6 +202,7 @@ public class SenzHandler {
             // save senz in db
             User sender = dbSource.getOrCreateUser(senz.getSender().getUsername());
             dbSource.createPermissionsForUser(senz);
+            dbSource.createConfigurablePermissionsForUser(senz);
             senz.setSender(sender);
             Log.d(TAG, "save senz");
             // if senz already exists in the db, SQLiteConstraintException should throw

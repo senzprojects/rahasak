@@ -26,6 +26,8 @@ public class SenzorsDbContract {
         public static final String COLOMN_NAME_IMAGE = "image";
         public static final String COLUMN_NAME_SENDER = "sender";
         public static final String COLUMN_NAME_RECEIVER = "receiver";
+        public static final String COLUMN_NAME_DELETE = "delete";
+        public static final String COLUMN_TIMESTAMP = "timestamp";
     }
 
     /* Inner class that defines permission control for the user

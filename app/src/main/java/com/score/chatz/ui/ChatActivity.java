@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -14,10 +15,28 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.utils.ActivityUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.List;
 
 
 public class ChatActivity extends AppCompatActivity {
@@ -43,16 +62,6 @@ public class ChatActivity extends AppCompatActivity {
         sender = new User("", senderString);
         FragmentManager fm = getSupportFragmentManager();
         ChatFragment mainFragment = (ChatFragment) fm.findFragmentById(R.id.container_main);
-        /*toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setCollapsible(false);
-        toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
-        setSupportActionBar(toolbar);*/
-       /* getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
-
-        //displaying custom ActionBar
-        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.chat_action_bar, null));*/
         setupActionBar();
 
         if (mainFragment == null) {
@@ -97,6 +106,13 @@ public class ChatActivity extends AppCompatActivity {
 
 
     }
+
+
+
+
+
+
+
 
 
 

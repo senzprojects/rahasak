@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/light_blue_card_theme"/>
-    <gradient
-        android:angle="90"
-        android:endColor="#9cf8f7"
-        android:startColor="#4ed9d7"
-        android:type="linear" />
+
+
+
 </shape>
