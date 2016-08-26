@@ -93,11 +93,10 @@ public class RemoteSenzService extends Service {
             //should check null because in air plan mode it will be null
             if (netInfo != null && netInfo.isConnectedOrConnecting()) {
                 // send ping
-                initComm();
+                if (!isOnline) initComm();
             } else {
                 // means disconnected
-                isOnline = false;
-                resetSoc();
+                if (isOnline) resetSoc();
             }
         }
     };
@@ -118,13 +117,12 @@ public class RemoteSenzService extends Service {
         Log.d(TAG, "onCreate called");
 
         registerReceivers();
+        initComm();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand executed");
-
-        initComm();
 
         return Service.START_STICKY;
     }
@@ -197,6 +195,8 @@ public class RemoteSenzService extends Service {
     }
 
     private boolean resetSoc() {
+        isOnline = false;
+
         try {
             if (socket != null) {
                 socket.close();
@@ -228,7 +228,7 @@ public class RemoteSenzService extends Service {
                 }
             }
         } catch (IOException e) {
-            isOnline = false;
+            resetSoc();
             e.printStackTrace();
         }
     }
