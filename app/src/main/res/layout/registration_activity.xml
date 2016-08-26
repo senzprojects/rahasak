@@ -22,7 +22,7 @@
         android:textColor="@color/android_grey"
         android:textColorHint="@color/android_green"
         android:textSize="30sp"
-        android:singleLine="false"
+        android:singleLine="true"
         android:layout_centerVertical="true"
         android:layout_alignRight="@+id/welcome_text"
         android:layout_alignLeft="@+id/welcome_text"
