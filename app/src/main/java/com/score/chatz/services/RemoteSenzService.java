@@ -46,8 +46,8 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    public static final String SENZ_HOST = "10.2.2.49";
-    //public static final String SENZ_HOST = "udp.mysensors.info";
+    //public static final String SENZ_HOST = "10.2.2.49";
+    public static final String SENZ_HOST = "udp.mysensors.info";
     public static final int SENZ_PORT = 7070;
 
     // senz socket
@@ -214,7 +214,6 @@ public class RemoteSenzService extends Service {
                 }
             }
         } catch (IOException e) {
-            resetSoc();
             e.printStackTrace();
         }
     }
@@ -313,6 +312,7 @@ public class RemoteSenzService extends Service {
         @Override
         protected void onPostExecute(Object o) {
             Log.e(TAG, "Stop SenzComm");
+            resetSoc();
         }
     }
 
