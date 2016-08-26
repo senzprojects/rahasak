@@ -45,23 +45,26 @@ import java.util.HashMap;
 
 public class RegistrationActivity extends AppCompatActivity {
     private static final String TAG = SplashActivity.class.getName();
+
+    //UI controls
     private Button registerBtn;
     private EditText editTextUserId;
     private User registeringUser;
+    private TextView welcomeTextView;
+
+    //Type faces
     private Typeface batangFont;
     private Typeface typeface;
 
-
-    private boolean isResponseReceived;
     // service interface
     private ISenzService senzService = null;
     private boolean isServiceBound = false;
-    private TextView welcomeTextView;
 
     // service connection
     private ServiceConnection senzServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("TAG", "Connected with senz service");
+
             isServiceBound = true;
             senzService = ISenzService.Stub.asInterface(service);
             doPreRegistration();
@@ -78,12 +81,27 @@ public class RegistrationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.registration_activity);
+
         setupUI();
         setupRegisterBtn();
-        SenzHandler.getInstance(getApplicationContext());
-        registerReceiver(senzMessageReceiver, new IntentFilter("com.score.chatz.DATA_SENZ"));
 
+        SenzHandler.getInstance(getApplicationContext());
+
+        //Register all receivers
+        registerReceivers();
+    }
+
+    /**
+     * Register all intent receivers
+     */
+    private void registerReceivers(){
+        registerReceiver(senzMessageReceiver, new IntentFilter("com.score.chatz.DATA_SENZ"));
+    }
+
+    private void unRegisterReceivers(){
+        if (senzMessageReceiver != null) unregisterReceiver(senzMessageReceiver);
     }
 
     /**
@@ -92,19 +110,23 @@ public class RegistrationActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (isServiceBound == true) unbindService(senzServiceConnection);
-        if (senzMessageReceiver != null) unregisterReceiver(senzMessageReceiver);
 
+        //Unbind from service
+        if (isServiceBound == true) unbindService(senzServiceConnection);
+
+        //remove all registers
+        unRegisterReceivers();
     }
 
     private void setupUI(){
         batangFont = Typeface.createFromAsset(getAssets(), "fonts/batang.ttf");
         typeface = Typeface.createFromAsset(getAssets(), "fonts/vegur_2.otf");
+
         editTextUserId = (EditText) findViewById(R.id.registering_user_id);
         welcomeTextView = (TextView) findViewById(R.id.welcome_text);
+
         welcomeTextView.setTypeface(typeface);
     }
-
 
     private void setupRegisterBtn(){
         registerBtn = (Button) findViewById(R.id.register_btn);
@@ -118,7 +140,6 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         });
     }
-
 
     /**
      * Sign-up button action,
@@ -137,7 +158,6 @@ public class RegistrationActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Create user
@@ -162,14 +182,13 @@ public class RegistrationActivity extends AppCompatActivity {
                 intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
                 bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
             } else {
-                // sta  rt to send senz to server form here
+                // start to send senz to server form here
                 doRegistration();
             }
         } catch (NoSuchProviderException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
     }
-
 
     /**
      * Create register senz
@@ -196,7 +215,6 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
-
     private BroadcastReceiver senzMessageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -204,8 +222,6 @@ public class RegistrationActivity extends AppCompatActivity {
             handleMessage(intent);
         }
     };
-
-
 
     /**
      * Handle broadcast message receives
@@ -235,12 +251,6 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
-
-
     /**
      * Switch to home activity
      * This method will be call after successful login
@@ -250,7 +260,6 @@ public class RegistrationActivity extends AppCompatActivity {
         RegistrationActivity.this.startActivity(intent);
         RegistrationActivity.this.finish();
     }
-
 
     /**
      * Display message dialog when user request(click) to register
@@ -301,11 +310,6 @@ public class RegistrationActivity extends AppCompatActivity {
         dialog.show();
     }
 
-
-
-
-
-
     /**
      * Display message dialog with registration status
      *
@@ -343,9 +347,4 @@ public class RegistrationActivity extends AppCompatActivity {
 
         dialog.show();
     }
-
-
-
-
-
 }

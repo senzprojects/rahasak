@@ -60,6 +60,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!--- activities -->
         <activity
             android:name=".ui.SplashActivity"
             android:configChanges="orientation"
@@ -73,6 +74,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.CountryListActivity"
             android:configChanges="orientation"
@@ -84,6 +86,7 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
+
         <activity
             android:name=".ui.SenzMapActivity"
             android:configChanges="orientation"
@@ -92,43 +95,48 @@
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:windowSoftInputMode="stateHidden" />
 
-        <service
-            android:name=".services.LocationService"
-            android:enabled="true" />
-
-        <receiver android:name=".receivers.SenzReceiver">
-            <intent-filter>
-                <action android:name="com.score.senz.NEW_SENZ" />
-            </intent-filter>
-        </receiver>
-
         <activity
             android:name=".ui.ChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
+
         <activity
             android:name=".ui.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
+
         <activity
             android:name=".ui.AddUserActivity"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
+
         <activity
             android:name=".ui.SettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-        <!--<activity android:name=".ui.PermissionControlListFragment" />
-        <activity android:name=".ui.UserProfileFragment" />-->
+
         <activity
             android:name=".ui.RegistrationActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/MyMaterialTheme" />
+            android:theme="@style/MyMaterialTheme"
+            android:windowSoftInputMode="adjustResize"
+            />
+
         <activity
             android:name=".ui.PhotoActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
 
+        <activity
+            android:name=".ui.UserProfileActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat"></activity>
+
+        <!-- Servicves -->
+        <service
+            android:name=".services.LocationService"
+            android:enabled="true" />
         <service
             android:name=".services.RemoteSenzService"
             android:enabled="true">
@@ -137,6 +145,7 @@
             </intent-filter>
         </service>
 
+        <!-- Receievers -->
         <receiver android:name=".receivers.BootCompleteReceiver">
             <intent-filter>
                 <action android:name="senz.action.RESTART" />
@@ -153,11 +162,12 @@
                 <action android:name="senz.action.RESTART" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".receivers.SenzReceiver">
+            <intent-filter>
+                <action android:name="com.score.senz.NEW_SENZ" />
+            </intent-filter>
+        </receiver>
 
-        <activity
-            android:name=".ui.UserProfileActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat"></activity>
     </application>
 
 </manifest>

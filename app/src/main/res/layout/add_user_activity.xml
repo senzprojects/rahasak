@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/scrollview"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:isScrollContainer="true"
+    android:fillViewport="true"
+    android:background="@color/white">
+<RelativeLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.score.chatz.ui.AddUserActivity"
     android:background="@color/white">
 
     <EditText
@@ -34,7 +41,8 @@
         android:layout_alignStart="@+id/friend_id"
         android:layout_marginTop="34dp"
         android:layout_alignRight="@+id/friend_id"
-        android:layout_alignEnd="@+id/friend_id" />
+        android:layout_alignEnd="@+id/friend_id"
+        android:layout_marginBottom="100dp" />
 
     <TextView
         android:layout_width="match_parent"
@@ -110,3 +118,4 @@
         android:layout_alignStart="@+id/textView4" />
 
 </RelativeLayout>
+</ScrollView>
