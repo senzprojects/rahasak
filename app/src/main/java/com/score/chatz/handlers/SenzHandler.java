@@ -179,7 +179,7 @@ public class SenzHandler {
          */
 
 
-        if(senz.getAttributes().containsKey("profilezphoto") || senz.getAttributes().containsKey("chatzphoto")){
+        if (senz.getAttributes().containsKey("profilezphoto") || senz.getAttributes().containsKey("chatzphoto")) {
             Intent intent = new Intent();
             intent.setClass(context, PhotoActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -268,9 +268,9 @@ public class SenzHandler {
                 // save stream to db
                 try {
                     Log.i(TAG, "SENDER OF PHOTO : " + senz.getSender());
-                    if(senz.getAttributes().containsKey("chatzphoto")) {
+                    if (senz.getAttributes().containsKey("chatzphoto")) {
                         dbSource.createSecret(new Secret(null, senzStream.getStream(), senz.getSender(), senz.getReceiver()));
-                    }else if(senz.getAttributes().containsKey("profilezphoto")){
+                    } else if (senz.getAttributes().containsKey("profilezphoto")) {
                         User sender = senz.getSender();
                         sender.setUserImage(senzStream.getStream());
                         //dbSource.createUser(sender);
@@ -495,8 +495,6 @@ public class SenzHandler {
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 }
-
-
             }
         });
 
@@ -540,9 +538,9 @@ public class SenzHandler {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-            if(senz.getAttributes().containsKey("chatzphoto")) {
+            if (senz.getAttributes().containsKey("chatzphoto")) {
                 senzAttributes.put("chatzphoto", imgs[i].trim());
-            }else if(senz.getAttributes().containsKey("profilezphoto")){
+            } else if (senz.getAttributes().containsKey("profilezphoto")) {
                 senzAttributes.put("profilezphoto", imgs[i].trim());
             }
 

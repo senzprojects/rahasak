@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
@@ -45,8 +46,8 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    //public static final String SENZ_HOST = "10.2.2.49";
-    public static final String SENZ_HOST = "udp.mysensors.info";
+    public static final String SENZ_HOST = "10.2.2.49";
+    //public static final String SENZ_HOST = "udp.mysensors.info";
     public static final int SENZ_PORT = 7070;
 
     // senz socket
@@ -92,8 +93,8 @@ public class RemoteSenzService extends Service {
 
             //should check null because in air plan mode it will be null
             if (netInfo != null && netInfo.isConnectedOrConnecting()) {
-                // send ping
-                initComm();
+                // init comm
+                new SenzComm().execute();
             } else {
                 // means disconnected
                 resetSoc();
@@ -116,13 +117,15 @@ public class RemoteSenzService extends Service {
     public void onCreate() {
         Log.d(TAG, "onCreate called");
 
-        initComm();
         registerReceivers();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand executed");
+
+        // init comm
+        new SenzComm().execute();
 
         return Service.START_STICKY;
     }
@@ -162,22 +165,7 @@ public class RemoteSenzService extends Service {
         Intent intentAlarm = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000 * 5 * 60, pendingIntent);
-    }
-
-    private void initComm() {
-        new Thread(new Runnable() {
-            public void run() {
-                if (!isOnline) {
-                    initSoc();
-                    initPing();
-                    sendPing();
-                    initReader();
-                } else {
-                    sendPing();
-                }
-            }
-        }).start();
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * 60 * 5, 1000 * 5 * 60, pendingIntent);
     }
 
     private void initSoc() {
@@ -304,6 +292,28 @@ public class RemoteSenzService extends Service {
                 }
             }
         }).start();
+    }
+
+    class SenzComm extends AsyncTask {
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            if (!isOnline) {
+                initSoc();
+                initPing();
+                sendPing();
+                initReader();
+            } else {
+                sendPing();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            Log.e(TAG, "Stop SenzComm");
+        }
     }
 
 }
