@@ -321,7 +321,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, text, image, sender, receiver, delete, timestamp " +
+        String query = "SELECT _id, text, image, sender, receiver, deleted, timestamp " +
                 "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
 
@@ -712,7 +712,7 @@ public class SenzorsDbSource {
     }
 
     /**
-     * Delete secret from database,
+     * Delete sec from database,
      *
      * @param
      */

@@ -303,7 +303,7 @@ public class ChatFragment extends Fragment {
         super.onDestroy();
 
     }
-    
+
     /**
      * Handle broadcast message receives
      * Need to handle registration success failure here
