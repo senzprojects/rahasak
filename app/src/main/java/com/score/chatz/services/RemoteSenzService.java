@@ -45,14 +45,17 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    //public static final String SENZ_HOST = "10.2.2.49";
-    public static final String SENZ_HOST = "udp.mysensors.info";
+    public static final String SENZ_HOST = "10.2.2.49";
+    //public static final String SENZ_HOST = "udp.mysensors.info";
     public static final int SENZ_PORT = 7070;
 
     // senz socket
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
+
+    // status of the online/offline
+    private boolean isOnline;
 
     // API end point of this service, we expose the endpoints define in ISenzService.aidl
     private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
@@ -69,7 +72,7 @@ public class RemoteSenzService extends Service {
 
         @Override
         public void sendInOrder(List<Senz> senzList) throws RemoteException {
-            wirteSenzList(senzList);
+            writeSenzList(senzList);
         }
     };
 
@@ -88,9 +91,13 @@ public class RemoteSenzService extends Service {
             Log.d(TAG, "Network status changed");
 
             //should check null because in air plan mode it will be null
-            if (netInfo != null && netInfo.isConnected()) {
+            if (netInfo != null && netInfo.isConnectedOrConnecting()) {
                 // send ping
-                sendPing();
+                initComm();
+            } else {
+                // means disconnected
+                isOnline = false;
+                resetSoc();
             }
         }
     };
@@ -138,7 +145,7 @@ public class RemoteSenzService extends Service {
         // Register network status receiver
         IntentFilter filter = new IntentFilter();
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        LocalBroadcastManager.getInstance(RemoteSenzService.this).registerReceiver(networkStatusReceiver, filter);
+        registerReceiver(networkStatusReceiver, filter);
 
         // register local ping alarm receiver
         IntentFilter alarmFilter = new IntentFilter();
@@ -148,7 +155,7 @@ public class RemoteSenzService extends Service {
 
     private void unRegisterReceivers() {
         // un register receivers
-        LocalBroadcastManager.getInstance(RemoteSenzService.this).unregisterReceiver(networkStatusReceiver);
+        unregisterReceiver(networkStatusReceiver);
         LocalBroadcastManager.getInstance(RemoteSenzService.this).unregisterReceiver(pingAlarmReceiver);
     }
 
@@ -163,8 +170,8 @@ public class RemoteSenzService extends Service {
     private void initComm() {
         new Thread(new Runnable() {
             public void run() {
-                if (socket == null || !socket.isConnected()) {
-                    initSoc();
+                if (!isOnline) {
+                    if (initSoc()) isOnline = true;
                     initPing();
                     sendPing();
                     initReader();
@@ -184,6 +191,22 @@ public class RemoteSenzService extends Service {
             return true;
         } catch (IOException e) {
             e.printStackTrace();
+
+            return false;
+        }
+    }
+
+    private boolean resetSoc() {
+        try {
+            if (socket != null) {
+                socket.close();
+                reader.close();
+                writer.close();
+
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return false;
@@ -192,7 +215,7 @@ public class RemoteSenzService extends Service {
     private void initReader() {
         try {
             String line;
-            while ((line = reader.readLine()) != null) {
+            while (isOnline && (line = reader.readLine()) != null) {
                 if (!line.isEmpty()) {
                     String senz = line.replaceAll("\n", "").replaceAll("\r", "");
 
@@ -201,10 +224,11 @@ public class RemoteSenzService extends Service {
                     // handle senz
                     SenzHandler.getInstance(RemoteSenzService.this).handleSenz(senz);
                 } else {
-                    Log.e(TAG, "empty senz recived");
+                    Log.e(TAG, "empty senz received");
                 }
             }
         } catch (IOException e) {
+            isOnline = false;
             e.printStackTrace();
         }
     }
@@ -217,8 +241,6 @@ public class RemoteSenzService extends Service {
     private void writeSenz(final Senz senz) {
         new Thread(new Runnable() {
             public void run() {
-                //if (socket == null || !socket.isConnected()) initSoc();
-
                 // sign and write senz
                 try {
                     PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
@@ -233,8 +255,13 @@ public class RemoteSenzService extends Service {
                     String message = SenzParser.getSenzMessage(senzPayload, senzSignature);
                     Log.d(TAG, "Senz to be send: " + message);
 
-                    writer.println(message);
-                    writer.flush();
+                    //  sends the message to the server
+                    if (isOnline) {
+                        writer.println(message);
+                        writer.flush();
+                    } else {
+                        Log.e(TAG, "Socket disconnected");
+                    }
                 } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException | NoUserException e) {
                     e.printStackTrace();
                 }
@@ -242,7 +269,7 @@ public class RemoteSenzService extends Service {
         }).start();
     }
 
-    private void wirteSenzList(final List<Senz> senzList) {
+    private void writeSenzList(final List<Senz> senzList) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -267,15 +294,14 @@ public class RemoteSenzService extends Service {
                         Log.d(TAG, "Senz to be send: " + message);
 
                         //  sends the message to the server
-                        if (socket != null && socket.isConnected()) {
+                        if (isOnline) {
                             writer.println(message);
                             writer.flush();
                         } else {
                             Log.e(TAG, "Socket disconnected");
                         }
 
-                        if (senzList.indexOf(senz) == 0)
-                            Thread.currentThread().sleep(100);
+                        if (senzList.indexOf(senz) == 0) Thread.sleep(100);
                     }
                 } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException | InterruptedException e) {
                     e.printStackTrace();
