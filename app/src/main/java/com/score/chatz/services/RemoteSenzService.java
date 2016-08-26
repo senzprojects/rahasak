@@ -45,8 +45,8 @@ public class RemoteSenzService extends Service {
     private static final String TAG = RemoteSenzService.class.getName();
 
     // socket host, port
-    public static final String SENZ_HOST = "10.2.2.49";
-    //public static final String SENZ_HOST = "udp.mysensors.info";
+    //public static final String SENZ_HOST = "10.2.2.49";
+    public static final String SENZ_HOST = "udp.mysensors.info";
     public static final int SENZ_PORT = 7070;
 
     // senz socket
@@ -93,10 +93,10 @@ public class RemoteSenzService extends Service {
             //should check null because in air plan mode it will be null
             if (netInfo != null && netInfo.isConnectedOrConnecting()) {
                 // send ping
-                if (!isOnline) initComm();
+                initComm();
             } else {
                 // means disconnected
-                if (isOnline) resetSoc();
+                resetSoc();
             }
         }
     };
@@ -116,8 +116,8 @@ public class RemoteSenzService extends Service {
     public void onCreate() {
         Log.d(TAG, "onCreate called");
 
-        registerReceivers();
         initComm();
+        registerReceivers();
     }
 
     @Override
@@ -169,7 +169,7 @@ public class RemoteSenzService extends Service {
         new Thread(new Runnable() {
             public void run() {
                 if (!isOnline) {
-                    if (initSoc()) isOnline = true;
+                    initSoc();
                     initPing();
                     sendPing();
                     initReader();
@@ -180,36 +180,34 @@ public class RemoteSenzService extends Service {
         }).start();
     }
 
-    private boolean initSoc() {
+    private void initSoc() {
         try {
             socket = new Socket(InetAddress.getByName(SENZ_HOST), SENZ_PORT);
             reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             writer = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
-            return true;
+            isOnline = true;
         } catch (IOException e) {
             e.printStackTrace();
 
-            return false;
+            isOnline = true;
         }
     }
 
-    private boolean resetSoc() {
-        isOnline = false;
+    private void resetSoc() {
+        if (isOnline) {
+            isOnline = false;
 
-        try {
-            if (socket != null) {
-                socket.close();
-                reader.close();
-                writer.close();
-
-                return true;
+            try {
+                if (socket != null) {
+                    socket.close();
+                    reader.close();
+                    writer.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        return false;
     }
 
     private void initReader() {
@@ -300,10 +298,8 @@ public class RemoteSenzService extends Service {
                         } else {
                             Log.e(TAG, "Socket disconnected");
                         }
-
-                        if (senzList.indexOf(senz) == 0) Thread.sleep(100);
                     }
-                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException | InterruptedException e) {
+                } catch (NoSuchAlgorithmException | NoUserException | InvalidKeySpecException | SignatureException | InvalidKeyException e) {
                     e.printStackTrace();
                 }
             }

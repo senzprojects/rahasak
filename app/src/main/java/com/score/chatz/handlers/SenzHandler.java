@@ -475,14 +475,9 @@ public class SenzHandler {
 
                 Log.i(TAG, "USER INFO - senz.getSender() : " + senz.getSender().getUsername() + ", senz.getReceiver() : " + senz.getReceiver().getUsername());
                 try {
-//                    Senz _senz = getPhotoStreamingSenz(senz, image); //Swapped senz, passing original senz
-//                    startPhotoSharing(senz, senzService);
-//                    senzService.send(_senz);
-//                    stopPhotoSharing(senz, senzService);
-
                     // compose senzes
                     Senz startSenz = getStartPhotoSharingSenze(senz);
-                    //senzService.send(startSenz);
+                    senzService.send(startSenz);
 
                     ArrayList<Senz> photoSenzList = getPhotoStreamingSenz(senz, image);
                     //Senz photoSenz = getPhotoSenz(senz, image);
@@ -491,9 +486,7 @@ public class SenzHandler {
                     Senz stopSenz = getStopPhotoSharingSenz(senz);
                     //senzService.send(stopSenz);
 
-
                     ArrayList<Senz> senzList = new ArrayList<Senz>();
-                    senzList.add(startSenz);
                     senzList.addAll(photoSenzList);
                     senzList.add(stopSenz);
                     senzService.sendInOrder(senzList);
