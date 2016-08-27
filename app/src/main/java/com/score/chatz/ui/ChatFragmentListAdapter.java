@@ -3,6 +3,7 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.Base64;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
@@ -130,14 +132,21 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
             viewHolder.message.setText(secret.getText());
         }else{
-            byte[] imageAsBytes = Base64.decode(secret.getImage().getBytes(), Base64.DEFAULT);
+            //byte[] imageAsBytes = Base64.decode(secret.getImage().getBytes(), Base64.DEFAULT);
 
-            Bitmap imgBitmap= BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);
-            viewHolder.image.setImageBitmap(imgBitmap);
-            viewHolder.image.setRotation(-90);
+            //Bitmap imgBitmap= BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);
+
+
+            //viewHolder.image.setImageBitmap(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes())imgBitmap);
+            if(secret.getImage() != null)
+            viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
+            //viewHolder.image.setRotation(-90);
         }
         viewHolder.sender.setText(secret.getSender().getUsername());
     }
+
+
+
 
     /**
      * Keep reference to children view to avoid unnecessary calls

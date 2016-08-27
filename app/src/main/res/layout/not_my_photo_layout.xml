@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?><!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -77,53 +76,72 @@
 </RelativeLayout>-->
 
 
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:layout_width="fill_parent"
-android:layout_height="fill_parent"
-android:orientation="horizontal"
-android:background="@color/white"
-android:gravity="right">
-<FrameLayout
-    android:layout_width="10dp"
-    android:layout_height="match_parent"
-    android:background="@color/android_grey"
-    android:layout_margin="5dp"></FrameLayout>
-<FrameLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginTop="5dp"
-    android:layout_marginRight="5dp"
-    android:layout_marginBottom="5dp">
-    <RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white"
+    android:gravity="right"
+    android:orientation="horizontal">
+
+    <FrameLayout
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:layout_margin="5dp"
+        android:background="@color/android_grey"></FrameLayout>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/message_container"
-        android:padding="5dp"
-        android:layout_alignParentEnd="false"
-        android:layout_alignParentLeft="false">
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/not_my_image"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentStart="false"
-            android:foregroundGravity="center_vertical"
-            android:scaleType="center"
-            android:background="@drawable/default_user" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Lakmal Caldera"
-            android:id="@+id/sender"
-            android:layout_alignParentEnd="false"
-            android:layout_alignParentBottom="false"
-            android:textColor="@color/black"
-            android:layout_below="@+id/not_my_image"
-            android:textStyle="italic"
-            android:textSize="12sp"
-            android:layout_alignLeft="@+id/not_my_image" />
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp">
 
-    </RelativeLayout>
-</FrameLayout>
+        <LinearLayout
+            android:id="@+id/message_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="5dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!--<LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:background="@color/android_green">-->
+
+                    <ImageView
+                        android:id="@+id/not_my_image"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/default_user"
+                        android:adjustViewBounds="true"
+                        android:cropToPadding="false"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentStart="true"
+                        android:background="@drawable/image_border"
+                        android:scaleType="centerInside" />
+                <!--</LinearLayout>-->
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/sender"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Lakmal Caldera"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="italic" />
+                </FrameLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </FrameLayout>
 </LinearLayout>

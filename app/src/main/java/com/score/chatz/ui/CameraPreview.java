@@ -17,6 +17,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.services.SenzServiceConnection;
+import com.score.chatz.utils.CameraUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -35,8 +36,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final String TAG = CameraPreview.class.getName();;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
-    private int pictureWidth = 500;
-    private int pictureHeight = 500;
+    //private int pictureWidth = 500;
+    //private int pictureHeight = 500;
 
     //Constructor that obtains context and camera
     public CameraPreview(Context _context, Camera camera) {
@@ -54,9 +55,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if(mCamera != null)
         mCamera.release();
+        int rotate = (new Camera.CameraInfo().orientation - 0 + 360) % 360;
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
         Camera.Parameters params = mCamera.getParameters();
-        params.setPictureSize(pictureWidth, pictureHeight);
+        //params.setPictureSize(pictureWidth, pictureHeight);
+        params.setRotation(rotate);
+        mCamera.setParameters(params);
 
         try {
             mCamera.setPreviewDisplay(surfaceHolder);
@@ -76,7 +80,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
-                SenzHandler.getInstance(getContext()).sendPhoto(getResizedBitmap(bytes, 2), originalSenz);
+                //Rotate image
+                //byte[] rotatedImage = CameraUtils.getRotatedImage(bytes, -90);
+
+                //Scaled down image
+                byte[] resizedImage = CameraUtils.getResizedImage(bytes, 2, 100);
+
+
+                SenzHandler.getInstance(getContext()).sendPhoto(resizedImage, originalSenz);
 
                 activity.finish();
             }
@@ -92,17 +103,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
 }
 
-    public byte[] getResizedBitmap(byte[] image, int raducingFactor) {
-        Bitmap bitmap = BitmapFactory.decodeByteArray(image , 0, image.length);
-        int width = bitmap.getWidth();
-        int height = bitmap.getHeight();
-        Bitmap resizeBitmap =  Bitmap.createScaledBitmap(bitmap, width/raducingFactor, height/raducingFactor, true);
 
-        ByteArrayOutputStream baos= new ByteArrayOutputStream();
-        resizeBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-
-        return baos.toByteArray();
-    }
 
     public byte[] scaleDown(Bitmap realImage, float maxImageSize,
                                    boolean filter) {
