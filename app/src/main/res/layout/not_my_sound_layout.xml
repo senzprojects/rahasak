@@ -38,8 +38,8 @@
                     android:background="@color/android_green">-->
 
                 <ImageView
-                    android:id="@+id/not_my_image"
-                    android:layout_width="200dp"
+                    android:id="@+id/play"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentStart="true"
@@ -47,7 +47,8 @@
                     android:background="@drawable/image_border"
                     android:cropToPadding="false"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/default_user" />
+                    android:src="@drawable/play_recording"
+                    android:padding="10dp" />
                 <!--</LinearLayout>-->
 
                 <FrameLayout

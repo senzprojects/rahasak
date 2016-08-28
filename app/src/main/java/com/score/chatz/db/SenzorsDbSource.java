@@ -263,6 +263,7 @@ public class SenzorsDbSource {
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
         Long _timeStamp = System.currentTimeMillis();
         values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, _timeStamp);
+        values.put(SenzorsDbContract.Secret.COLUMN_NAME_SOUND, secret.getSound());
 
         // Insert the new row, if fails throw an error
         db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
@@ -322,7 +323,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, text, image, thumbnail, sender, receiver, deleted, timestamp " +
+        String query = "SELECT _id, text, image, thumbnail, sender, receiver, deleted, timestamp, sound " +
                 "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
 
@@ -335,6 +336,7 @@ public class SenzorsDbSource {
         int _secretDelete;
         Long _secretTimestamp;
         String _thumbnail;
+        String _secretSound;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -349,12 +351,15 @@ public class SenzorsDbSource {
             _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
+            _secretSound = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SOUND));
+
 
             // create secret
             Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
             secret.setDelete(_secretDelete == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
             secret.setID(_secretId);
+            secret.setSound(_secretSound);
 
             // fill secret list
             secretList.add(secret);

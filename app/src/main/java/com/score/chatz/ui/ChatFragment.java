@@ -71,6 +71,7 @@ public class ChatFragment extends Fragment {
 
     private EditText text_message;
     private ImageButton sendBtn;
+    private ImageButton micBtn;
     private ImageButton getLocBtn;
     private ImageButton getCamBtn;
 
@@ -188,6 +189,7 @@ public class ChatFragment extends Fragment {
         text_message = (EditText) view.findViewById(R.id.text_message);
 
         sendBtn = (ImageButton) view.findViewById(R.id.sendBtn);
+        micBtn = (ImageButton) view.findViewById(R.id.micBtn);
         getCamBtn = (ImageButton) view.findViewById(R.id.getCamBtn);
         getLocBtn = (ImageButton) view.findViewById(R.id.getLocBtn);
 
@@ -227,9 +229,22 @@ public class ChatFragment extends Fragment {
             }
         });
 
+        micBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openRecorder();
+            }
+        });
+
         updateMainBtnUi();
 
         return view;
+    }
+
+    private void openRecorder(){
+        Intent openRecordingActivity = new Intent(getActivity(), RecordingActivity.class);
+        openRecordingActivity.putExtra("SENDER", sender);
+        getActivity().startActivity(openRecordingActivity);
     }
 
     private void displayMessagesList() {

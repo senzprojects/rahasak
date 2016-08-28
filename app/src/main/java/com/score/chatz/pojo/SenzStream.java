@@ -102,6 +102,9 @@ public class SenzStream {
             case PROFILEZPHOTO:
                 regex = Pattern.compile("#profilezphoto\\s(.*?)\\s@");
                 break;
+            case CHATZSOUND:
+                regex = Pattern.compile("#chatzsound\\s(.*?)\\s@");
+                break;
         }
 
         return regex;
@@ -129,6 +132,14 @@ public class SenzStream {
                     startOfStream = matcher.group(1);
                 }
             break;
+            case CHATZSOUND:
+                pattern = Pattern.compile("^(DATA\\s#time\\s[0-9]+\\s#chatzsound\\s)");
+                matcher = pattern.matcher(image);
+                if (matcher.find())
+                {
+                    startOfStream = matcher.group(1);
+                }
+                break;
         }
 
         return startOfStream;
@@ -162,6 +173,15 @@ public class SenzStream {
                     lastSection = matcher.group(1);
                 }
                 break;
+            case CHATZSOUND:
+                pattern = Pattern.compile("(\\s@[a-zA-Z0-9]+?\\s\\^[a-zA-Z0-9]+?\\sSIGNATURE)$");
+                matcher = pattern.matcher(image);
+
+                if (matcher.find())
+                {
+                    lastSection = matcher.group(1);
+                }
+                break;
         }
 
 
@@ -170,7 +190,7 @@ public class SenzStream {
     }
 
     public enum SENZ_STEAM_TYPE{
-        CHATZPHOTO, PROFILEZPHOTO
+        CHATZPHOTO, PROFILEZPHOTO, CHATZSOUND
     }
 }
 

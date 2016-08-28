@@ -14,6 +14,7 @@ public class Secret {
     private Long timeStamp;
     private String id;
     private String imageThumbnail;
+    private String sound;
 
     public Secret(String text, String image, String thumb, User sender, User receiver) {
         this.text = text;
@@ -41,6 +42,14 @@ public class Secret {
 
     public String getThumbnail() {
         return imageThumbnail;
+    }
+
+    public void setSound(String _sound){
+        this.sound = _sound;
+    }
+
+    public String getSound(){
+        return sound;
     }
 
     public void setDelete(boolean val){

@@ -29,6 +29,12 @@
     <!-- access to camera -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- access to mic -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- access to modify audio manager -->
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
     <uses-feature
@@ -122,7 +128,10 @@
             android:name=".ui.UserProfileActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
-        <activity android:name=".ui.PhotoFullScreenActivity"
+        <activity
+            android:name=".ui.PhotoFullScreenActivity"
+            android:theme="@style/MyMaterialTheme" />
+        <activity android:name=".ui.RecordingActivity"
             android:theme="@style/MyMaterialTheme"></activity>
 
         <!-- Servicves -->
@@ -144,7 +153,7 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.AlarmReceiver"></receiver>
+        <receiver android:name=".receivers.AlarmReceiver" />
         <receiver android:name=".receivers.DeathWatchReceiver">
             <intent-filter>
                 <action android:name="senz.action.RESTART" />

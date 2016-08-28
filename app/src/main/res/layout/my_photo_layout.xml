@@ -1,58 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:gravity="right">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="15dp"
-        android:layout_marginRight="15dp"
-        android:layout_marginBottom="15dp"
-        android:layout_marginLeft="15dp">
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/message_container"
-            android:padding="5dp"
-            android:background="@color/my_message_background"
-            android:layout_alignParentStart="false">
-            <ImageView
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:id="@+id/my_image"
-                android:gravity="left"
-                android:src="@drawable/default_user"
-                android:scaleType="centerCrop" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lakmal Caldera"
-                android:id="@+id/sender"
-                android:layout_alignParentEnd="false"
-                android:layout_alignParentBottom="false"
-                android:textColor="@color/black"
-                android:layout_below="@+id/my_image"
-                android:textStyle="italic"
-                android:textSize="12sp"
-                android:gravity="left"
-                android:layout_alignLeft="@+id/my_image" />
-
-
-
-
-
-        </RelativeLayout>
-
-    </RelativeLayout>
-</RelativeLayout>-->
-
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
@@ -83,7 +29,7 @@ android:gravity="right">
         <ImageView
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:id="@+id/my_image"
+            android:id="@+id/play"
             android:gravity="left"
             android:src="@drawable/default_user"
             android:scaleType="fitCenter"
@@ -99,8 +45,8 @@ android:gravity="right">
             android:textColor="@color/black"
             android:textStyle="bold|italic"
             android:textSize="15sp"
-            android:layout_alignLeft="@+id/my_image"
-            android:layout_below="@+id/my_image" />
+            android:layout_alignLeft="@+id/play"
+            android:layout_below="@+id/play" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -111,7 +57,7 @@ android:gravity="right">
                 android:textColor="@color/android_grey"
                 android:textStyle="italic"
                 android:textSize="9sp"
-                android:layout_alignLeft="@+id/my_image"
+                android:layout_alignLeft="@+id/play"
                 android:layout_below="@+id/sender" />
         </LinearLayout>
     </RelativeLayout>

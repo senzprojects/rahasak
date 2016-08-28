@@ -157,9 +157,22 @@
                     android:layout_centerHorizontal="true"
                     android:adjustViewBounds="true"
                     android:scaleType="fitCenter"
-                    android:padding="11dp"
+                    android:padding="9dp"
                     android:baselineAlignBottom="false"
                     android:id="@+id/sendBtn"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/chat_message_btn" />
+
+                <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/microphone"
+                    android:layout_centerHorizontal="true"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:padding="9dp"
+                    android:baselineAlignBottom="false"
+                    android:id="@+id/micBtn"
                     android:layout_gravity="center_vertical"
                     android:background="@drawable/chat_message_btn" />
 

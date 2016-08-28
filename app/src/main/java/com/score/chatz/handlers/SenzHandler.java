@@ -301,7 +301,25 @@ public class SenzHandler {
             intent.putExtra("SENZ", senz);
             context.sendBroadcast(intent);
 
-        }  else {
+        }  else if (senz.getAttributes().containsKey("chatzsound")) {
+            // save stream to db
+            try {
+                if (senz.getAttributes().containsKey("chatzsound")) {
+                    User sender = senz.getSender();
+                    Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
+                    secret.setSound(senz.getAttributes().get("chatzsound"));
+                    dbSource.createSecret(secret);
+                }
+            } catch (SQLiteConstraintException e) {
+                Log.e(TAG, e.toString());
+            }
+
+            // broadcast
+            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
+            intent.putExtra("SENZ", senz);
+            context.sendBroadcast(intent);
+
+        } else {
             /*
              * Default cases, handle such as registration success or, any other scenarios where need to specifically handle in the Activity.
              */
@@ -346,6 +364,8 @@ public class SenzHandler {
                 senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
             }else if (stream.contains("#profilezphoto")){
                 senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO);
+            }else if (stream.contains("#chatzsound")){
+                senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.CHATZSOUND);
             }
         }
     }
@@ -537,13 +557,97 @@ public class SenzHandler {
     }
 
 
+    public void sendSound(final Secret secret) {
+        serviceConnection.executeAfterServiceConnected(new Runnable() {
+            @Override
+            public void run() {
+                // service instance
+                ISenzService senzService = serviceConnection.getInterface();
+                try {
+                    // compose senzes
+                    Senz startSenz = getStartSoundSharingSenze(secret);
+                    senzService.send(startSenz);
+
+                    ArrayList<Senz> photoSenzList = getSoundStreamingSenz(secret);
+                    //Senz photoSenz = getPhotoSenz(senz, image);
+                    //senzService.send(photoSenz);
+
+                    Senz stopSenz = getStopSoundSharingSenz(secret);
+                    //senzService.send(stopSenz);
+
+                    ArrayList<Senz> senzList = new ArrayList<Senz>();
+                    senzList.addAll(photoSenzList);
+                    senzList.add(stopSenz);
+                    senzService.sendInOrder(senzList);
+
+
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+    private ArrayList<Senz> getSoundStreamingSenz(Secret secret) {
+        String soundString = secret.getSound();
+        ArrayList<Senz> senzList = new ArrayList<>();
+        String[] imgs = split(soundString, 1024);
+        for (int i = 0; i < imgs.length; i++) {
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.DATA;
+
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("chatzsound", imgs[i].trim());
+
+
+            Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+            senzList.add(_senz);
+        }
+
+        return senzList;
+    }
+
+    private Senz getStartSoundSharingSenze(Secret secret) {
+        //senz is the original senz
+        // create senz attributes
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("stream", "on");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+        return _senz;
+    }
+
+    private Senz getStopSoundSharingSenz(Secret secret) {
+        // create senz attributes
+        //senz is the original senz
+        HashMap<String, String> senzAttributes = new HashMap<>();
+        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+        senzAttributes.put("stream", "off");
+
+        // new senz
+        String id = "_ID";
+        String signature = "_SIGNATURE";
+        SenzTypeEnum senzType = SenzTypeEnum.DATA;
+        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+        return _senz;
+    }
+
+
     private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image) {
         String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
         String thumbnail = CameraUtils.resizeBase64Image(imageAsString);
         Log.i(TAG, "Thumbnail - " + thumbnail);
-
-
-
 
         ArrayList<Senz> senzList = new ArrayList<>();
         String[] imgs = split(imageAsString, 1024);

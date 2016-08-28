@@ -3,11 +3,7 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.support.v4.content.res.ResourcesCompat;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +14,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
-import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
@@ -39,6 +35,8 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     static final int NOT_MY_MESSAGE_TYPE = 1;
     static final int MY_PHOTO_TYPE = 2;
     static final int NOT_MY_PHOTO_TYPE = 3;
+    static final int NOT_MY_SOUND_TYPE = 4;
+    static final int MY_SOUND_TYPE = 5;
     static User currentUser;
     private LayoutInflater mInflater;
 
@@ -62,7 +60,11 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     @Override
     public int getItemViewType(int position) {
         //Log.i(TAG, "WHO IS SENDER: " + ((Secret)getItem(position)).getSender().getUsername() + ", currentUser: " + currentUser.getUsername());
-        if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() == null){
+        if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+            return NOT_MY_SOUND_TYPE;
+        }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+            return MY_SOUND_TYPE;
+        }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() == null){
             return MY_MESSAGE_TYPE;
         }else if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() == null){
             return NOT_MY_MESSAGE_TYPE;
@@ -110,7 +112,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     break;
                 case MY_PHOTO_TYPE:
                     view = mInflater.inflate(R.layout.my_photo_layout, viewGroup, false);
-                    holder.image = (ImageView) view.findViewById(R.id.my_image);
+                    holder.image = (ImageView) view.findViewById(R.id.play);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.messageType = MY_PHOTO_TYPE;
                     break;
@@ -119,6 +121,18 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     holder.image = (ImageView) view.findViewById(R.id.not_my_image);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
                     holder.messageType = NOT_MY_PHOTO_TYPE;
+                    break;
+                case MY_SOUND_TYPE:
+                    view = mInflater.inflate(R.layout.my_sound_layout, viewGroup, false);
+                    holder.image = (ImageView) view.findViewById(R.id.play);
+                    holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.messageType = MY_SOUND_TYPE;
+                    break;
+                case NOT_MY_SOUND_TYPE:
+                    view = mInflater.inflate(R.layout.not_my_sound_layout, viewGroup, false);
+                    holder.image = (ImageView) view.findViewById(R.id.play);
+                    holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.messageType = NOT_MY_SOUND_TYPE;
                     break;
             }
             view.setTag(holder);
@@ -136,7 +150,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         viewHolder.sender.setText(secret.getSender().getUsername());
         if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
             viewHolder.message.setText(secret.getText());
-        }else{
+        }else if (viewHolder.messageType == NOT_MY_PHOTO_TYPE || viewHolder.messageType == MY_PHOTO_TYPE){
             /*viewHolder.image.setImageResource(R.drawable.confidential);*/
             viewHolder.image.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -158,6 +172,17 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             Date date = new Date(timestamp.getTime());
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy' 'HH:mm:ss:S");
             viewHolder.sentTime.setText(simpleDateFormat.format(date));
+        }
+
+
+        if (viewHolder.messageType == NOT_MY_SOUND_TYPE || viewHolder.messageType == MY_SOUND_TYPE) {
+            viewHolder.image.setImageResource(R.drawable.play_recording);
+            viewHolder.image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AudioUtils.play(Base64.decode(secret.getSound(), 0), getContext());
+                }
+            });
         }
 
         viewHolder.sender.setText(secret.getSender().getUsername());
