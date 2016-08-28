@@ -93,7 +93,7 @@ public class User implements Parcelable {
         this.username = username;
     }
 
-    public void setUserImage(String username) {
+    public void setUserImage(String image) {
         this.image = image;
     }
 

@@ -36,7 +36,6 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
             "CREATE TABLE " + SenzorsDbContract.User.TABLE_NAME + " (" +
                     SenzorsDbContract.User._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + "," +
                     SenzorsDbContract.User.COLUMN_NAME_USERNAME + TEXT_TYPE + "UNIQUE NOT NULL" + "," +
-                    SenzorsDbContract.User.COLUMN_NAME_NAME + TEXT_TYPE +","+
                     SenzorsDbContract.User.COLOMN_NAME_IMAGE + TEXT_TYPE +
                     " )";
 

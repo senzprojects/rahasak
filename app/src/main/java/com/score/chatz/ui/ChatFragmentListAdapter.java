@@ -1,6 +1,7 @@
 package com.score.chatz.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -126,21 +127,22 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         return view;
     }
 
-    private void setUpRow(int i, Secret secret, View view, ViewHolder viewHolder) {
+    private void setUpRow(int i, final Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
         viewHolder.sender.setText(secret.getSender().getUsername());
         if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
             viewHolder.message.setText(secret.getText());
         }else{
-            //byte[] imageAsBytes = Base64.decode(secret.getImage().getBytes(), Base64.DEFAULT);
-
-            //Bitmap imgBitmap= BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);
-
-
-            //viewHolder.image.setImageBitmap(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes())imgBitmap);
-            if(secret.getImage() != null)
+            /*viewHolder.image.setImageResource(R.drawable.confidential);
+            viewHolder.image.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, PhotoFullScreenActivity.class);
+                    intent.putExtra("IMAGE", secret.getImage());
+                    context.startActivity(intent);
+                }
+            });*/
             viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
-            //viewHolder.image.setRotation(-90);
         }
         viewHolder.sender.setText(secret.getSender().getUsername());
     }

@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 
@@ -12,20 +13,25 @@ import java.io.ByteArrayOutputStream;
  */
 public class CameraUtils {
 
+    protected static final String TAG = CameraUtils.class.getName();
+
     /**
      * Rotate bitmap to your degree
-     * @param image original bitmap image
+     * @param imageBitmap original bitmap image
      * @param degrees amount you want to turn
      * @return rotated bitmap
      */
     public static Bitmap getRotatedImage(Bitmap imageBitmap, int degrees){
-        //Setup matrix rotate image
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degrees);
+        Bitmap rotatedBitmap = null;
+        if(imageBitmap != null) {
+            //Setup matrix rotate image
+            Matrix matrix = new Matrix();
+            matrix.postRotate(degrees);
 
-        //Work on the bitmap
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, imageBitmap.getWidth(), imageBitmap.getHeight(), true);
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+            //Work on the bitmap
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, imageBitmap.getWidth(), imageBitmap.getHeight(), true);
+            rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+        }
 
         return rotatedBitmap;
     }
@@ -51,6 +57,26 @@ public class CameraUtils {
     }
 
     /**
+     * Maintain same hight and width
+     * compress image to threshold kbs
+     * @param threshold
+     * @return
+     */
+    public static byte[] getCompressedImage(byte[] imageArray, int threshold){
+        int kbs = imageArray.length/1024;
+        int thresholdCompression = (100 * threshold) / kbs;
+
+        //If the required compression is greater than what is supplied then take full  quality
+        thresholdCompression = thresholdCompression > 100 ? 100 : thresholdCompression;
+
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imageArray , 0, imageArray.length);
+        ByteArrayOutputStream baos= new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, thresholdCompression, baos);
+
+        return baos.toByteArray();
+    }
+
+    /**
      * utility method to get bytes from Bitmap
      * @param image
      * @return
@@ -67,9 +93,11 @@ public class CameraUtils {
      * @return
      */
     public static Bitmap getBitmapFromBytes(byte[] byteArray) {
+        Log.i(TAG, "IMAGE BYTE ARRAY - " + byteArray.toString());
         byte[] imageAsBytes = Base64.decode(byteArray, Base64.DEFAULT);
-
         Bitmap imgBitmap= BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);
+
+        //Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray , 0, byteArray.length);
         return imgBitmap;
     }
 }

@@ -344,9 +344,9 @@ public class ChatFragment extends Fragment {
                      *  receiver - other person
                      *
                      */
-                Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"),new User("", receiver), senz.getSender());
-                SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
-                dbSource.createSecret(newSecret);
+                //Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"),new User("", receiver), senz.getSender());
+                //SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
+                //dbSource.createSecret(newSecret);
                 displayMessagesList();
                 /*ImageView image = (ImageView)findViewById(R.id.ImageView);
                 Bitmap imgBitmap=BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);

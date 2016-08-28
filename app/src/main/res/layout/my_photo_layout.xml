@@ -81,14 +81,14 @@ android:gravity="right">
             android:layout_height="wrap_content"
             android:orientation="vertical">
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:id="@+id/my_image"
             android:gravity="left"
             android:src="@drawable/default_user"
-            android:scaleType="centerCrop"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentLeft="true" />
+            android:scaleType="fitCenter"
+            android:background="@drawable/image_border"
+            android:adjustViewBounds="true" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

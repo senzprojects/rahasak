@@ -207,6 +207,7 @@ public class UserProfileActivity extends AppCompatActivity {
         if(userzPerm.getUser().getUserImage() != null) {
             byte[] imageAsBytes = Base64.decode(userzPerm.getUser().getUserImage().getBytes(), Base64.DEFAULT);
             Bitmap imgBitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
+
             userImage.setImageBitmap(imgBitmap);
             userImage.setRotation(-90);
         }

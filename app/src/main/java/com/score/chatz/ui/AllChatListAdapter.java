@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
@@ -85,14 +87,14 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
                     view = mInflater.inflate(R.layout.rahas_image_row_layout, viewGroup, false);
                     holder.image = (ImageView) view.findViewById(R.id.image);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
-                    holder.userImage = (ImageView) view.findViewById(R.id.user_image);
+                    holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
                     holder.messageType = IMAGE_MESSAGE;
                     break;
                 case TEXT_MESSAGE:
                     view = mInflater.inflate(R.layout.rahas_row_layout, viewGroup, false);
                     holder.message = (TextView) view.findViewById(R.id.message);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
-                    holder.userImage = (ImageView) view.findViewById(R.id.user_image);
+                    holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
                     holder.messageType = TEXT_MESSAGE;
                     break;
             }
@@ -111,19 +113,18 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
         if (viewHolder.messageType == TEXT_MESSAGE){
             viewHolder.message.setText(secret.getText());
         }else{
-            byte[] imageAsBytes = Base64.decode(secret.getImage().getBytes(), Base64.DEFAULT);
-
-            Bitmap imgBitmap= BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);
-            viewHolder.image.setImageBitmap(imgBitmap);
-            viewHolder.image.setRotation(-90);
+            if(secret.getImage() != null) {
+                Log.i(TAG, "IMAGE YOOOO : " + secret.getImage().getBytes());
+                Log.i(TAG, "IMAGE YOOOO2222 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
+                viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
+            }
         }
 
         //Extracting user image
         if(secret.getSender().getUserImage() != null) {
-            byte[] imageAsBytes = Base64.decode(secret.getSender().getUserImage().getBytes(), Base64.DEFAULT);
-            Bitmap imgBitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-            viewHolder.userImage.setImageBitmap(imgBitmap);
-            viewHolder.userImage.setRotation(-90);
+            Log.i(TAG, "IMAGE YOOOO : " + secret.getSender().getUserImage().getBytes());
+            Log.i(TAG, "IMAGE YOOOO2222 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
+            viewHolder.userImage.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
         }
 
         //User name
@@ -138,7 +139,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
         TextView sender;
         Integer messageType;
         ImageView image;
-        ImageView userImage;
+        com.github.siyamed.shapeimageview.CircularImageView userImage;
 
     }
 }

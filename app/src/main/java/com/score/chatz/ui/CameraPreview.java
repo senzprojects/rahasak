@@ -55,12 +55,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if(mCamera != null)
         mCamera.release();
-        int rotate = (new Camera.CameraInfo().orientation - 0 + 360) % 360;
         mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        Camera.Parameters params = mCamera.getParameters();
-        //params.setPictureSize(pictureWidth, pictureHeight);
-        params.setRotation(rotate);
-        mCamera.setParameters(params);
 
         try {
             mCamera.setPreviewDisplay(surfaceHolder);
@@ -80,49 +75,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
-                //Rotate image
-                //byte[] rotatedImage = CameraUtils.getRotatedImage(bytes, -90);
-
                 //Scaled down image
-                byte[] resizedImage = CameraUtils.getResizedImage(bytes, 2, 100);
-
+                byte[] resizedImage = CameraUtils.getCompressedImage(bytes, 5); //Compress image ~ 100kbs
 
                 SenzHandler.getInstance(getContext()).sendPhoto(resizedImage, originalSenz);
 
                 activity.finish();
             }
         });
-
-        Camera.Parameters params = mCamera.getParameters();
-
-        List<Camera.Size> sizes = params.getSupportedPictureSizes();
-        Size mSize;
-        for (Camera.Size size : sizes) {
-            Log.i(TAG, "Available resolution: "+size.width+" "+size.height);
-            //mSize = size;
-        }
 }
-
-
-
-    public byte[] scaleDown(Bitmap realImage, float maxImageSize,
-                                   boolean filter) {
-        float ratio = Math.min(
-                (float) maxImageSize / realImage.getWidth(),
-                (float) maxImageSize / realImage.getHeight());
-        int width = Math.round((float) ratio * realImage.getWidth());
-        int height = Math.round((float) ratio * realImage.getHeight());
-
-        Bitmap newBitmap = Bitmap.createScaledBitmap(realImage, width,
-                height, filter);
-
-        ByteArrayOutputStream baos= new ByteArrayOutputStream();
-        newBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
-
-        return baos.toByteArray();
-    }
-
-
 
 
     @Override

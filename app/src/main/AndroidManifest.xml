@@ -60,7 +60,7 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
-        <!--- activities -->
+        <!-- - activities -->
         <activity
             android:name=".ui.SplashActivity"
             android:configChanges="orientation"
@@ -74,7 +74,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.CountryListActivity"
             android:configChanges="orientation"
@@ -86,7 +85,6 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
-
         <activity
             android:name=".ui.SenzMapActivity"
             android:configChanges="orientation"
@@ -94,44 +92,38 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:windowSoftInputMode="stateHidden" />
-
         <activity
             android:name=".ui.ChatActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat" />
-
         <activity
             android:name=".ui.HomeActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-
         <activity
             android:name=".ui.AddUserActivity"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
-
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.SettingsActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme" />
-
         <activity
             android:name=".ui.RegistrationActivity"
             android:screenOrientation="portrait"
             android:theme="@style/MyMaterialTheme"
-            android:windowSoftInputMode="adjustResize"
-            />
-
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ui.PhotoActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"></activity>
-
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" />
         <activity
             android:name=".ui.UserProfileActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat"></activity>
+            android:theme="@style/Theme.AppCompat" />
+        <activity android:name=".ui.PhotoFullScreenActivity"
+            android:theme="@style/MyMaterialTheme"></activity>
 
         <!-- Servicves -->
         <service
@@ -152,12 +144,8 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
-        <receiver android:name=".receivers.AlarmReceiver">
-        </receiver>
-
-        <receiver
-            android:name=".receivers.DeathWatchReceiver">
+        <receiver android:name=".receivers.AlarmReceiver"></receiver>
+        <receiver android:name=".receivers.DeathWatchReceiver">
             <intent-filter>
                 <action android:name="senz.action.RESTART" />
             </intent-filter>
@@ -167,7 +155,6 @@
                 <action android:name="com.score.senz.NEW_SENZ" />
             </intent-filter>
         </receiver>
-
     </application>
 
 </manifest>

@@ -258,23 +258,14 @@ public class SenzHandler {
             if (senz.getAttributes().get("stream").equalsIgnoreCase("ON")) {
                 Log.d(TAG, "Stream ON from " + senz.getSender().getUsername());
 
-                senzStream = new SenzStream(true, senz.getSender().getUsername(), new StringBuffer());
-            } else if (senz.getAttributes().get("stream").equalsIgnoreCase("OFF")) {
-                // stream off
-                senzStream.setIsActive(false);
-
-                Log.d(TAG, "Stream OFF from " + senz.getSender().getUsername());
-
+                senzStream = new SenzStream(true, senz.getSender().getUsername(), new StringBuilder());
+                senzStream.setIsActive(true);
+            }
+        } else if (senz.getAttributes().containsKey("chatzphoto")) {
                 // save stream to db
                 try {
-                    Log.i(TAG, "SENDER OF PHOTO : " + senz.getSender());
                     if (senz.getAttributes().containsKey("chatzphoto")) {
-                        dbSource.createSecret(new Secret(null, senzStream.getStream(), senz.getSender(), senz.getReceiver()));
-                    } else if (senz.getAttributes().containsKey("profilezphoto")) {
-                        User sender = senz.getSender();
-                        sender.setUserImage(senzStream.getStream());
-                        //dbSource.createUser(sender);
-                        dbSource.insertImageToDB(senzStream.getStream(), sender.getUsername());
+                        dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver()));
                     }
                 } catch (SQLiteConstraintException e) {
                     Log.e(TAG, e.toString());
@@ -284,8 +275,26 @@ public class SenzHandler {
                 Intent intent = new Intent("com.score.chatz.DATA_SENZ");
                 intent.putExtra("SENZ", senz);
                 context.sendBroadcast(intent);
+
+        } else if (senz.getAttributes().containsKey("profilezphoto")) {
+            // save stream to db
+            try {
+                if (senz.getAttributes().containsKey("profilezphoto")) {
+                    User sender = senz.getSender();
+                    sender.setUserImage(senz.getAttributes().get("profilezphoto"));
+                    //dbSource.createUser(sender);
+                    dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
+                }
+            } catch (SQLiteConstraintException e) {
+                Log.e(TAG, e.toString());
             }
-        } else {
+
+            // broadcast
+            Intent intent = new Intent("com.score.chatz.DATA_SENZ");
+            intent.putExtra("SENZ", senz);
+            context.sendBroadcast(intent);
+
+        }  else {
             /*
              * Default cases, handle such as registration success or, any other scenarios where need to specifically handle in the Activity.
              */
@@ -303,15 +312,34 @@ public class SenzHandler {
 
     private void handleStream(String stream) {
         if (senzStream != null && senzStream.isActive()) {
-            // streaming ON
-            Log.d(TAG, "Stream ON, chatzphoto ");
-            senzStream.putStream(stream);
             if (stream.contains("#stream off")) {
                 Log.d(TAG, "Stream OFFFFFFFFFFFF ");
                 senzStream.setIsActive(false);
+                //Stream has ended. Already receieved Stream oFF.. we need to notify the handleSenz method to process the stream
+                handleSenz(senzStream.getSenzString());
+
+            }else{
+                // streaming ON
+                setStreamType(stream);
+                Log.d(TAG, "Stream ON, chatzphoto Data SAVED : " + stream);
+                senzStream.putStream(stream);
             }
         } else {
             Log.e(TAG, "Stream OFF, chatzphoto ");
+        }
+    }
+
+    /**
+     * set the type of stream if not already done.
+     * @param stream
+     */
+    private void setStreamType(String stream){
+        if(senzStream.getStreamType() == null){
+            if (stream.contains("#chatzphoto")) {
+                senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
+            }else if (stream.contains("#profilezphoto")){
+                senzStream.setStreamType(SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO);
+            }
         }
     }
 
@@ -502,29 +530,11 @@ public class SenzHandler {
     }
 
 
-    private Senz getPhotoSenz(Senz senz, byte[] image) {
-        String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
-
-        //Save photo to db before sending
-        new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, senz.getSender(), senz.getReceiver()));
-
-        String id = "_ID";
-        String signature = "_SIGNATURE";
-        SenzTypeEnum senzType = SenzTypeEnum.DATA;
-
-        // create senz attributes
-        HashMap<String, String> senzAttributes = new HashMap<>();
-        senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
-        senzAttributes.put("chatzphoto", imageAsString);
-
-        return new Senz(id, signature, senzType, senz.getReceiver(), senz.getSender(), senzAttributes);
-    }
-
     private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image) {
         String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
 
         //Save photo to db before sending
-        new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, senz.getSender(), senz.getReceiver()));
+        new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, senz.getReceiver(), senz.getSender()));
 
 
         ArrayList<Senz> senzList = new ArrayList<>();

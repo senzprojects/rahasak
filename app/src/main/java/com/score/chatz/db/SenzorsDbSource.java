@@ -374,8 +374,13 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT MAX(_id), text, image, sender, receiver " +
-                "FROM secret WHERE sender != ? GROUP BY sender ORDER BY _id DESC";
+        /*String query = "SELECT * " +
+                "FROM secret as s " +
+                "RIGHT JOIN user as u " +
+                "ON u.username = s.sender " +
+                "WHERE s.sender != ? GROUP BY s.sender ORDER BY s._id DESC";*/
+        String query = "SELECT MAX(_id), text, image, sender, receiver FROM secret " +
+                "WHERE sender != ? GROUP BY sender ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername()});
 
         // secret attr
@@ -383,6 +388,7 @@ public class SenzorsDbSource {
         String _secretImage;
         String _secretSender;
         String _secretReceiver;
+        String _secretSenderImage;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -393,9 +399,12 @@ public class SenzorsDbSource {
             _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
             _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
+            _secretSenderImage = getImageFromDB(_secretSender);
 
             // create secret
-            Secret secret = new Secret(_secretText, _secretImage, new User("", _secretSender), new User("", _secretReceiver));
+            User senderUser = new User("", _secretSender);
+            senderUser.setUserImage(_secretSenderImage);
+            Secret secret = new Secret(_secretText, _secretImage, senderUser, new User("", _secretReceiver));
 
             // fill secret list
             secretList.add(secret);
@@ -741,35 +750,45 @@ public class SenzorsDbSource {
     }
 
     public void insertImageToDB(String username, String encodedImage) {
+        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        ContentValues cv = new ContentValues();
 
-        cv.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
+        Log.i(TAG, "USER IMAGE STORED TO DB : " + encodedImage);
 
-        SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
+        // content values to inset
+        ContentValues values = new ContentValues();
+        values.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
 
-        int p = db.update(SenzorsDbContract.User.TABLE_NAME, cv, SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?", new String[]{username});
-        if (p == 0) {
-            cv.put(SenzorsDbContract.User.COLUMN_NAME_USERNAME, username);
-            db.insert(SenzorsDbContract.User.TABLE_NAME, null, cv);
-        }
+        // update
+        db.update(SenzorsDbContract.User.TABLE_NAME,
+                values,
+                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
+                new String[]{username});
     }
 
     public String getImageFromDB(String username) {
-
-        String selectQuery = "SELECT image from  " + SenzorsDbContract.User.TABLE_NAME + " where " + SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = '" + username + "'";
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
 
-        String image = null;
+        // query
+        String query = "SELECT user.image " +
+                "FROM user " +
+                "WHERE user.username = ?";
+        Cursor cursor = db.rawQuery(query,  new String[] {username});
+
+        // user attributes
+        String _userImage = null;
+
+        // extract attributes
         if (cursor.moveToFirst()) {
-            do {
-                image = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
-                // get  the  data into array,or class variable
-            } while (cursor.moveToNext());
+            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
         }
 
-        return image;
+        Log.i(TAG, "USER IMAGE RETRIEVED FROM DB : " + _userImage);
+
+        // clean
+        cursor.close();
+
+        return _userImage;
 
     }
 
