@@ -169,13 +169,13 @@ android:layout_height="match_parent"
 
 <FrameLayout
     android:layout_width="0dp"
-    android:layout_height="70dp"
-    android:layout_weight="3"
+    android:layout_height="match_parent"
+    android:layout_weight="4"
     android:padding="10dp">
 
     <com.github.siyamed.shapeimageview.CircularImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:src="@drawable/default_user"
         android:id="@+id/user_image"
         app:siBorderWidth="1dp"
@@ -185,16 +185,20 @@ android:layout_height="match_parent"
 
     <RelativeLayout
         android:layout_width="0dp"
-        android:layout_height="70dp"
+        android:layout_height="match_parent"
         android:layout_weight="8"
         android:padding="10dp">
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Lakmal"
             android:id="@+id/user_name"
-            android:layout_centerVertical="true" />
+            android:layout_centerVertical="true"
+            android:textStyle="bold|italic"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:layout_toLeftOf="@+id/perm_locations" />
         <ImageView
             android:layout_width="20dp"
             android:layout_height="wrap_content"

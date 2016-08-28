@@ -66,7 +66,7 @@ public class SenzStream {
     public String getSenzString(){
         String senzString = getStartOfStream(streamType);
         senzString += getImageFromStream();
-        senzString += getEndOfStream();
+        senzString += getEndOfStream(streamType);
         return senzString;
     }
 
@@ -81,7 +81,9 @@ public class SenzStream {
         while (matcher.find())
         {
             imageString += matcher.group(1);
+            Log.i("STREAM", "PARTS - " + matcher.group(1));
         }
+        Log.i("STREAM", "FINAL - " + imageString);
         return imageString;
     }
 
@@ -98,7 +100,7 @@ public class SenzStream {
                 regex = Pattern.compile("#chatzphoto\\s(.*?)\\s#time|(^[^D][^A][^T][^A].*?)\\s#time");
                 break;
             case PROFILEZPHOTO:
-                regex = Pattern.compile("#profilezphoto\\s(.*?)\\s#time");
+                regex = Pattern.compile("#profilezphoto\\s(.*?)\\s@");
                 break;
         }
 
@@ -112,13 +114,20 @@ public class SenzStream {
      */
     private String getStartOfStream(SENZ_STEAM_TYPE type){
         String startOfStream = null;
+        Pattern pattern = null;
+        Matcher matcher = null;
 
         switch (type){
             case CHATZPHOTO:
                 startOfStream = "DATA #chatzphoto ";
                 break;
             case PROFILEZPHOTO:
-                startOfStream = "DATA #profilezphoto ";
+                pattern = Pattern.compile("^(DATA\\s#time\\s[0-9]+\\s#profilezphoto\\s)");
+                matcher = pattern.matcher(image);
+                if (matcher.find())
+                {
+                    startOfStream = matcher.group(1);
+                }
             break;
         }
 
@@ -129,16 +138,33 @@ public class SenzStream {
      * Extract the last part of the stream which is common to all streaming packets
      * @return
      */
-    private String getEndOfStream(){
+    private String getEndOfStream(SENZ_STEAM_TYPE type){
         String lastSection = "";
+        Pattern pattern = null;
+        Matcher matcher = null;
 
-        Pattern pattern = Pattern.compile("(\\s#time\\s\\d+?\\s@[a-zA-Z0-9]+?\\s\\^[a-zA-Z0-9]+?\\sSIGNATURE)$");
-        Matcher matcher = pattern.matcher(image);
+        switch (type){
+            case CHATZPHOTO:
+                pattern = Pattern.compile("(\\s#time\\s\\d+?\\s@[a-zA-Z0-9]+?\\s\\^[a-zA-Z0-9]+?\\sSIGNATURE)$");
+                matcher = pattern.matcher(image);
 
-        if (matcher.find())
-        {
-            lastSection = matcher.group(1);
+                if (matcher.find())
+                {
+                    lastSection = matcher.group(1);
+                }
+                break;
+            case PROFILEZPHOTO:
+                pattern = Pattern.compile("(\\s@[a-zA-Z0-9]+?\\s\\^[a-zA-Z0-9]+?\\sSIGNATURE)$");
+                matcher = pattern.matcher(image);
+
+                if (matcher.find())
+                {
+                    lastSection = matcher.group(1);
+                }
+                break;
         }
+
+
 
         return lastSection;
     }

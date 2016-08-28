@@ -24,6 +24,7 @@ public class SenzorsDbContract {
         public static final String TABLE_NAME = "secret";
         public static final String COLUMN_NAME_TEXT = "text";
         public static final String COLOMN_NAME_IMAGE = "image";
+        public static final String COLOMN_NAME_IMAGE_THUMB = "thumbnail";
         public static final String COLUMN_NAME_SENDER = "sender";
         public static final String COLUMN_NAME_RECEIVER = "receiver";
         public static final String COLUMN_NAME_DELETE = "deleted";

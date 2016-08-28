@@ -327,7 +327,7 @@ public class ChatFragment extends Fragment {
                      *  receiver - other person
                      *
                      */
-                    Secret newSecret = new Secret(text_message.getText().toString(), null,new User("", receiver), senz.getSender());
+                    Secret newSecret = new Secret(text_message.getText().toString(), null, null,new User("", receiver), senz.getSender());
                     SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
                     dbSource.createSecret(newSecret);
                     text_message.setText("");

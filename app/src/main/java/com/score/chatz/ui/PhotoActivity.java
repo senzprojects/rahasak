@@ -22,6 +22,7 @@ import com.google.android.gms.vision.CameraSource;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.SenzStream;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
@@ -47,30 +48,10 @@ public class PhotoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo);
         instnce = this;
-
-        //initializeCamera();
-
-        // Add a listener to the Capture button
-        /*Button captureButton = (Button) findViewById(id.button_capture);
-        captureButton.setOnClickListener(new View.OnClickListener() {
-                                             @Override
-                                             public void onClick(View v) {
-                                                 // get an image from the camera
-                                                 Log.e("log", "mPicture"+mPicture);
-
-                                                 mCamera.takePicture(null, null, mPicture);
-                                             }
-                                         }
-        );*/
-
-        mCameraPreview = new CameraPreview(this, mCamera);
-        //mCamera.startPreview();
+        mCameraPreview = new CameraPreview(this, mCamera, (SenzStream.SENZ_STEAM_TYPE) getIntent().getExtras().get("StreamType"));
 
         FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
         preview.addView(mCameraPreview);
-
-
-
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
@@ -104,19 +85,12 @@ public class PhotoActivity extends AppCompatActivity {
         }
     }
 
-    private void initializeCamera(){
-        //mCamera = openFrontFacingCameraGingerbread();
-
-        mCamera.startPreview();
-    }
-
     private void startCountdownToPhoto(){
         new CountDownTimer(5000,1000){
             @Override
             public void onFinish() {
                 //initializeCamera();
                 mCameraPreview.takePhoto(instnce, originalSenz);
-
             }
             @Override
             public void onTick(long millisUntilFinished) {
@@ -126,10 +100,6 @@ public class PhotoActivity extends AppCompatActivity {
         }.start();
 
     }
-
-
-
-
 
     // service interface
     private ISenzService senzService = null;
@@ -200,14 +170,4 @@ public class PhotoActivity extends AppCompatActivity {
         }
         return camera;
     }
-
-
-
-
-
-
-
-
-
-
 }

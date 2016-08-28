@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 
 import com.score.chatz.R;
 import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.utils.CameraUtils;
 
 import java.util.ArrayList;
 
@@ -86,6 +88,10 @@ import java.util.ArrayList;
                 viewHolder.userLocationPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_locations_deactive, null));
             }
             viewHolder.userImageView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.default_user, null));
+            //Extracting user image
+            if(userPerm.getUser().getUserImage() != null) {
+                viewHolder.userImageView.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(userPerm.getUser().getUserImage().getBytes()), -90));
+            }
             //Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user);
             //viewHolder.userImageView.setImageBitmap(largeIcon);
         }

@@ -13,12 +13,14 @@ public class Secret {
     private boolean isDelete;
     private Long timeStamp;
     private String id;
+    private String imageThumbnail;
 
-    public Secret(String text, String image,User sender, User receiver) {
+    public Secret(String text, String image, String thumb, User sender, User receiver) {
         this.text = text;
         this.sender = sender;
         this.receiver = receiver;
         this.image = image;
+        this.imageThumbnail = thumb;
     }
 
     public String getText() {
@@ -35,6 +37,10 @@ public class Secret {
 
     public String getImage() {
         return image;
+    }
+
+    public String getThumbnail() {
+        return imageThumbnail;
     }
 
     public void setDelete(boolean val){

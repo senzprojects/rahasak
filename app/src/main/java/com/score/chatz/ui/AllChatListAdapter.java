@@ -19,7 +19,10 @@ import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by lakmalcaldera on 8/19/16.
@@ -87,6 +90,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
                     view = mInflater.inflate(R.layout.rahas_image_row_layout, viewGroup, false);
                     holder.image = (ImageView) view.findViewById(R.id.image);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
                     holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
                     holder.messageType = IMAGE_MESSAGE;
                     break;
@@ -94,6 +98,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
                     view = mInflater.inflate(R.layout.rahas_row_layout, viewGroup, false);
                     holder.message = (TextView) view.findViewById(R.id.message);
                     holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
                     holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
                     holder.messageType = TEXT_MESSAGE;
                     break;
@@ -103,6 +108,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
             //get view holder back_icon
             holder = (ViewHolder) view.getTag();
         }
+        holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
         setUpRow(i, secret, view, holder);
         return view;
     }
@@ -114,17 +120,24 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
             viewHolder.message.setText(secret.getText());
         }else{
             if(secret.getImage() != null) {
-                Log.i(TAG, "IMAGE YOOOO : " + secret.getImage().getBytes());
-                Log.i(TAG, "IMAGE YOOOO2222 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
+                Log.i(TAG, "IMAGE 11 : " + secret.getImage().getBytes());
+                Log.i(TAG, "IMAGE 22 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
                 viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
             }
         }
 
         //Extracting user image
         if(secret.getSender().getUserImage() != null) {
-            Log.i(TAG, "IMAGE YOOOO : " + secret.getSender().getUserImage().getBytes());
-            Log.i(TAG, "IMAGE YOOOO2222 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
+            Log.i(TAG, "IMAGE 11111111 : " + secret.getSender().getUserImage().getBytes());
+            Log.i(TAG, "IMAGE 22222222 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
             viewHolder.userImage.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
+        }
+
+        if(secret.getTimeStamp() != null){
+            Timestamp timestamp = new Timestamp(secret.getTimeStamp());
+            Date date = new Date(timestamp.getTime());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy' 'HH:mm:ss:S");
+            viewHolder.sentTime.setText(simpleDateFormat.format(date));
         }
 
         //User name
@@ -137,6 +150,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
     static class ViewHolder {
         TextView message;
         TextView sender;
+        TextView sentTime;
         Integer messageType;
         ImageView image;
         com.github.siyamed.shapeimageview.CircularImageView userImage;

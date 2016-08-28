@@ -23,7 +23,10 @@ import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Lakmal on 8/9/16.
@@ -123,6 +126,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             //get view holder back_icon
             holder = (ViewHolder) view.getTag();
         }
+        holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
         setUpRow(i, secret, view, holder);
         return view;
     }
@@ -133,7 +137,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
             viewHolder.message.setText(secret.getText());
         }else{
-            /*viewHolder.image.setImageResource(R.drawable.confidential);
+            /*viewHolder.image.setImageResource(R.drawable.confidential);*/
             viewHolder.image.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -141,9 +145,21 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     intent.putExtra("IMAGE", secret.getImage());
                     context.startActivity(intent);
                 }
-            });*/
-            viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
+            });
+            //viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getThumbnail().getBytes()), -90));
+            if(secret.getThumbnail() != null) {
+                Bitmap decodedImage = CameraUtils.decodeBase64(secret.getThumbnail());
+                viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
+            }
         }
+
+        if(secret.getTimeStamp() != null){
+            Timestamp timestamp = new Timestamp(secret.getTimeStamp());
+            Date date = new Date(timestamp.getTime());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy' 'HH:mm:ss:S");
+            viewHolder.sentTime.setText(simpleDateFormat.format(date));
+        }
+
         viewHolder.sender.setText(secret.getSender().getUsername());
     }
 
@@ -156,6 +172,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     static class ViewHolder {
         TextView message;
         TextView sender;
+        TextView sentTime;
         Integer messageType;
         ImageView image;
 

@@ -3,6 +3,7 @@ package com.score.chatz.handlers;
 import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteConstraintException;
+import android.graphics.Bitmap;
 import android.os.RemoteException;
 import android.util.Base64;
 import android.util.Log;
@@ -14,6 +15,7 @@ import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.ui.PhotoActivity;
+import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
 import com.score.senz.ISenzService;
@@ -185,6 +187,11 @@ public class SenzHandler {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             //To pass:
             intent.putExtra("Senz", senz);
+            if(senz.getAttributes().containsKey("chatzphoto")) {
+                intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
+            }else if(senz.getAttributes().containsKey("profilezphoto")){
+                intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO);
+            }
             context.startActivity(intent);
         } else if (senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")) {
             Intent serviceIntent = new Intent(context, LocationService.class);
@@ -265,7 +272,7 @@ public class SenzHandler {
                 // save stream to db
                 try {
                     if (senz.getAttributes().containsKey("chatzphoto")) {
-                        dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver()));
+                        dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), CameraUtils.resizeBase64Image(senz.getAttributes().get("chatzphoto")), senz.getSender(), senz.getReceiver()));
                     }
                 } catch (SQLiteConstraintException e) {
                     Log.e(TAG, e.toString());
@@ -281,7 +288,7 @@ public class SenzHandler {
             try {
                 if (senz.getAttributes().containsKey("profilezphoto")) {
                     User sender = senz.getSender();
-                    sender.setUserImage(senz.getAttributes().get("profilezphoto"));
+                    //sender.setUserImage(senz.getAttributes().get("profilezphoto"));
                     //dbSource.createUser(sender);
                     dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
                 }
@@ -423,7 +430,7 @@ public class SenzHandler {
 
                     Log.d(TAG, "save incoming chatz");
                     String msg = senz.getAttributes().get("chatzmsg");
-                    Secret newSecret = new Secret(msg, null, senz.getSender(), senz.getReceiver());
+                    Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
                     dbSource.createSecret(newSecret);
 
                     senz.setSender(sender);
@@ -532,9 +539,10 @@ public class SenzHandler {
 
     private ArrayList<Senz> getPhotoStreamingSenz(Senz senz, byte[] image) {
         String imageAsString = Base64.encodeToString(image, Base64.DEFAULT);
+        String thumbnail = CameraUtils.resizeBase64Image(imageAsString);
+        Log.i(TAG, "Thumbnail - " + thumbnail);
 
-        //Save photo to db before sending
-        new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, senz.getReceiver(), senz.getSender()));
+
 
 
         ArrayList<Senz> senzList = new ArrayList<>();
@@ -550,6 +558,10 @@ public class SenzHandler {
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             if (senz.getAttributes().containsKey("chatzphoto")) {
                 senzAttributes.put("chatzphoto", imgs[i].trim());
+
+                //Save photo to db before sending
+                new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender()));
+
             } else if (senz.getAttributes().containsKey("profilezphoto")) {
                 senzAttributes.put("profilezphoto", imgs[i].trim());
             }

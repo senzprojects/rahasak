@@ -257,10 +257,11 @@ public class SenzorsDbSource {
         ContentValues values = new ContentValues();
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_TEXT, secret.getText());
         values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE, secret.getImage());
+        values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB, secret.getThumbnail());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER, secret.getReceiver().getUsername());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_SENDER, secret.getSender().getUsername());
         values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
-        Long _timeStamp = System.currentTimeMillis()/1000;
+        Long _timeStamp = System.currentTimeMillis();
         values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, _timeStamp);
 
         // Insert the new row, if fails throw an error
@@ -321,7 +322,7 @@ public class SenzorsDbSource {
         ArrayList<Secret> secretList = new ArrayList();
 
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
-        String query = "SELECT _id, text, image, sender, receiver, deleted, timestamp " +
+        String query = "SELECT _id, text, image, thumbnail, sender, receiver, deleted, timestamp " +
                 "FROM secret WHERE (sender = ? AND receiver = ?) OR (sender = ? AND receiver = ?) ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername(), receiver.getUsername(), receiver.getUsername(), sender.getUsername()});
 
@@ -333,6 +334,7 @@ public class SenzorsDbSource {
         String _secretReceiver;
         int _secretDelete;
         Long _secretTimestamp;
+        String _thumbnail;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -346,9 +348,10 @@ public class SenzorsDbSource {
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
             _secretDelete = cursor.getInt(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_DELETE));
             _secretTimestamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
+            _thumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
 
             // create secret
-            Secret secret = new Secret(_secretText, _secretImage, new User("", _secretSender), new User("", _secretReceiver));
+            Secret secret = new Secret(_secretText, _secretImage, _thumbnail, new User("", _secretSender), new User("", _secretReceiver));
             secret.setDelete(_secretDelete == 1 ? true : false);
             secret.setTimeStamp(_secretTimestamp);
             secret.setID(_secretId);
@@ -379,7 +382,7 @@ public class SenzorsDbSource {
                 "RIGHT JOIN user as u " +
                 "ON u.username = s.sender " +
                 "WHERE s.sender != ? GROUP BY s.sender ORDER BY s._id DESC";*/
-        String query = "SELECT MAX(_id), text, image, sender, receiver FROM secret " +
+        String query = "SELECT MAX(_id), text, image, thumbnail, sender, receiver, timestamp FROM secret " +
                 "WHERE sender != ? GROUP BY sender ORDER BY _id DESC";
         Cursor cursor = db.rawQuery(query,  new String[] {sender.getUsername()});
 
@@ -389,6 +392,8 @@ public class SenzorsDbSource {
         String _secretSender;
         String _secretReceiver;
         String _secretSenderImage;
+        String _secretThumbnail;
+        Long _timeStamp;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -399,12 +404,15 @@ public class SenzorsDbSource {
             _secretImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE));
             _secretSender = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_SENDER));
             _secretReceiver = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER));
+            _secretThumbnail = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB));
+            _timeStamp = cursor.getLong(cursor.getColumnIndex(SenzorsDbContract.Secret.COLUMN_TIMESTAMP));
             _secretSenderImage = getImageFromDB(_secretSender);
 
             // create secret
             User senderUser = new User("", _secretSender);
             senderUser.setUserImage(_secretSenderImage);
-            Secret secret = new Secret(_secretText, _secretImage, senderUser, new User("", _secretReceiver));
+            Secret secret = new Secret(_secretText, _secretImage, _secretThumbnail, senderUser, new User("", _secretReceiver));
+            secret.setTimeStamp(_timeStamp);
 
             // fill secret list
             secretList.add(secret);
@@ -604,7 +612,7 @@ public class SenzorsDbSource {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getReadableDatabase();
 
         // join query to retrieve data
-        String query = "SELECT user._id, user.username, permission.location, permission.camera " +
+        String query = "SELECT user._id, user.username, user.image, permission.location, permission.camera " +
                 "FROM user " +
                 "INNER JOIN permission " +
                 "ON user.username = permission.user";
@@ -615,6 +623,7 @@ public class SenzorsDbSource {
         boolean _location;
         boolean _camera;
         String _userId;
+        String _userImage;
 
         // extract attributes
         while (cursor.moveToNext()) {
@@ -626,9 +635,11 @@ public class SenzorsDbSource {
             // get user attributes
             _userId = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User._ID));
             _username = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLUMN_NAME_USERNAME));
+            _userImage = cursor.getString(cursor.getColumnIndex(SenzorsDbContract.User.COLOMN_NAME_IMAGE));
 
             // create senz
             User user = new User(_userId, _username);
+            user.setUserImage(_userImage);
             UserPermission userPerm = new UserPermission(user, _camera, _location);
 
             // fill senz list

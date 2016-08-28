@@ -16,6 +16,7 @@ import android.view.SurfaceView;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.utils.CameraUtils;
 import com.score.senz.ISenzService;
@@ -36,11 +37,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final String TAG = CameraPreview.class.getName();;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
+    private SenzStream.SENZ_STEAM_TYPE streamType;
     //private int pictureWidth = 500;
     //private int pictureHeight = 500;
 
     //Constructor that obtains context and camera
-    public CameraPreview(Context _context, Camera camera) {
+    public CameraPreview(Context _context, Camera camera, SenzStream.SENZ_STEAM_TYPE streamType) {
         super(_context);
         //context = _context;
         //this.mCamera = camera;
@@ -48,6 +50,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         this.mSurfaceHolder = this.getHolder();
         this.mSurfaceHolder.addCallback(this); // we get notified when underlying surface is created and destroyed
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //this is a deprecated method, is not requierd after 3.0
+        this.streamType = streamType;
 
     }
 
@@ -75,8 +78,14 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
-                //Scaled down image
-                byte[] resizedImage = CameraUtils.getCompressedImage(bytes, 5); //Compress image ~ 100kbs
+                byte[] resizedImage = null;
+
+                if(streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
+                    //Scaled down image
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 5); //Compress image ~ 5kbs
+                }else if(streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO){
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 50); //Compress image ~ 50kbs
+                }
 
                 SenzHandler.getInstance(getContext()).sendPhoto(resizedImage, originalSenz);
 

@@ -38,6 +38,7 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senz.ISenzService;
 import com.score.senzc.enums.SenzTypeEnum;
@@ -203,13 +204,11 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private void setupUserPermissions(){
+        userzPerm = getUserConfigPerm(user);
         username.setText(userzPerm.getUser().getUsername());
         if(userzPerm.getUser().getUserImage() != null) {
-            byte[] imageAsBytes = Base64.decode(userzPerm.getUser().getUserImage().getBytes(), Base64.DEFAULT);
-            Bitmap imgBitmap = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length);
-
-            userImage.setImageBitmap(imgBitmap);
-            userImage.setRotation(-90);
+            Bitmap decodedImage = CameraUtils.getBitmapFromBytes(userzPerm.getUser().getUserImage().getBytes());
+            userImage.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
         }
         cameraSwitch.setChecked(userzPerm.getCamPerm());
         locationSwitch.setChecked(userzPerm.getLocPerm());

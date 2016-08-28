@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+
+
+<LinearLayout
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,13 +17,13 @@
 
     <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="70dp"
-        android:layout_weight="3"
+        android:layout_height="match_parent"
+        android:layout_weight="4"
         android:padding="10dp">
 
         <com.github.siyamed.shapeimageview.CircularImageView
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:src="@drawable/default_user"
             android:id="@+id/user_image"
             app:siBorderWidth="1dp"
@@ -24,11 +31,16 @@
 
     </FrameLayout>
 
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="8"
-        android:padding="10dp">
+        android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        android:gravity="center_vertical">
 
         <ImageView
             android:layout_width="80dp"
@@ -40,16 +52,33 @@
             android:layout_alignParentEnd="false"
             android:scaleType="centerCrop" />
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Lakmal"
             android:id="@+id/sender"
             android:layout_centerVertical="true"
             android:layout_alignParentLeft="false"
-            android:layout_below="@+id/image" />
+            android:layout_below="@+id/image"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:textStyle="bold|italic" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="11:00 AM"
+            android:id="@+id/sent_time"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentBottom="false"
+            android:textColor="@color/android_grey"
+            android:textStyle="italic"
+            android:textSize="9sp"
+            android:layout_alignLeft="@+id/sender"
+            android:layout_below="@+id/sender" />
 
 
     </RelativeLayout>
 
-
+    </FrameLayout>
 </LinearLayout>
+
+</RelativeLayout>

@@ -14,6 +14,7 @@ import java.io.ByteArrayOutputStream;
 public class CameraUtils {
 
     protected static final String TAG = CameraUtils.class.getName();
+    protected static final int THUMB_NAIL_SIZE = 50;
 
     /**
      * Rotate bitmap to your degree
@@ -39,21 +40,25 @@ public class CameraUtils {
     /**
      * Resize and compress image
      * @param image original image
-     * @param frameReduction how small or big you want the frame to look. Original lengths are divided by this value, maintaining same ratio.
+     * @param sizeX how small or big you want the frame to look. Original lengths are divided by this value, maintaining same ratio.
      * @param imageCompression quality of the image. 100 - best, 0 - worst
      * @return image as a byte array
      */
-    public static byte[] getResizedImage(byte[] image, int frameReduction, int imageCompression) {
+    public static byte[] getResizedImage(byte[] image, int sizeX, int sizeY, int imageCompression) {
         Bitmap bitmap = BitmapFactory.decodeByteArray(image , 0, image.length);
 
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
-        Bitmap resizeBitmap =  Bitmap.createScaledBitmap(bitmap, width/frameReduction, height/frameReduction, true);
+        Bitmap resizeBitmap =  Bitmap.createScaledBitmap(bitmap, sizeX, sizeY, true);
 
         ByteArrayOutputStream baos= new ByteArrayOutputStream();
         resizeBitmap.compress(Bitmap.CompressFormat.JPEG, imageCompression, baos);
 
         return baos.toByteArray();
+    }
+
+    public static byte[] getThumnail(byte[] image){
+        return getResizedImage(image, THUMB_NAIL_SIZE, THUMB_NAIL_SIZE, 50);
     }
 
     /**
@@ -99,5 +104,35 @@ public class CameraUtils {
 
         //Bitmap bitmap = BitmapFactory.decodeByteArray(byteArray , 0, byteArray.length);
         return imgBitmap;
+    }
+
+    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality)
+    {
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+        image.compress(compressFormat, quality, byteArrayOS);
+        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT);
+    }
+
+    public static Bitmap decodeBase64(String input)
+    {
+        byte[] decodedBytes = Base64.decode(input, 0);
+        return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+    public static String resizeBase64Image(String base64image){
+        byte [] encodeByte=Base64.decode(base64image.getBytes(),Base64.DEFAULT);
+        BitmapFactory.Options options=new BitmapFactory.Options();
+        options.inPurgeable = true;
+        Bitmap image = BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length,options);
+
+        image = Bitmap.createScaledBitmap(image, THUMB_NAIL_SIZE, THUMB_NAIL_SIZE, false);
+
+        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+        image.compress(Bitmap.CompressFormat.PNG,100, baos);
+
+        byte [] b=baos.toByteArray();
+        System.gc();
+        return Base64.encodeToString(b, Base64.NO_WRAP);
+
     }
 }
