@@ -151,13 +151,13 @@ public class RemoteSenzService extends Service {
         // register local ping alarm receiver
         IntentFilter alarmFilter = new IntentFilter();
         alarmFilter.addAction("PING_ALARM");
-        LocalBroadcastManager.getInstance(RemoteSenzService.this).registerReceiver(pingAlarmReceiver, filter);
+        registerReceiver(pingAlarmReceiver, filter);
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
-        LocalBroadcastManager.getInstance(RemoteSenzService.this).unregisterReceiver(pingAlarmReceiver);
+        unregisterReceiver(pingAlarmReceiver);
     }
 
     private void initPing() {
