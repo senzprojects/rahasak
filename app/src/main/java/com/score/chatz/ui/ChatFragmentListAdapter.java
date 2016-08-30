@@ -3,6 +3,8 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +17,8 @@ import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioUtils;
+import com.score.chatz.utils.BitmapTaskParams;
+import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
@@ -162,8 +166,9 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
             });
             //viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getThumbnail().getBytes()), -90));
             if(secret.getThumbnail() != null) {
-                Bitmap decodedImage = CameraUtils.decodeBase64(secret.getThumbnail());
-                viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
+                //Bitmap decodedImage = CameraUtils.decodeBase64(secret.getThumbnail());
+                //viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
+                loadBitmap(secret.getImage(), viewHolder.image);
             }
         }
 
@@ -187,6 +192,16 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
         viewHolder.sender.setText(secret.getSender().getUsername());
     }
+
+    private void loadBitmap(String data, ImageView imageView) {
+        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+        //task.execute(new BitmapTaskParams(data, 100, 100));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
+        else
+            task.execute(new BitmapTaskParams(data, 100, 100));
+    }
+
 
 
 

@@ -3,6 +3,8 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,10 +17,13 @@ import android.widget.TextView;
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.Secret;
+import com.score.chatz.utils.BitmapTaskParams;
+import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -122,7 +127,8 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
             if(secret.getImage() != null) {
                 Log.i(TAG, "IMAGE 11 : " + secret.getImage().getBytes());
                 Log.i(TAG, "IMAGE 22 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
-                viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
+                //viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
+                loadBitmap(secret.getImage(), viewHolder.image);
             }
         }
 
@@ -130,7 +136,8 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
         if(secret.getSender().getUserImage() != null) {
             Log.i(TAG, "IMAGE 11111111 : " + secret.getSender().getUserImage().getBytes());
             Log.i(TAG, "IMAGE 22222222 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
-            viewHolder.userImage.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
+            //viewHolder.userImage.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
+            loadBitmap(secret.getSender().getUserImage(), viewHolder.userImage);
         }
 
         if(secret.getTimeStamp() != null){
@@ -142,6 +149,14 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
 
         //User name
         viewHolder.sender.setText(secret.getSender().getUsername());
+    }
+
+    private void loadBitmap(String data, ImageView imageView) {
+        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
+        else
+            task.execute(new BitmapTaskParams(data, 100, 100));
     }
 
     /**

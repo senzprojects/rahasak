@@ -79,12 +79,12 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
                 byte[] resizedImage = null;
-
+                bytes = rotateBitmapByteArray(bytes, -90);
                 if(streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 5); //Compress image ~ 5kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 100); //Compress image ~ 5kbs
                 }else if(streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO){
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 50); //Compress image ~ 50kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 100); //Compress image ~ 50kbs
                 }
 
                 SenzHandler.getInstance(getContext()).sendPhoto(resizedImage, originalSenz);
@@ -92,8 +92,15 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 activity.finish();
             }
         });
-}
+    }
 
+    private byte[] rotateBitmapByteArray(byte[] data, int deg){
+        Bitmap decodedBitmap = CameraUtils.decodeBase64(Base64.encodeToString(data, 0));
+        Bitmap rotatedBitmap = CameraUtils.getRotatedImage(decodedBitmap, deg);
+        ByteArrayOutputStream baos= new ByteArrayOutputStream();
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        return baos.toByteArray();
+    }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {

@@ -3,7 +3,11 @@ package com.score.chatz.ui;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.content.res.ResourcesCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +19,11 @@ import com.github.siyamed.shapeimageview.CircularImageView;
 
 import com.score.chatz.R;
 import com.score.chatz.pojo.UserPermission;
+import com.score.chatz.utils.BitmapTaskParams;
+import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 /**
@@ -90,11 +97,20 @@ import java.util.ArrayList;
             viewHolder.userImageView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.default_user, null));
             //Extracting user image
             if(userPerm.getUser().getUserImage() != null) {
-                viewHolder.userImageView.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(userPerm.getUser().getUserImage().getBytes()), -90));
+                //viewHolder.userImageView.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(userPerm.getUser().getUserImage().getBytes()), -90));
+                //loadBitmap(CameraUtils.getBytesFromImage(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(Base64.decode(userPerm.getUser().getUserImage(), 0)), -90)), viewHolder.userImageView);
+
+                loadBitmap(userPerm.getUser().getUserImage(), viewHolder.userImageView);
             }
-            //Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(), R.drawable.default_user);
-            //viewHolder.userImageView.setImageBitmap(largeIcon);
         }
+
+    private void loadBitmap(String data, ImageView imageView) {
+        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
+        else
+            task.execute(new BitmapTaskParams(data, 100, 100));
+    }
 
         /**
          * Keep reference to children view to avoid unnecessary calls

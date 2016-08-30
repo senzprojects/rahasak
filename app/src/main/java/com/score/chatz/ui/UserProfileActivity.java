@@ -13,6 +13,8 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +40,8 @@ import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.pojo.UserPermission;
 import com.score.chatz.utils.ActivityUtils;
+import com.score.chatz.utils.BitmapTaskParams;
+import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senz.ISenzService;
@@ -207,8 +211,9 @@ public class UserProfileActivity extends AppCompatActivity {
         userzPerm = getUserConfigPerm(user);
         username.setText(userzPerm.getUser().getUsername());
         if(userzPerm.getUser().getUserImage() != null) {
-            Bitmap decodedImage = CameraUtils.getBitmapFromBytes(userzPerm.getUser().getUserImage().getBytes());
-            userImage.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
+            //Bitmap decodedImage = CameraUtils.getBitmapFromBytes(userzPerm.getUser().getUserImage().getBytes());
+            //userImage.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
+            loadBitmap(userzPerm.getUser().getUserImage(), userImage);
         }
         cameraSwitch.setChecked(userzPerm.getCamPerm());
         locationSwitch.setChecked(userzPerm.getLocPerm());
@@ -234,6 +239,14 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void loadBitmap(String data, ImageView imageView) {
+        BitmapWorkerTask task = new BitmapWorkerTask(imageView);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
+        else
+            task.execute(new BitmapTaskParams(data, 100, 100));
     }
 
     private UserPermission getUserConfigPerm(User user){
