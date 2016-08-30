@@ -87,7 +87,7 @@ public class PreferenceUtils {
      * @return key string
      */
     public static String getRsaKey(Context context, String keyType) {
-        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_MULTI_PROCESS);
         return preferences.getString(keyType, "");
     }
 
