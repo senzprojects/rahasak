@@ -12,7 +12,6 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.score.chatz.exceptions.NoUserException;
@@ -47,7 +46,9 @@ public class RemoteSenzService extends Service {
 
     // socket host, port
     //public static final String SENZ_HOST = "10.2.2.49";
-    public static final String SENZ_HOST = "udp.mysensors.info";
+    //public static final String SENZ_HOST = "udp.mysensors.info";
+    private static final String SENZ_HOST = "52.77.228.195";
+
     public static final int SENZ_PORT = 7070;
 
     // senz socket
@@ -57,30 +58,6 @@ public class RemoteSenzService extends Service {
 
     // status of the online/offline
     private boolean isOnline;
-
-    // API end point of this service, we expose the endpoints define in ISenzService.aidl
-    private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
-        @Override
-        public String getUser() throws RemoteException {
-            return null;
-        }
-
-        @Override
-        public void send(Senz senz) throws RemoteException {
-            Log.d(TAG, "Senz service call with senz " + senz.getId());
-            writeSenz(senz);
-        }
-
-        @Override
-        public void sendInOrder(List<Senz> senzList) throws RemoteException {
-            writeSenzList(senzList);
-        }
-    };
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return apiEndPoints;
-    }
 
     // broadcast receiver to check network status changes
     private final BroadcastReceiver networkStatusReceiver = new BroadcastReceiver() {
@@ -113,6 +90,30 @@ public class RemoteSenzService extends Service {
         }
     };
 
+    // API end point of this service, we expose the endpoints define in ISenzService.aidl
+    private final ISenzService.Stub apiEndPoints = new ISenzService.Stub() {
+        @Override
+        public String getUser() throws RemoteException {
+            return null;
+        }
+
+        @Override
+        public void send(Senz senz) throws RemoteException {
+            Log.d(TAG, "Senz service call with senz " + senz.getId());
+            writeSenz(senz);
+        }
+
+        @Override
+        public void sendInOrder(List<Senz> senzList) throws RemoteException {
+            writeSenzList(senzList);
+        }
+    };
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return apiEndPoints;
+    }
+
     @Override
     public void onCreate() {
         Log.d(TAG, "onCreate called");
@@ -139,25 +140,25 @@ public class RemoteSenzService extends Service {
         // restart service again
         // its done via broadcast receiver
         Intent intent = new Intent("senz.action.RESTART");
-        LocalBroadcastManager.getInstance(RemoteSenzService.this).sendBroadcast(intent);
+        sendBroadcast(intent);
     }
 
     private void registerReceivers() {
         // Register network status receiver
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(networkStatusReceiver, filter);
+        IntentFilter networkFilter = new IntentFilter();
+        networkFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkStatusReceiver, networkFilter);
 
         // register local ping alarm receiver
         IntentFilter alarmFilter = new IntentFilter();
         alarmFilter.addAction("PING_ALARM");
-        LocalBroadcastManager.getInstance(RemoteSenzService.this).registerReceiver(pingAlarmReceiver, filter);
+        registerReceiver(pingAlarmReceiver, alarmFilter);
     }
 
     private void unRegisterReceivers() {
         // un register receivers
         unregisterReceiver(networkStatusReceiver);
-        LocalBroadcastManager.getInstance(RemoteSenzService.this).unregisterReceiver(pingAlarmReceiver);
+        unregisterReceiver(pingAlarmReceiver);
     }
 
     private void initPing() {
@@ -165,7 +166,7 @@ public class RemoteSenzService extends Service {
         Intent intentAlarm = new Intent(this, AlarmReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intentAlarm, PendingIntent.FLAG_CANCEL_CURRENT);
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * 60 * 5, 1000 * 5 * 60, pendingIntent);
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000 * 60 * 10, 1000 * 60 * 10, pendingIntent);
     }
 
     private void initSoc() {
