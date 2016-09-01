@@ -29,8 +29,39 @@ public class CameraUtils {
             Matrix matrix = new Matrix();
             matrix.postRotate(degrees);
 
+
             //Work on the bitmap
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, imageBitmap.getWidth(), imageBitmap.getHeight(), true);
+            rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+        }
+
+        return rotatedBitmap;
+    }
+
+    /**
+     * Rotate bitmap, and scale to width and height according to ratio
+     * @param imageBitmap original bitmap image
+     * @param degrees amount you want to turn
+     * @return rotated bitmap
+     */
+    public static Bitmap getAdjustedImage(Bitmap imageBitmap, int degrees, int maxWidth){
+        Bitmap rotatedBitmap = null;
+        if(imageBitmap != null) {
+
+            //Setup matrix rotate image
+            Matrix matrix = new Matrix();
+            matrix.postRotate(degrees);
+
+            //Resize
+            int width = imageBitmap.getWidth();
+            int height = imageBitmap.getHeight();
+
+            float scaleWidth =  width /(float) maxWidth;
+            int newHeight = (int) ((int) height/ scaleWidth);
+
+
+            //Work on the bitmap
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, maxWidth, newHeight, true);
             rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
         }
 
@@ -172,5 +203,26 @@ public class CameraUtils {
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;
         return BitmapFactory.decodeByteArray(data, 0, data.length, options);
+    }
+
+    public static Bitmap getResizedBitmap(Bitmap bm, int maxWidth) {
+
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+
+        float scaleWidth = ((float) maxWidth) / width;
+        float scaleHeight = ((float) height) * ((float) maxWidth) / (float) width;
+
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+
+        return resizedBitmap;
+
     }
 }

@@ -164,10 +164,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
                     context.startActivity(intent);
                 }
             });
-            //viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getThumbnail().getBytes()), -90));
-            if(secret.getThumbnail() != null) {
-                //Bitmap decodedImage = CameraUtils.decodeBase64(secret.getThumbnail());
-                //viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
+            if(secret.getImage() != null) {
                 loadBitmap(secret.getImage(), viewHolder.image);
             }
         }
@@ -197,9 +194,9 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         BitmapWorkerTask task = new BitmapWorkerTask(imageView);
         //task.execute(new BitmapTaskParams(data, 100, 100));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 400, 400)));
         else
-            task.execute(new BitmapTaskParams(data, 100, 100));
+            task.execute(new BitmapTaskParams(data, 400, 400));
     }
 
 

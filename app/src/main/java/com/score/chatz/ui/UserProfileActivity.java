@@ -244,9 +244,9 @@ public class UserProfileActivity extends AppCompatActivity {
     private void loadBitmap(String data, ImageView imageView) {
         BitmapWorkerTask task = new BitmapWorkerTask(imageView);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 100, 100)));
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (new BitmapTaskParams(data, 1000, 1000)));
         else
-            task.execute(new BitmapTaskParams(data, 100, 100));
+            task.execute(new BitmapTaskParams(data, 1000, 1000));
     }
 
     private UserPermission getUserConfigPerm(User user){

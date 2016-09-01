@@ -272,7 +272,7 @@ public class SenzHandler {
                 // save stream to db
                 try {
                     if (senz.getAttributes().containsKey("chatzphoto")) {
-                        dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), CameraUtils.resizeBase64Image(senz.getAttributes().get("chatzphoto")), senz.getSender(), senz.getReceiver()));
+                        dbSource.createSecret(new Secret(null, senz.getAttributes().get("chatzphoto"), senz.getAttributes().get("chatzphoto"), senz.getSender(), senz.getReceiver()));
                     }
                 } catch (SQLiteConstraintException e) {
                     Log.e(TAG, e.toString());
@@ -288,8 +288,6 @@ public class SenzHandler {
             try {
                 if (senz.getAttributes().containsKey("profilezphoto")) {
                     User sender = senz.getSender();
-                    //sender.setUserImage(senz.getAttributes().get("profilezphoto"));
-                    //dbSource.createUser(sender);
                     dbSource.insertImageToDB(sender.getUsername(), senz.getAttributes().get("profilezphoto"));
                 }
             } catch (SQLiteConstraintException e) {

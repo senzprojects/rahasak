@@ -97,13 +97,13 @@ public class SenzStream {
 
         switch (type){
             case CHATZPHOTO:
-                regex = Pattern.compile("#chatzphoto\\s(.*?)\\s#time|(^[^D][^A][^T][^A].*?)\\s#time");
+                regex = Pattern.compile("#chatzphoto\\s(.*?)\\s|(^[^D][^A][^T][^A].*?)\\s#time");
                 break;
             case PROFILEZPHOTO:
-                regex = Pattern.compile("#profilezphoto\\s(.*?)\\s@");
+                regex = Pattern.compile("#profilezphoto\\s(.*?)\\s");
                 break;
             case CHATZSOUND:
-                regex = Pattern.compile("#chatzsound\\s(.*?)\\s@");
+                regex = Pattern.compile("#chatzsound\\s(.*?)\\s");
                 break;
         }
 
@@ -122,27 +122,35 @@ public class SenzStream {
 
         switch (type){
             case CHATZPHOTO:
-                startOfStream = "DATA #chatzphoto ";
+                pattern = Pattern.compile("(#time\\s[0-9]+\\s)");
+                matcher = pattern.matcher(image);
+                if (matcher.find())
+                {
+                    startOfStream = matcher.group(1);
+                }
+                startOfStream += "#chatzphoto ";
                 break;
             case PROFILEZPHOTO:
-                pattern = Pattern.compile("^(DATA\\s#time\\s[0-9]+\\s#profilezphoto\\s)");
+                pattern = Pattern.compile("(#time\\s[0-9]+\\s)");
                 matcher = pattern.matcher(image);
                 if (matcher.find())
                 {
                     startOfStream = matcher.group(1);
                 }
+                startOfStream += "#profilezphoto ";
             break;
             case CHATZSOUND:
-                pattern = Pattern.compile("^(DATA\\s#time\\s[0-9]+\\s#chatzsound\\s)");
+                pattern = Pattern.compile("(#time\\s[0-9]+\\s)");
                 matcher = pattern.matcher(image);
                 if (matcher.find())
                 {
                     startOfStream = matcher.group(1);
                 }
+                startOfStream += "#chatzsound ";
                 break;
         }
 
-        return startOfStream;
+        return "DATA " + startOfStream;
     }
 
     /**
@@ -156,7 +164,7 @@ public class SenzStream {
 
         switch (type){
             case CHATZPHOTO:
-                pattern = Pattern.compile("(\\s#time\\s\\d+?\\s@[a-zA-Z0-9]+?\\s\\^[a-zA-Z0-9]+?\\sSIGNATURE)$");
+                pattern = Pattern.compile("(\\s@[a-zA-Z0-9]+?\\s\\^[a-zA-Z0-9]+?\\sSIGNATURE)$");
                 matcher = pattern.matcher(image);
 
                 if (matcher.find())
