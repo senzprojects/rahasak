@@ -15,6 +15,7 @@ import android.view.SurfaceView;
 
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.handlers.SenzHandler;
+import com.score.chatz.handlers.SenzPhotoHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.SenzServiceConnection;
@@ -83,7 +84,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                     resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
                 }
 
-                SenzHandler.getInstance(getContext()).sendPhoto(resizedImage, originalSenz);
+                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
 
                 activity.finish();
             }

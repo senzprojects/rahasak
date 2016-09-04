@@ -45,6 +45,7 @@ import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
 import com.score.chatz.handlers.SenzHandler;
+import com.score.chatz.handlers.SenzSoundHandler;
 import com.score.chatz.pojo.Secret;
 import com.score.chatz.utils.AudioRecorder;
 import com.score.chatz.utils.AudioUtils;
@@ -144,7 +145,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void sendSecret(Secret secret) {
-        SenzHandler.getInstance(this).sendSound(secret);
+        SenzSoundHandler.getInstance().sendSound(secret, this);
     }
 
     private Secret getSoundSecret(User sender, User receiver, String sound) {
