@@ -49,6 +49,9 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -296,7 +299,7 @@ public class ChatFragment extends Fragment {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
-            senzAttributes.put("chatzmsg", text_message.getText().toString());
+            senzAttributes.put("chatzmsg", URLEncoder.encode(text_message.getText().toString(), "UTF-8"));
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 
             // new senz
@@ -307,7 +310,7 @@ public class ChatFragment extends Fragment {
             Senz senz = new Senz(id, signature, senzType, null, _sender, senzAttributes);
 
             senzService.send(senz);
-        } catch (RemoteException e) {
+        } catch (RemoteException | UnsupportedEncodingException e) {
             e.printStackTrace();
        }
     }

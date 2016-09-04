@@ -23,6 +23,8 @@ import com.score.senzc.enums.SenzTypeEnum;
 import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -447,7 +449,7 @@ public class SenzHandler {
                     SenzorsDbSource dbSource = new SenzorsDbSource(context);
 
                     Log.d(TAG, "save incoming chatz");
-                    String msg = senz.getAttributes().get("chatzmsg");
+                    String msg = URLDecoder.decode(senz.getAttributes().get("chatzmsg"), "UTF-8");
                     Secret newSecret = new Secret(msg, null, null,senz.getSender(), senz.getReceiver());
                     dbSource.createSecret(newSecret);
 
@@ -458,7 +460,7 @@ public class SenzHandler {
                     NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "New message received from @" + senz.getSender().getUsername());
                     shareMessageBackToUser(senzService, senz, sender, senz.getReceiver(), true);
                     handleDataChanges(senz);
-                } catch (SQLiteConstraintException e) {
+                } catch (SQLiteConstraintException | UnsupportedEncodingException e) {
                     shareMessageBackToUser(senzService, senz, sender, senz.getReceiver(), false);
                     Log.e(TAG, e.toString());
                 }

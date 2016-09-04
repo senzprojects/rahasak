@@ -54,8 +54,6 @@ import java.util.HashMap;
 
 public class UserProfileActivity extends AppCompatActivity {
     private static final String TAG = UserProfileActivity.class.getName();
-    private ImageView backBtn;
-    private Toolbar toolbar;
     private User user;
     private TextView username;
     private Switch cameraSwitch;
@@ -92,12 +90,6 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         String senderString = intent.getStringExtra("SENDER");
         user = new User("", senderString);
-
-
-        /*toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setCollapsible(false);
-        toolbar.setOverScrollMode(Toolbar.OVER_SCROLL_NEVER);
-        setSupportActionBar(toolbar);*/
 
         username = (TextView) findViewById(R.id.user_name);
         userImage = (ImageView) findViewById(R.id.clickable_image);
