@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.hardware.Camera;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
@@ -56,15 +57,16 @@ public class UserProfileActivity extends AppCompatActivity {
     private ImageView backBtn;
     private Toolbar toolbar;
     private User user;
-    TextView username;
-    Switch cameraSwitch;
-    Switch locationSwitch;
-    UserPermission userzPerm;
-    UserPermission currentUserGivenPerm;
-    User currentUser;
-    Button shareSecretBtn;
-    TextView tapImageText;
-    ImageButton userImage;
+    private TextView username;
+    private Switch cameraSwitch;
+    private Switch locationSwitch;
+    private UserPermission userzPerm;
+    private UserPermission currentUserGivenPerm;
+    private User currentUser;
+    private Button shareSecretBtn;
+    private TextView tapImageText;
+    private ImageView userImage;
+    private static SenzorsDbSource db;
 
     // service interface
     private ISenzService senzService = null;
@@ -98,7 +100,7 @@ public class UserProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);*/
 
         username = (TextView) findViewById(R.id.user_name);
-        userImage = (ImageButton) findViewById(R.id.clickable_image);
+        userImage = (ImageView) findViewById(R.id.clickable_image);
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
 
@@ -123,7 +125,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void setupGetProfileImageBtn(){
         tapImageText = (TextView) findViewById(R.id.tap_image_text);
-        ImageButton imgBtn = (ImageButton) findViewById(R.id.clickable_image);
+        ImageView imgBtn = (ImageView) findViewById(R.id.clickable_image);
         imgBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -209,12 +211,13 @@ public class UserProfileActivity extends AppCompatActivity {
 
     private void setupUserPermissions(){
         userzPerm = getUserConfigPerm(user);
+
         username.setText(userzPerm.getUser().getUsername());
+
         if(userzPerm.getUser().getUserImage() != null) {
-            //Bitmap decodedImage = CameraUtils.getBitmapFromBytes(userzPerm.getUser().getUserImage().getBytes());
-            //userImage.setImageBitmap(CameraUtils.getRotatedImage(decodedImage, -90));
-            loadBitmap(userzPerm.getUser().getUserImage(), userImage);
+            loadBitmap(db.getImageFromDB(user.getUsername()), userImage);
         }
+
         cameraSwitch.setChecked(userzPerm.getCamPerm());
         locationSwitch.setChecked(userzPerm.getLocPerm());
         cameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -250,7 +253,12 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
     private UserPermission getUserConfigPerm(User user){
-        return new SenzorsDbSource(this).getUserConfigPermission(user);
+        if(db == null) {
+            db = new SenzorsDbSource(this);
+            return db.getUserConfigPermission(user);
+        }else{
+            return db.getUserConfigPermission(user);
+        }
     }
 
     private UserPermission getUserAndPermission(User user){

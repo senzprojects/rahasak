@@ -251,22 +251,30 @@ public class SenzorsDbSource {
         Log.d(TAG, "AddSecret, adding secret from - " + secret.getSender().getUsername());
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
-        Log.i("SECRET", "Secret created: text - " + secret.getText() + ", sender - " + secret.getSender().getUsername() + ", receiver - " + secret.getReceiver().getUsername());
+        try {
+            db.beginTransaction();
+            Log.i("SECRET", "Secret created: text - " + secret.getText() + ", sender - " + secret.getSender().getUsername() + ", receiver - " + secret.getReceiver().getUsername());
 
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_TEXT, secret.getText());
-        values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE, secret.getImage());
-        values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB, secret.getThumbnail());
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER, secret.getReceiver().getUsername());
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_SENDER, secret.getSender().getUsername());
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
-        Long _timeStamp = System.currentTimeMillis();
-        values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, _timeStamp);
-        values.put(SenzorsDbContract.Secret.COLUMN_NAME_SOUND, secret.getSound());
+            // content values to inset
+            ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_TEXT, secret.getText());
+            values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE, secret.getImage());
+            values.put(SenzorsDbContract.Secret.COLOMN_NAME_IMAGE_THUMB, secret.getThumbnail());
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_RECEIVER, secret.getReceiver().getUsername());
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_SENDER, secret.getSender().getUsername());
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_DELETE, 0);
+            Long _timeStamp = System.currentTimeMillis();
+            values.put(SenzorsDbContract.Secret.COLUMN_TIMESTAMP, _timeStamp);
+            values.put(SenzorsDbContract.Secret.COLUMN_NAME_SOUND, secret.getSound());
 
-        // Insert the new row, if fails throw an error
-        db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
+            // Insert the new row, if fails throw an error
+            db.insertOrThrow(SenzorsDbContract.Secret.TABLE_NAME, null, values);
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
+
     }
 
     /**
@@ -768,18 +776,25 @@ public class SenzorsDbSource {
     public void insertImageToDB(String username, String encodedImage) {
         SQLiteDatabase db = SenzorsDbHelper.getInstance(context).getWritableDatabase();
 
+        try {
+            db.beginTransaction();
+            Log.i(TAG, "USER IMAGE STORED TO DB : " + encodedImage);
 
-        Log.i(TAG, "USER IMAGE STORED TO DB : " + encodedImage);
+            // content values to inset
+            ContentValues values = new ContentValues();
+            values.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
 
-        // content values to inset
-        ContentValues values = new ContentValues();
-        values.put(SenzorsDbContract.User.COLOMN_NAME_IMAGE, encodedImage);
+            // update
+            db.update(SenzorsDbContract.User.TABLE_NAME,
+                    values,
+                    SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
+                    new String[]{username});
 
-        // update
-        db.update(SenzorsDbContract.User.TABLE_NAME,
-                values,
-                SenzorsDbContract.User.COLUMN_NAME_USERNAME + " = ?",
-                new String[]{username});
+            db.setTransactionSuccessful();
+        }
+        finally {
+            db.endTransaction();
+        }
     }
 
     public String getImageFromDB(String username) {
