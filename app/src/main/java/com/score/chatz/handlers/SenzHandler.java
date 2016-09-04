@@ -112,7 +112,6 @@ public class SenzHandler {
     private void handleShareSenz(final Senz senz) {
         Log.d("Tag", senz.getSender() + " : " + senz.getSenzType().toString());
 
-        //call back after service bind
         serviceConnection.executeAfterServiceConnected(new Runnable() {
             @Override
             public void run() {
@@ -184,22 +183,48 @@ public class SenzHandler {
 
 
         if (senz.getAttributes().containsKey("profilezphoto") || senz.getAttributes().containsKey("chatzphoto")) {
-            Intent intent = new Intent();
-            intent.setClass(context, PhotoActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            //To pass:
-            intent.putExtra("Senz", senz);
-            if(senz.getAttributes().containsKey("chatzphoto")) {
-                intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
-            }else if(senz.getAttributes().containsKey("profilezphoto")){
-                intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO);
+
+            if(CameraUtils.isCameraFrontAvailable(context)) {
+                Intent intent = new Intent();
+                intent.setClass(context, PhotoActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //To pass:
+                intent.putExtra("Senz", senz);
+                if (senz.getAttributes().containsKey("chatzphoto")) {
+                    intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO);
+                } else if (senz.getAttributes().containsKey("profilezphoto")) {
+                    intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO);
+                }
+                context.startActivity(intent);
+            }else{
+                shareSensorNotAvailableToUser(senz.getSender());
             }
-            context.startActivity(intent);
         } else if (senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")) {
             Intent serviceIntent = new Intent(context, LocationService.class);
             serviceIntent.putExtra("USER", senz.getSender());
             context.startService(serviceIntent);
         }
+    }
+
+    private void shareSensorNotAvailableToUser(User receiver){
+        ISenzService senzService = serviceConnection.getInterface();
+
+        try {
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("msg", "SensorNotAvailable");
+
+            String id = "_ID";
+            String signature = "";
+            SenzTypeEnum senzType = SenzTypeEnum.DATA;
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+            senzService.send(senz);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void handleDataSenz(Senz senz) {

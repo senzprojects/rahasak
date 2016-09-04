@@ -1,5 +1,7 @@
 package com.score.chatz.utils;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -224,5 +226,13 @@ public class CameraUtils {
 
         return resizedBitmap;
 
+    }
+
+    public static boolean isCameraFrontAvailable(Context context) {
+        if(context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -58,7 +58,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if(mCamera != null)
         mCamera.release();
-        mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        mCamera = getCameraInstant();
 
         try {
             mCamera.setPreviewDisplay(surfaceHolder);
@@ -137,6 +137,21 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             // intentionally left blank for a test
             Log.d(TAG, "Error starting camera preview: "+e.getMessage());
         }
+    }
+
+    /**
+     * Helper method to access the camera returns null if
+     * it cannot get the camera or does not exist
+     * @return
+     */
+    private Camera getCameraInstant(){
+        Camera camera = null;
+        try{
+            camera=Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        }catch (Exception e){
+            // cannot get camera or does not exist
+        }
+        return camera;
     }
 
 
