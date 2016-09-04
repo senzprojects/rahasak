@@ -113,7 +113,6 @@ public class ChatFragment extends Fragment {
      * this fragment using the provided parameters.
      *
      * @param receiver receiver
-     *
      * @return A new instance of fragment ChatFragment.
      */
     // TODO: Rename and change types and number of parameters
@@ -200,26 +199,24 @@ public class ChatFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.messages_list_view);
 
 
-
-
         try {
             currentUser = PreferenceUtils.getUser(getContext());
-        }catch (NoUserException e) {
+        } catch (NoUserException e) {
             e.printStackTrace();
         }
 
         sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(text_message.getText().length() != 0)
-                sendMessage();
+                if (text_message.getText().length() != 0)
+                    sendMessage();
             }
         });
 
         getLocBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getLocBtn.isEnabled())
+                if (getLocBtn.isEnabled())
                     getSenz(new User("", sender));
             }
         });
@@ -227,7 +224,7 @@ public class ChatFragment extends Fragment {
         getCamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(getCamBtn.isEnabled())
+                if (getCamBtn.isEnabled())
                     getPhoto(new User("", sender));
             }
         });
@@ -244,7 +241,7 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
-    private void openRecorder(){
+    private void openRecorder() {
         Intent openRecordingActivity = new Intent(getActivity(), RecordingActivity.class);
         openRecordingActivity.putExtra("SENDER", sender);
         getActivity().startActivity(openRecordingActivity);
@@ -283,12 +280,10 @@ public class ChatFragment extends Fragment {
     };
 
 
-    private void update(){
+    private void update() {
         displayMessagesList();
         updateMainBtnUi();
     }
-
-
 
 
     /**
@@ -312,7 +307,7 @@ public class ChatFragment extends Fragment {
             senzService.send(senz);
         } catch (RemoteException | UnsupportedEncodingException e) {
             e.printStackTrace();
-       }
+        }
     }
 
 
@@ -345,37 +340,19 @@ public class ChatFragment extends Fragment {
                      *  receiver - other person
                      *
                      */
-                    Secret newSecret = new Secret(text_message.getText().toString(), null, null,new User("", receiver), senz.getSender());
+                    Secret newSecret = new Secret(text_message.getText().toString(), null, null, new User("", receiver), senz.getSender());
                     SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
                     dbSource.createSecret(newSecret);
                     text_message.setText("");
                     displayMessagesList();
-                } else if(msg != null && msg.equalsIgnoreCase("MsgSentFail")) {
+                } else if (msg != null && msg.equalsIgnoreCase("MsgSentFail")) {
                     Toast.makeText(getActivity(), "User seems to be offline.", Toast.LENGTH_SHORT).show();
                 }
-            } else if(senz.getAttributes().containsKey("chatzphoto")){
-                    // save senz in db
-                    Log.d(TAG, "save sent PHOTO");
-                    //Log.d(TAG, "reeiver: " + receiver + ", " + "senz.getSender() : " + senz.getSender().getUsername() + ", PHOT) : " + senz.getAttributes().get("chatzphoto"));
-                    /*
-                     *  senz.getSender - you who are sending the message
-                     *  receiver - other person
-                     *
-                     */
-                //Secret newSecret = new Secret(null, senz.getAttributes().get("chatzphoto"),new User("", receiver), senz.getSender());
-                //SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
-                //dbSource.createSecret(newSecret);
+            } else if (senz.getAttributes().containsKey("chatzphoto")) {
                 displayMessagesList();
-                /*ImageView image = (ImageView)findViewById(R.id.ImageView);
-                Bitmap imgBitmap=BitmapFactory.decodeByteArray(imageAsBytes,0,imageAsBytes.length);
-                image.setImageBitmap(imgBitmap);
-                    Secret newSecret = new Secret(null, ,new User("", receiver), senz.getSender());
-                    SenzorsDbSource dbSource = new SenzorsDbSource(getActivity());
-                    dbSource.createSecret(newSecret);
-                    text_message.setText("");
-                    displayMessagesList();*/
-
-            }else if (senz.getAttributes().containsKey("lat")) {
+            } else if (senz.getAttributes().containsKey("chatzsound")) {
+                displayMessagesList();
+            } else if (senz.getAttributes().containsKey("lat")) {
                 // location response received
                 double lat = Double.parseDouble(senz.getAttributes().get("lat"));
                 double lan = Double.parseDouble(senz.getAttributes().get("lon"));
@@ -462,7 +439,7 @@ public class ChatFragment extends Fragment {
     /*
      * Get photo of user
      */
-    private void getPhoto(User receiver){
+    private void getPhoto(User receiver) {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
@@ -481,29 +458,28 @@ public class ChatFragment extends Fragment {
         }
     }
 
-    private void updateMainBtnUi(){
+    private void updateMainBtnUi() {
         Log.i(TAG, "Getting permission of user - " + sender);
         UserPermission userPerm = dbSource.getUserPermission(new User("", sender));
-        if(userPerm.getCamPerm() == true){
+        if (userPerm.getCamPerm() == true) {
             getCamBtn.setImageResource(R.drawable.perm_camera_active);
             getCamBtn.setEnabled(true);
-        }else{
+        } else {
             getCamBtn.setImageResource(R.drawable.perm_camera_deactive);
             getCamBtn.setEnabled(false);
         }
 
-        if(userPerm.getLocPerm() == true){
+        if (userPerm.getLocPerm() == true) {
             getLocBtn.setImageResource(R.drawable.perm_locations_active);
             getLocBtn.setEnabled(true);
-        }else{
+        } else {
             getLocBtn.setImageResource(R.drawable.perm_locations_deactive);
             getLocBtn.setEnabled(false);
         }
     }
 
 
-
-    private class MessagesDeleteTask extends AsyncTask<Secret,Secret,Secret> {
+    private class MessagesDeleteTask extends AsyncTask<Secret, Secret, Secret> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

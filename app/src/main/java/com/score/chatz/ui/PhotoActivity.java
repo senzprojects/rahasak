@@ -31,16 +31,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PhotoActivity extends AppCompatActivity {
-
     protected static final String TAG = PhotoActivity.class.getName();
+
     private android.hardware.Camera mCamera;
     private CameraPreview mCameraPreview;
     private ImageView closeBtn;
-    boolean isServiceBound = false;
-    PhotoActivity instnce;
-    SenzorsDbSource dbSource;
-    Senz originalSenz;
-
+    private boolean isServiceBound = false;
+    private PhotoActivity instnce;
+    private SenzorsDbSource dbSource;
+    private Senz originalSenz;
 
     /** Called when the activity is first created. */
     @Override
@@ -149,11 +148,9 @@ public class PhotoActivity extends AppCompatActivity {
         });
     }
 
-
     private void goBack(){
         this.finish();
     }
-
 
     /**
      * Helper method to access the camera returns null if

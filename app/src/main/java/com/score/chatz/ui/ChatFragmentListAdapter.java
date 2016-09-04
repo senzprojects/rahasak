@@ -58,7 +58,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
     @Override
     public int getViewTypeCount() {
-        return 4;
+        return 6;
     }
 
     @Override

@@ -41,7 +41,6 @@ public class BitmapWorkerTask extends AsyncTask<BitmapTaskParams, Void, Bitmap> 
             }
         }
     }
-
 }
 
 

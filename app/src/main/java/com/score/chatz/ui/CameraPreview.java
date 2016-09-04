@@ -34,30 +34,27 @@ import java.util.List;
  */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
 
-    private static final String TAG = CameraPreview.class.getName();;
+    private static final String TAG = CameraPreview.class.getName();
+    ;
     private SurfaceHolder mSurfaceHolder;
     private Camera mCamera;
     private SenzStream.SENZ_STEAM_TYPE streamType;
-    //private int pictureWidth = 500;
-    //private int pictureHeight = 500;
 
     //Constructor that obtains context and camera
     public CameraPreview(Context _context, Camera camera, SenzStream.SENZ_STEAM_TYPE streamType) {
         super(_context);
-        //context = _context;
-        //this.mCamera = camera;
+
         this.mCamera = camera;
         this.mSurfaceHolder = this.getHolder();
         this.mSurfaceHolder.addCallback(this); // we get notified when underlying surface is created and destroyed
         this.mSurfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); //this is a deprecated method, is not requierd after 3.0
         this.streamType = streamType;
-
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
-        if(mCamera != null)
-        mCamera.release();
+        if (mCamera != null)
+            mCamera.release();
         mCamera = getCameraInstant();
 
         try {
@@ -70,20 +67,19 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             Log.d(TAG, "Error setting camera preview: " + e.getMessage());
 
         }
-
     }
 
-    public void takePhoto(final PhotoActivity activity, final Senz originalSenz){
-        mCamera.takePicture(null, null, new Camera.PictureCallback(){
+    public void takePhoto(final PhotoActivity activity, final Senz originalSenz) {
+        mCamera.takePicture(null, null, new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] bytes, Camera camera) {
 
                 byte[] resizedImage = null;
                 bytes = resizeBitmapByteArray(bytes, -90);
-                if(streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
+                if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
                     resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 5kbs
-                }else if(streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO){
+                } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
                     resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
                 }
 
@@ -94,11 +90,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         });
     }
 
-    private byte[] resizeBitmapByteArray(byte[] data, int deg){
+    private byte[] resizeBitmapByteArray(byte[] data, int deg) {
         Bitmap decodedBitmap = CameraUtils.decodeBase64(Base64.encodeToString(data, 0));
         // set max width ~ 600px
         Bitmap rotatedBitmap = CameraUtils.getAdjustedImage(decodedBitmap, deg, 800);
-        ByteArrayOutputStream baos= new ByteArrayOutputStream();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();
     }
@@ -106,7 +102,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
         if (mCamera != null) {
-            Log.d(TAG,"Stopping preview in SurfaceDestroyed().");
+            Log.d(TAG, "Stopping preview in SurfaceDestroyed().");
             mCamera.setPreviewCallback(null);
             mCamera.stopPreview();
             mCamera.release();
@@ -116,15 +112,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     @Override
     public void surfaceChanged(SurfaceHolder surfaceHolder, int format,
                                int width, int height) {
-
-
-        if(mSurfaceHolder.getSurface()==null){
+        if (mSurfaceHolder.getSurface() == null) {
             //preview surface does not exist
             return;
         }
         try {
             mCamera.stopPreview();
-        }catch(Exception e){
+        } catch (Exception e) {
             //ignore: tried to stop a non-existent preview
         }
 
@@ -135,24 +129,23 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
             mCamera.startPreview();
         } catch (Exception e) {
             // intentionally left blank for a test
-            Log.d(TAG, "Error starting camera preview: "+e.getMessage());
+            Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
 
     /**
      * Helper method to access the camera returns null if
      * it cannot get the camera or does not exist
+     *
      * @return
      */
-    private Camera getCameraInstant(){
+    private Camera getCameraInstant() {
         Camera camera = null;
-        try{
-            camera=Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
-        }catch (Exception e){
+        try {
+            camera = Camera.open(Camera.CameraInfo.CAMERA_FACING_FRONT);
+        } catch (Exception e) {
             // cannot get camera or does not exist
         }
         return camera;
     }
-
-
 }
