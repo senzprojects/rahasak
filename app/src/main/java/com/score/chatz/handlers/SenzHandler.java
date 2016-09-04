@@ -649,6 +649,12 @@ public class SenzHandler {
 
         ArrayList<Senz> senzList = new ArrayList<>();
         String[] imgs = split(imageAsString, 1024);
+
+        if (senz.getAttributes().containsKey("chatzphoto")) {
+            //Save photo to db before sending if its a chatzphoto
+            new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender()));
+        }
+
         for (int i = 0; i < imgs.length; i++) {
             // new senz
             String id = "_ID";
@@ -660,10 +666,6 @@ public class SenzHandler {
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
             if (senz.getAttributes().containsKey("chatzphoto")) {
                 senzAttributes.put("chatzphoto", imgs[i].trim());
-
-                //Save photo to db before sending
-                new SenzorsDbSource(context).createSecret(new Secret(null, imageAsString, thumbnail, senz.getReceiver(), senz.getSender()));
-
             } else if (senz.getAttributes().containsKey("profilezphoto")) {
                 senzAttributes.put("profilezphoto", imgs[i].trim());
             }
