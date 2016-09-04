@@ -9,11 +9,13 @@ public class UserPermission {
     private User user;
     private boolean cameraPermission;
     private boolean locationPermission;
+    private boolean micPermission;
 
-    public UserPermission(User user, boolean cameraPermission, boolean locationPermission) {
+    public UserPermission(User user, boolean cameraPermission, boolean locationPermission,  boolean micPermission) {
         this.user = user;
         this.cameraPermission = cameraPermission;
         this.locationPermission = locationPermission;
+        this.micPermission = micPermission;
     }
 
     public User getUser() {
@@ -28,5 +30,8 @@ public class UserPermission {
         return locationPermission;
     }
 
+    public boolean getMicPerm() {
+        return micPermission;
+    }
 
 }

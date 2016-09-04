@@ -37,6 +37,10 @@ import java.nio.ShortBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.exceptions.NoUserException;
@@ -47,7 +51,7 @@ import com.score.chatz.utils.AudioUtils;
 import com.score.chatz.utils.PreferenceUtils;
 import com.score.senzc.pojos.User;
 
-public class RecordingActivity extends AppCompatActivity{
+public class RecordingActivity extends AppCompatActivity {
 
     private static final String TAG = RecordingActivity.class.getName();
     private TextView mTimerTextView;
@@ -57,10 +61,11 @@ public class RecordingActivity extends AppCompatActivity{
     private User sender;
     private User receiver;
 
+    private boolean isRecordingDone;
+
     SenzorsDbSource dbSource;
 
     AudioRecorder audioRecorder;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,7 +76,7 @@ public class RecordingActivity extends AppCompatActivity{
         enableButtons(false);
 
         this.mTimerTextView = (TextView) this.findViewById(R.id.timer);
-        this.mTimerTextView.setText(mStartTime+"");
+        this.mTimerTextView.setText(mStartTime + "");
 
         Intent intent = getIntent();
         try {
@@ -85,6 +90,8 @@ public class RecordingActivity extends AppCompatActivity{
         dbSource = new SenzorsDbSource(this);
 
         audioRecorder = new AudioRecorder();
+
+        isRecordingDone = false;
 
         Log.i(TAG, "SENDER FROM RECORDING ACTIVITY - " + sender.getUsername());
         Log.i(TAG, "RECEIVERE FROM RECORDING ACTIVITY - " + receiver.getUsername());
@@ -104,12 +111,12 @@ public class RecordingActivity extends AppCompatActivity{
         enableButton(R.id.btnStop, isRecording);
     }
 
-    private void startRecording(){
+    private void startRecording() {
         audioRecorder.startRecording(getApplicationContext());
-        /*ticker = new Thread(new Runnable() {
+        ticker = new Thread(new Runnable() {
             @Override
             public void run() {
-                while(mStartTime >= 0) {
+                while (mStartTime > 0) {
                     tick();
                     try {
                         Thread.sleep(1000);
@@ -119,25 +126,28 @@ public class RecordingActivity extends AppCompatActivity{
                 }
             }
         });
-        ticker.start();*/
+        ticker.start();
     }
 
     private void stopRecording() {
         // stops the recording activity
-        audioRecorder.stopRecording();
-        if(audioRecorder.getRecording() != null){
-            Secret secret = getSoundSecret(sender, receiver, Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0));
-            dbSource.createSecret(secret);
-            sendSecret(secret);
+        if(isRecordingDone == false) {
+            isRecordingDone = true;
+            audioRecorder.stopRecording();
+            if (audioRecorder.getRecording() != null) {
+                Secret secret = getSoundSecret(receiver, sender, Base64.encodeToString(audioRecorder.getRecording().toByteArray(), 0));
+                dbSource.createSecret(secret);
+                sendSecret(secret);
+            }
         }
         this.finish();
     }
 
-    private void sendSecret(Secret secret){
+    private void sendSecret(Secret secret) {
         SenzHandler.getInstance(this).sendSound(secret);
     }
 
-    private Secret getSoundSecret(User sender, User receiver, String sound){
+    private Secret getSoundSecret(User sender, User receiver, String sound) {
         //Swapping receiever and sender here cause we need to send the secret out
         Secret secret = new Secret(null, null, null, receiver, sender);
         secret.setSound(sound);
@@ -162,22 +172,35 @@ public class RecordingActivity extends AppCompatActivity{
     };
 
     private void tick() {
-        if(mStartTime > 0) {
-            mStartTime--;
-            this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mTimerTextView.setText(mStartTime + "");
+        try {
+            if (mStartTime > 0) {
+                mStartTime--;
+                this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mTimerTextView.setText(mStartTime + "");
+                    }
+                });
+                if (mStartTime == 0) {
+                    stopRecording();
                 }
-            });
-            if (mStartTime == 0) {
+            } else {
                 stopRecording();
             }
-        }else{
-            stopRecording();
+        } catch (Exception ex) {
+            Log.e(TAG, "Tick method exceptop - " + ex);
         }
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
 }
 
 

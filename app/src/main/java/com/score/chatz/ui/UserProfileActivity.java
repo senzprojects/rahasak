@@ -58,6 +58,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private TextView username;
     private Switch cameraSwitch;
     private Switch locationSwitch;
+    private Switch micSwitch;
     private UserPermission userzPerm;
     private UserPermission currentUserGivenPerm;
     private User currentUser;
@@ -94,6 +95,7 @@ public class UserProfileActivity extends AppCompatActivity {
         username = (TextView) findViewById(R.id.user_name);
         userImage = (ImageView) findViewById(R.id.clickable_image);
         cameraSwitch = (Switch) findViewById(R.id.perm_camera_switch);
+        micSwitch = (Switch) findViewById(R.id.perm_mic_switch);
         locationSwitch = (Switch) findViewById(R.id.perm_location_switch);
 
         userzPerm = getUserConfigPerm(user);
@@ -211,15 +213,16 @@ public class UserProfileActivity extends AppCompatActivity {
         }
 
         cameraSwitch.setChecked(userzPerm.getCamPerm());
+        micSwitch.setChecked(userzPerm.getMicPerm());
         locationSwitch.setChecked(userzPerm.getLocPerm());
         cameraSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked == true){
                     //Send permCam true to user
-                    sendPermission(user, "true", null);
+                    sendPermission(user, "true", null, null);
                 }else{
                     //Send permCam false to user
-                    sendPermission(user, "false", null);
+                    sendPermission(user, "false", null, null);
                 }
             }
         });
@@ -227,10 +230,21 @@ public class UserProfileActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked == true){
                     //Send permLoc true to user
-                    sendPermission(user, null, "true");
+                    sendPermission(user, null, "true", null);
                 }else{
                     //Send permLoc false to user
-                    sendPermission(user, null, "false");
+                    sendPermission(user, null, "false", null);
+                }
+            }
+        });
+        micSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked == true){
+                    //Send permMic true to user
+                    sendPermission(user, null, null, "true");
+                }else{
+                    //Send permMic false to user
+                    sendPermission(user, null, null, "false");
                 }
             }
         });
@@ -270,7 +284,7 @@ public class UserProfileActivity extends AppCompatActivity {
     }
 
 
-    public void sendPermission(User receiver, String camPerm, String locPerm) {
+    public void sendPermission(User receiver, String camPerm, String locPerm, String micPerm) {
         try {
             // create senz attributes
             HashMap<String, String> senzAttributes = new HashMap<>();
@@ -280,6 +294,9 @@ public class UserProfileActivity extends AppCompatActivity {
             }
             if(locPerm != null) {
                 senzAttributes.put("locPerm", locPerm); //Dafault Values
+            }
+            if(micPerm != null) {
+                senzAttributes.put("micPerm", micPerm); //Dafault Values
             }
             senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
 

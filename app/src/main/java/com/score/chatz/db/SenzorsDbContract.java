@@ -38,6 +38,7 @@ public class SenzorsDbContract {
         public static final String TABLE_NAME = "permission";
         public static final String COLUMN_NAME_LOCATION = "location";
         public static final String COLUMN_NAME_CAMERA = "camera";
+        public static final String COLUMN_NAME_MIC = "mic";
         public static final String COLOMN_NAME_USER = "user";
     }
 
@@ -47,6 +48,7 @@ public class SenzorsDbContract {
         public static final String TABLE_NAME = "permission_config";
         public static final String COLUMN_NAME_LOCATION = "location";
         public static final String COLUMN_NAME_CAMERA = "camera";
+        public static final String COLUMN_NAME_MIC = "mic";
         public static final String COLOMN_NAME_USER = "user";
     }
 

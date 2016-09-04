@@ -15,6 +15,7 @@ import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.LocationService;
 import com.score.chatz.services.SenzServiceConnection;
 import com.score.chatz.ui.PhotoActivity;
+import com.score.chatz.ui.RecordingActivity;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.NotificationUtils;
 import com.score.chatz.utils.SenzParser;
@@ -195,15 +196,29 @@ public class SenzHandler {
                 } else if (senz.getAttributes().containsKey("profilezphoto")) {
                     intent.putExtra("StreamType", SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO);
                 }
-                context.startActivity(intent);
+                try {
+                    context.startActivity(intent);
+                }catch (Exception ex){
+                    Log.w(TAG, "Camer might already be in use... exception: " + ex);
+                }
             }else{
                 shareSensorNotAvailableToUser(senz.getSender());
             }
+        } else if (senz.getAttributes().containsKey("chatzmic")) {
+            openRecorder(senz.getSender().getUsername());
         } else if (senz.getAttributes().containsKey("lat") && senz.getAttributes().containsKey("lon")) {
             Intent serviceIntent = new Intent(context, LocationService.class);
             serviceIntent.putExtra("USER", senz.getSender());
             context.startService(serviceIntent);
         }
+    }
+
+    private void openRecorder(String sender) {
+        Intent openRecordingActivity = new Intent();
+        openRecordingActivity.setClass(context, RecordingActivity.class);
+        openRecordingActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        openRecordingActivity.putExtra("SENDER", sender);
+        context.startActivity(openRecordingActivity);
     }
 
     private void shareSensorNotAvailableToUser(User receiver){
@@ -270,7 +285,7 @@ public class SenzHandler {
                 senz.setSender(sender);
                 Log.d(TAG, "save user permission");
                 try {
-                    dbSource.updateConfigurablePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), senz.getAttributes().get("locPerm"));
+                    dbSource.updateConfigurablePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), senz.getAttributes().get("locPerm"), senz.getAttributes().get("micPerm"));
                 } catch (SQLiteConstraintException e) {
                     Log.e(TAG, e.toString());
                 }
@@ -331,7 +346,7 @@ public class SenzHandler {
             try {
                 if (senz.getAttributes().containsKey("chatzsound")) {
                     User sender = senz.getSender();
-                    Secret secret = new Secret(null, null, null, senz.getSender(), senz.getReceiver());
+                    Secret secret = new Secret(null, null, null, senz.getReceiver(), senz.getSender());
                     secret.setSound(senz.getAttributes().get("chatzsound"));
                     dbSource.createSecret(secret);
                 }
@@ -409,10 +424,13 @@ public class SenzHandler {
                     SenzorsDbSource dbSource = new SenzorsDbSource(context);
 
                     if (senz.getAttributes().containsKey("locPerm")) {
-                        dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("locPerm"));
+                        dbSource.updatePermissions(senz.getSender(), null, senz.getAttributes().get("locPerm"), null);
                     }
                     if (senz.getAttributes().containsKey("camPerm")) {
-                        dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), null);
+                        dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), null, null);
+                    }
+                    if (senz.getAttributes().containsKey("micPerm")) {
+                        dbSource.updatePermissions(senz.getSender(), null, null, senz.getAttributes().get("micPerm"));
                     }
 
                     senz.setSender(sender);
@@ -443,6 +461,9 @@ public class SenzHandler {
                 }
                 if (senz.getAttributes().containsKey("camPerm")) {
                     senzAttributes.put("camPerm", senz.getAttributes().get("camPerm"));
+                }
+                if (senz.getAttributes().containsKey("micPerm")) {
+                    senzAttributes.put("micPerm", senz.getAttributes().get("micPerm"));
                 }
 
             } else {
@@ -533,7 +554,7 @@ public class SenzHandler {
         Log.d(TAG, "save senz");
         // if senz already exists in the db, SQLiteConstraintException should throw
         try {
-            dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), senz.getAttributes().get("locPerm"));
+            dbSource.updatePermissions(senz.getSender(), senz.getAttributes().get("camPerm"), senz.getAttributes().get("locPerm"), senz.getAttributes().get("micPerm"));
             NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "Permission updated by @" + senz.getSender().getUsername());
             //shareBackToUser(senzService, sender, true);
         } catch (SQLiteConstraintException e) {
@@ -631,7 +652,7 @@ public class SenzHandler {
             senzAttributes.put("chatzsound", imgs[i].trim());
 
 
-            Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+            Senz _senz = new Senz(id, signature, senzType, secret.getReceiver(), secret.getSender(), senzAttributes);
             senzList.add(_senz);
         }
 
@@ -649,7 +670,7 @@ public class SenzHandler {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, secret.getReceiver(), secret.getSender(), senzAttributes);
         return _senz;
     }
 
@@ -664,7 +685,7 @@ public class SenzHandler {
         String id = "_ID";
         String signature = "_SIGNATURE";
         SenzTypeEnum senzType = SenzTypeEnum.DATA;
-        Senz _senz = new Senz(id, signature, senzType, secret.getSender(), secret.getReceiver(), senzAttributes);
+        Senz _senz = new Senz(id, signature, senzType, secret.getReceiver(), secret.getSender(), senzAttributes);
         return _senz;
     }
 

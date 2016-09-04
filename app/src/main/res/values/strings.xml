@@ -36,5 +36,6 @@
 
 
     <string name="no_registered_user">No Registered User. You must be a registered User to use this App.</string>
+    <string name="perm_mic">Mic</string>
 
 </resources>

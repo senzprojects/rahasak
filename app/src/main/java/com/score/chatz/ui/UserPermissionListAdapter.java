@@ -67,6 +67,7 @@ import java.util.ArrayList;
                 holder.usernameView = (TextView) view.findViewById(R.id.user_name);
                 holder.userLocationPermView = (ImageView) view.findViewById(R.id.perm_locations);
                 holder.userCameraPermView = (ImageView) view.findViewById(R.id.perm_camera);
+                holder.userMicPermView = (ImageView) view.findViewById(R.id.perm_mic);
 
                 view.setTag(holder);
             } else {
@@ -85,8 +86,14 @@ import java.util.ArrayList;
 
             if(userPerm.getCamPerm() == true){
                 viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));
-            }else{
+            }else {
                 viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_deactive, null));
+            }
+
+            if(userPerm.getMicPerm() == true){
+                viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_active, null));
+            }else {
+                viewHolder.userMicPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_mic_deactive, null));
             }
 
             if(userPerm.getLocPerm() == true){
@@ -120,6 +127,7 @@ import java.util.ArrayList;
             TextView usernameView;
             ImageView userCameraPermView;
             ImageView userLocationPermView;
+            ImageView userMicPermView;
         }
 
 

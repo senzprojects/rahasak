@@ -64,9 +64,9 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
     @Override
     public int getItemViewType(int position) {
         //Log.i(TAG, "WHO IS SENDER: " + ((Secret)getItem(position)).getSender().getUsername() + ", currentUser: " + currentUser.getUsername());
-        if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+        if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
             return NOT_MY_SOUND_TYPE;
-        }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
+        }else if(!((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getSound() != null){
             return MY_SOUND_TYPE;
         }else if(((Secret)getItem(position)).getSender().getUsername().equalsIgnoreCase(currentUser.getUsername()) && ((Secret)getItem(position)).getImage() == null){
             return MY_MESSAGE_TYPE;

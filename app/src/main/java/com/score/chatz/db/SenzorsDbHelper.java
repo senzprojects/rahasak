@@ -57,6 +57,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.Permission._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
                     SenzorsDbContract.Permission.COLUMN_NAME_CAMERA + INT_TYPE +", "+
                     SenzorsDbContract.Permission.COLUMN_NAME_LOCATION + INT_TYPE +", "+
+                    SenzorsDbContract.Permission.COLUMN_NAME_MIC + INT_TYPE +", "+
                     SenzorsDbContract.Permission.COLOMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
                     "UNIQUE" + "(" + SenzorsDbContract.Permission.COLOMN_NAME_USER + ")" +
                     " )";
@@ -66,6 +67,7 @@ public class SenzorsDbHelper extends SQLiteOpenHelper {
                     SenzorsDbContract.PermissionConfiguration._ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + ", " +
                     SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_CAMERA + INT_TYPE +", "+
                     SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_LOCATION + INT_TYPE +", "+
+                    SenzorsDbContract.PermissionConfiguration.COLUMN_NAME_MIC + INT_TYPE +", "+
                     SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + TEXT_TYPE + " NOT NULL" + ", " +
                     "UNIQUE" + "(" + SenzorsDbContract.PermissionConfiguration.COLOMN_NAME_USER + ")" +
                     " )";

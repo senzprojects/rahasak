@@ -77,6 +77,7 @@ public class ChatFragment extends Fragment {
     private ImageButton micBtn;
     private ImageButton getLocBtn;
     private ImageButton getCamBtn;
+    private ImageButton getMicBtn;
 
     SenzorsDbSource dbSource;
     User currentUser;
@@ -191,8 +192,9 @@ public class ChatFragment extends Fragment {
         text_message = (EditText) view.findViewById(R.id.text_message);
 
         sendBtn = (ImageButton) view.findViewById(R.id.sendBtn);
-        micBtn = (ImageButton) view.findViewById(R.id.micBtn);
+        micBtn = (ImageButton) view.findViewById(R.id.getMicBtn);
         getCamBtn = (ImageButton) view.findViewById(R.id.getCamBtn);
+        getMicBtn = (ImageButton) view.findViewById(R.id.getMicBtn);
         getLocBtn = (ImageButton) view.findViewById(R.id.getLocBtn);
 
         typeface = Typeface.createFromAsset(getActivity().getAssets(), "fonts/vegur_2.otf");
@@ -229,23 +231,26 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        micBtn.setOnClickListener(new View.OnClickListener() {
+        getMicBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (getMicBtn.isEnabled())
+                    getMic(new User("", sender));
+            }
+        });
+
+        /*micBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openRecorder();
             }
-        });
+        });*/
 
         updateMainBtnUi();
 
         return view;
     }
 
-    private void openRecorder() {
-        Intent openRecordingActivity = new Intent(getActivity(), RecordingActivity.class);
-        openRecordingActivity.putExtra("SENDER", sender);
-        getActivity().startActivity(openRecordingActivity);
-    }
 
     private void displayMessagesList() {
         // get User from db
@@ -458,6 +463,29 @@ public class ChatFragment extends Fragment {
         }
     }
 
+
+    /*
+     * Get mic of user
+     */
+    private void getMic(User receiver) {
+        try {
+            // create senz attributes
+            HashMap<String, String> senzAttributes = new HashMap<>();
+            senzAttributes.put("time", ((Long) (System.currentTimeMillis() / 1000)).toString());
+            senzAttributes.put("chatzmic", "chatzmic");
+
+            // new senz
+            String id = "_ID";
+            String signature = "_SIGNATURE";
+            SenzTypeEnum senzType = SenzTypeEnum.GET;
+            Senz senz = new Senz(id, signature, senzType, null, receiver, senzAttributes);
+
+            senzService.send(senz);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void updateMainBtnUi() {
         Log.i(TAG, "Getting permission of user - " + sender);
         UserPermission userPerm = dbSource.getUserPermission(new User("", sender));
@@ -475,6 +503,14 @@ public class ChatFragment extends Fragment {
         } else {
             getLocBtn.setImageResource(R.drawable.perm_locations_deactive);
             getLocBtn.setEnabled(false);
+        }
+
+        if (userPerm.getMicPerm() == true) {
+            getMicBtn.setImageResource(R.drawable.perm_mic_active);
+            getMicBtn.setEnabled(true);
+        } else {
+            getMicBtn.setImageResource(R.drawable.perm_mic_deactive);
+            getMicBtn.setEnabled(false);
         }
     }
 
