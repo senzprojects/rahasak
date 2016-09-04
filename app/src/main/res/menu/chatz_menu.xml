@@ -1,7 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
-
-    <item android:id="@+id/action_location_search"
-        android:icon="@drawable/location_friend"
-        android:title="Get friend's Location"
-        android:showAsAction="always"  />
-</menu>
