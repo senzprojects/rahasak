@@ -262,7 +262,9 @@ public class RemoteSenzService extends Service {
                 try {
                     PrivateKey privateKey = RSAUtils.getPrivateKey(RemoteSenzService.this);
 
-                    for (Senz senz : senzList) {
+                    //for (Senz senz : senzList) {
+                        for(int i = 0 ; i < senzList.size(); i++){
+                            Senz senz = senzList.get(i);
                         // if sender not already set find user(sender) and set it to senz first
                         if (senz.getSender() == null || senz.getSender().toString().isEmpty())
                             senz.setSender(PreferenceUtils.getUser(getBaseContext()));
@@ -281,6 +283,13 @@ public class RemoteSenzService extends Service {
 
                         //  sends the message to the server
                         if (isOnline) {
+                            if(i > (senzList.size() - 2)){
+                                try {
+                                    Thread.sleep(2000);
+                                }catch (InterruptedException ex){
+                                    Log.e(TAG, "Exception - " + ex);
+                                }
+                            }
                             writer.println(message);
                             writer.flush();
                         } else {
