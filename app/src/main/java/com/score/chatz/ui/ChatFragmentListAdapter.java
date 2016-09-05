@@ -21,6 +21,7 @@ import com.score.chatz.utils.BitmapTaskParams;
 import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.TimeUtils;
 import com.score.senzc.pojos.User;
 
 import java.sql.Timestamp;
@@ -151,7 +152,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
 
     private void setUpRow(int i, final Secret secret, View view, ViewHolder viewHolder) {
         // enable share and change color of view
-        viewHolder.sender.setText(secret.getSender().getUsername());
+        viewHolder.sender.setText("@"+secret.getSender().getUsername());
         if (viewHolder.messageType == NOT_MY_MESSAGE_TYPE || viewHolder.messageType == MY_MESSAGE_TYPE){
             viewHolder.message.setText(secret.getText());
         }else if (viewHolder.messageType == NOT_MY_PHOTO_TYPE || viewHolder.messageType == MY_PHOTO_TYPE){
@@ -172,8 +173,7 @@ public class ChatFragmentListAdapter extends ArrayAdapter<Secret> {
         if(secret.getTimeStamp() != null){
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy' 'HH:mm:ss:S");
-            viewHolder.sentTime.setText(simpleDateFormat.format(date));
+            viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
         }
 
 

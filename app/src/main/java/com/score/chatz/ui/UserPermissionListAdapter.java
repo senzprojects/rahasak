@@ -82,7 +82,7 @@ import java.util.ArrayList;
 
         private void setUpRow(int i, UserPermission userPerm, View view, ViewHolder viewHolder) {
             // enable share and change color of view
-            viewHolder.usernameView.setText(userPerm.getUser().getUsername());
+            viewHolder.usernameView.setText("@"+userPerm.getUser().getUsername());
 
             if(userPerm.getCamPerm() == true){
                 viewHolder.userCameraPermView.setImageDrawable(ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.perm_camera_active, null));

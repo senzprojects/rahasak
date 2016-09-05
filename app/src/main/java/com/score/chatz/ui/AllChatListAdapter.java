@@ -21,6 +21,8 @@ import com.score.chatz.utils.BitmapTaskParams;
 import com.score.chatz.utils.BitmapWorkerTask;
 import com.score.chatz.utils.CameraUtils;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.chatz.utils.TimeUtils;
+import com.score.senzc.pojos.Senz;
 import com.score.senzc.pojos.User;
 
 import java.io.ByteArrayOutputStream;
@@ -39,6 +41,7 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
     ArrayList<Secret> userSecretList;
     static final int TEXT_MESSAGE = 0;
     static final int IMAGE_MESSAGE = 1;
+    static final int SOUND_MESSAGE = 2;
     static User currentUser;
     private LayoutInflater mInflater;
 
@@ -56,16 +59,18 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
 
     @Override
     public int getViewTypeCount() {
-        return 2;
+        return 3;
     }
 
     @Override
     public int getItemViewType(int position) {
-        //Log.i(TAG, "WHO IS SENDER: " + ((Secret)getItem(position)).getSender().getUsername() + ", currentUser: " + currentUser.getUsername());
-        if(((Secret)getItem(position)).getImage() == null){
-            return TEXT_MESSAGE;
-        }else {
+        Secret secret = (Secret)getItem(position);
+        if(((Secret)getItem(position)).getImage() != null){
             return IMAGE_MESSAGE;
+        }else if(((Secret)getItem(position)).getSound() != null){
+            return SOUND_MESSAGE;
+        }else {
+            return TEXT_MESSAGE;
         }
     }
 
@@ -107,6 +112,12 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
                     holder.userImage = (com.github.siyamed.shapeimageview.CircularImageView) view.findViewById(R.id.user_image);
                     holder.messageType = TEXT_MESSAGE;
                     break;
+                case SOUND_MESSAGE:
+                    view = mInflater.inflate(R.layout.rahas_sound_row_layout, viewGroup, false);
+                    holder.sender = (TextView) view.findViewById(R.id.sender);
+                    holder.sentTime = (TextView) view.findViewById(R.id.sent_time);
+                    holder.messageType = SOUND_MESSAGE;
+                    break;
             }
             view.setTag(holder);
         } else {
@@ -123,32 +134,27 @@ public class AllChatListAdapter extends ArrayAdapter<Secret> {
         viewHolder.sender.setText(secret.getSender().getUsername());
         if (viewHolder.messageType == TEXT_MESSAGE){
             viewHolder.message.setText(secret.getText());
+        }else if(viewHolder.messageType == SOUND_MESSAGE){
+            //Nothing to do here!!
         }else{
             if(secret.getImage() != null) {
-                Log.i(TAG, "IMAGE 11 : " + secret.getImage().getBytes());
-                Log.i(TAG, "IMAGE 22 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
-                //viewHolder.image.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getImage().getBytes()), -90));
                 loadBitmap(secret.getImage(), viewHolder.image);
             }
         }
 
         //Extracting user image
         if(secret.getSender().getUserImage() != null) {
-            Log.i(TAG, "IMAGE 11111111 : " + secret.getSender().getUserImage().getBytes());
-            Log.i(TAG, "IMAGE 22222222 : " + CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
-            //viewHolder.userImage.setImageBitmap(CameraUtils.getRotatedImage(CameraUtils.getBitmapFromBytes(secret.getSender().getUserImage().getBytes()), -90));
             loadBitmap(secret.getSender().getUserImage(), viewHolder.userImage);
         }
 
         if(secret.getTimeStamp() != null){
             Timestamp timestamp = new Timestamp(secret.getTimeStamp());
             Date date = new Date(timestamp.getTime());
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy' 'HH:mm:ss:S");
-            viewHolder.sentTime.setText(simpleDateFormat.format(date));
+            viewHolder.sentTime.setText(TimeUtils.getTimeInWords(date));
         }
 
         //User name
-        viewHolder.sender.setText(secret.getSender().getUsername());
+        viewHolder.sender.setText("@"+secret.getSender().getUsername());
     }
 
     private void loadBitmap(String data, ImageView imageView) {

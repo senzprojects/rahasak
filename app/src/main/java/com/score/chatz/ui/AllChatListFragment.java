@@ -53,12 +53,9 @@ public class AllChatListFragment  extends ListFragment implements AdapterView.On
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //ArrayAdapter adapter = ArrayAdapter.createFromResource(getActivity(), R.array.users, R.layout.single_user_card_row);
-        //adapter = new UserPermissionListAdapter(getContext(), userPermissionList);
-        //setListAdapter(adapter);
         getContext().registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_UPDATE"));
         getListView().setOnItemClickListener(this);
-        getListView().setDividerHeight(1);
+        //getListView().setDividerHeight(1);
     }
 
     private BroadcastReceiver userSharedReceiver = new BroadcastReceiver() {

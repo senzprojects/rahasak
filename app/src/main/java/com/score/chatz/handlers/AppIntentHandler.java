@@ -30,6 +30,16 @@ public class AppIntentHandler {
         return  intent;
     }
 
+    public static Intent getUpdateSenzIntent() {
+        Intent intent = null;
+        try {
+            intent = getIntent(getIntentType(INTENT_TYPE.UPDATE_SENZ));
+        } catch (InvalidIntentType ex) {
+            Log.e(TAG, "No such intent, " + ex);
+        }
+        return  intent;
+    }
+
     public static Intent getCameraIntent(Context context){
         Intent intent = new Intent();
         intent.setClass(context, PhotoActivity.class);
@@ -58,6 +68,9 @@ public class AppIntentHandler {
             case DATA_SENZ:
                 intentString = "com.score.chatz.DATA_SENZ";
                 break;
+            case UPDATE_SENZ:
+                intentString = "com.score.chatz.USER_UPDATE";
+                break;
             default:
                 throw new InvalidIntentType();
         }
@@ -75,6 +88,6 @@ public class AppIntentHandler {
     }
 
     enum INTENT_TYPE {
-        DATA_SENZ
+        DATA_SENZ, UPDATE_SENZ
     }
 }

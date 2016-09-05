@@ -61,7 +61,7 @@ public class SenzUserHandler extends BaseHandler implements IComHandler {
             NotificationUtils.showNotification(context, context.getString(R.string.new_senz), "You have received an invitation from @" + senz.getSender().getUsername());
 
             //4. Broadcast intent to app
-            broadcastDataSenz(senz, context);
+            broadcastUpdateSenz(senz, context);
         } catch (SQLiteConstraintException e) {
             sendConfirmation(null, senzService, sender, false);
             Log.e(TAG, e.toString());

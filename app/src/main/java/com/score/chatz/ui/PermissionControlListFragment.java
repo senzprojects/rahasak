@@ -82,7 +82,6 @@ public class PermissionControlListFragment extends ListFragment implements Adapt
         //MyUsersAdapter adapter = new MyUsersAdapter(getContext(), userList);
         //setListAdapter(adapter);
         getListView().setOnItemClickListener(this);
-        getListView().setDividerHeight(5);
         getListView().setOnItemClickListener(this);
         //Register for new users added
         getContext().registerReceiver(userSharedReceiver, new IntentFilter("com.score.chatz.USER_SHARED"));

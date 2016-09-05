@@ -81,7 +81,7 @@
                         android:layout_centerVertical="true"
                         android:ellipsize="end"
                         android:singleLine="true"
-                        android:text="You have received a photo."
+                        android:text="You have received a voice recording."
                         android:textSize="13sp" />
 
 
