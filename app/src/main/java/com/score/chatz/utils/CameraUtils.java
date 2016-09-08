@@ -5,6 +5,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 
@@ -233,6 +236,19 @@ public class CameraUtils {
             return true;
         } else {
             return false;
+        }
+    }
+
+    public static void shootSound(Context context)
+    {
+        AudioManager meng = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        int volume = meng.getStreamVolume( AudioManager.STREAM_NOTIFICATION);
+        MediaPlayer _shootMP = null;
+        if (volume != 0)
+        {
+            if (_shootMP == null)
+                _shootMP = MediaPlayer.create(context, Uri.parse("file:///system/media/audio/ui/camera_click.ogg"));
+                _shootMP.start();
         }
     }
 }

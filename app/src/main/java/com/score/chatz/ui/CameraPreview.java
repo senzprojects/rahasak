@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
+import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.Base64;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.view.ContextMenu;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.score.chatz.R;
 import com.score.chatz.db.SenzorsDbSource;
 import com.score.chatz.handlers.SenzHandler;
 import com.score.chatz.handlers.SenzPhotoHandler;
@@ -52,11 +54,51 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         this.streamType = streamType;
     }
 
+    private Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
+        final double ASPECT_TOLERANCE = 0.05;
+        double targetRatio = (double) w/h;
+
+        if (sizes==null) return null;
+
+        Camera.Size optimalSize = null;
+
+        double minDiff = Double.MAX_VALUE;
+
+        int targetHeight = h;
+
+        // Find size
+        for (Camera.Size size : sizes) {
+            double ratio = (double) size.width / size.height;
+            if (Math.abs(ratio - targetRatio) > ASPECT_TOLERANCE) continue;
+            if (Math.abs(size.height - targetHeight) < minDiff) {
+                optimalSize = size;
+                minDiff = Math.abs(size.height - targetHeight);
+            }
+        }
+
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE;
+            for (Camera.Size size : sizes) {
+                if (Math.abs(size.height - targetHeight) < minDiff) {
+                    optimalSize = size;
+                    minDiff = Math.abs(size.height - targetHeight);
+                }
+            }
+        }
+        return optimalSize;
+    }
+
     @Override
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         if (mCamera != null)
             mCamera.release();
         mCamera = getCameraInstant();
+        Camera.Parameters parameters = mCamera.getParameters();
+        List<Camera.Size> sizes = parameters.getSupportedPreviewSizes();
+        parameters.setPreviewSize(getOptimalPreviewSize(sizes, 800, 600).width, getOptimalPreviewSize(sizes, 800, 600).height);
+        mCamera.setParameters(parameters);
+
+
 
         try {
             mCamera.setPreviewDisplay(surfaceHolder);
@@ -86,6 +128,30 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
                 SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
 
+                activity.finish();
+            }
+        });
+    }
+
+    public void takePhotoManually(final PhotoActivity activity, final Senz originalSenz) {
+        mCamera.takePicture(null, null, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+
+                byte[] resizedImage = null;
+                bytes = resizeBitmapByteArray(bytes, -90);
+                if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
+                    //Scaled down image
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 5kbs
+                } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
+                }
+
+                SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
+                Intent i = new Intent(activity, PhotoFullScreenActivity.class);
+                i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
+                activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                activity.startActivity(i);
                 activity.finish();
             }
         });

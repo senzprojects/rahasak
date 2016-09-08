@@ -21,8 +21,11 @@ import android.widget.TextView;
 
 import com.score.chatz.R;
 import com.score.chatz.exceptions.NoUserException;
+import com.score.chatz.handlers.AppIntentHandler;
+import com.score.chatz.pojo.SenzStream;
 import com.score.chatz.services.RemoteSenzService;
 import com.score.chatz.utils.PreferenceUtils;
+import com.score.senzc.pojos.Senz;
 
 /**
  * Splash activity, send login query from here
@@ -42,7 +45,6 @@ public class SplashActivity extends Activity{
         setContentView(R.layout.splash_layout);
         initSenzService();
         initNavigation();
-
     }
 
     /**

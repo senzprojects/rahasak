@@ -164,4 +164,19 @@
         </LinearLayout>
     </FrameLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Delivered"
+            android:textColor="@color/black"
+            android:id="@+id/deleviered_message"
+            android:textSize="10dp"
+            android:textStyle="italic"
+            android:layout_marginRight="5dp"
+            android:gravity="right" />
+    </FrameLayout>
+
 </LinearLayout>
