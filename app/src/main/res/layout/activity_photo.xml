@@ -94,81 +94,13 @@
                 app:siSquare="true"
                 app:siBorderAlpha = "0.0"
                 android:foregroundGravity="center"
-                android:scaleType="fitXY"
-                android:background="@drawable/vibrating_image" />
+                android:background="@drawable/vibrating_image"
+                android:scaleType="centerInside" />
         </com.skyfishjy.library.RippleBackground>
 
 
 
 
 </RelativeLayout>
-
-
-<!--
-
-    <com.skyfishjy.library.RippleBackground
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/go_ripple"
-        app:rb_color="#C5EDA8"
-        app:rb_radius="32dp"
-        app:rb_rippleAmount="4"
-        app:rb_duration="3000"
-        app:rb_scale="3"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="false"
-        android:background="@color/transparent">
-        <com.github.siyamed.shapeimageview.CircularImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_centerInParent="true"
-            android:src="@drawable/green_camera"
-            android:id="@+id/start"
-            app:siBorderWidth="0dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            app:siSquare="true"
-            app:siBorderAlpha = "0.0"
-            android:foregroundGravity="center"
-            android:scaleType="fitXY"
-            android:background="@drawable/vibrating_image" />
-    </com.skyfishjy.library.RippleBackground>
-
-
-
-    <com.skyfishjy.library.RippleBackground
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/stop_ripple"
-        app:rb_color="#EDA8A8"
-        app:rb_radius="32dp"
-        app:rb_rippleAmount="4"
-        app:rb_duration="3000"
-        app:rb_scale="3"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentLeft="false">
-        <com.github.siyamed.shapeimageview.CircularImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:src="@drawable/red_camera"
-            android:id="@+id/cancel"
-            app:siBorderWidth="0dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:cropToPadding="true"
-            app:siSquare="true"
-            app:siBorderAlpha = "0.0"
-            android:layout_centerInParent="true"
-            android:background="@drawable/vibrating_image" />
-    </com.skyfishjy.library.RippleBackground>
-
--->
-
 
 </RelativeLayout>

@@ -142,16 +142,16 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
                 bytes = resizeBitmapByteArray(bytes, -90);
                 if (streamType == SenzStream.SENZ_STEAM_TYPE.CHATZPHOTO) {
                     //Scaled down image
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 5kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 180); //Compress image ~ 5kbs
                 } else if (streamType == SenzStream.SENZ_STEAM_TYPE.PROFILEZPHOTO) {
-                    resizedImage = CameraUtils.getCompressedImage(bytes, 110); //Compress image ~ 50kbs
+                    resizedImage = CameraUtils.getCompressedImage(bytes, 180); //Compress image ~ 50kbs
                 }
 
                 SenzPhotoHandler.getInstance().sendPhoto(resizedImage, originalSenz, getContext());
                 Intent i = new Intent(activity, PhotoFullScreenActivity.class);
                 i.putExtra("IMAGE", Base64.encodeToString(resizedImage, 0));
-                activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 activity.startActivity(i);
+                activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 activity.finish();
             }
         });
@@ -160,7 +160,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private byte[] resizeBitmapByteArray(byte[] data, int deg) {
         Bitmap decodedBitmap = CameraUtils.decodeBase64(Base64.encodeToString(data, 0));
         // set max width ~ 600px
-        Bitmap rotatedBitmap = CameraUtils.getAdjustedImage(decodedBitmap, deg, 800);
+        Bitmap rotatedBitmap = CameraUtils.getAdjustedImage(decodedBitmap, deg, 1000);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         return baos.toByteArray();

@@ -61,21 +61,19 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
     private CameraPreview mCameraPreview;
     private boolean isPhotoTaken;
 
-    private ImageView closeBtn;
     private PhotoActivity instnce;
-    private SenzorsDbSource dbSource;
     private Senz originalSenz;
+    private PowerManager.WakeLock wakeLock;
+
+    private Rect startBtnRectRelativeToScreen;
+    private Rect cancelBtnRectRelativeToScreen;
     private CircularImageView cancelBtn;
     private ImageView startBtn;
     private RippleBackground goRipple;
-    private PowerManager.WakeLock wakeLock;
 
-    private boolean isServiceBound = false;
 
     private float dX, dY, startX, startY;
 
-
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,18 +88,11 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         FrameLayout preview = (FrameLayout) findViewById(R.id.photo);
         preview.addView(mCameraPreview);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayOptions(android.support.v7.app.ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(getLayoutInflater().inflate(R.layout.camera_action_bar, null));
-        setupCloseBtn();
-        dbSource = new SenzorsDbSource(this);
         try {
             originalSenz = (Senz) getIntent().getParcelableExtra("Senz");
         }catch (Exception ex){
             ex.printStackTrace();
         }
-        //startCountdownToPhoto();
 
         setupSwipeBtns();
         startBtnAnimations();
@@ -111,6 +102,17 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         PowerManager pm = (PowerManager) getApplicationContext().getSystemService(Context.POWER_SERVICE);
         wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "TAG");
         wakeLock.acquire();
+
+        getSupportActionBar().hide();
+    }
+
+    @Override
+    public void onWindowFocusChanged (boolean hasFocus){
+        super.onWindowFocusChanged(hasFocus);
+        if(hasFocus){
+            startBtnRectRelativeToScreen = new Rect(startBtn.getLeft(), startBtn.getTop(), startBtn.getRight(), startBtn.getBottom());
+            cancelBtnRectRelativeToScreen = new Rect(cancelBtn.getLeft(), cancelBtn.getTop(), cancelBtn.getRight(), cancelBtn.getBottom());
+        }
     }
 
     @Override
@@ -118,29 +120,21 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         super.onDestroy();
         //Release screen lock, so the phone can go back to sleep
         wakeLock.release();
+        stopVibrations();
+        if(mCamera != null)
+            mCamera.release();
     }
 
     private void setupSwipeBtns(){
         cancelBtn = (CircularImageView) findViewById(R.id.cancel);
-        cancelBtn.setTag(FLOATING_BTN_TYPES.RED_BTN);
         startBtn = (ImageView) findViewById(R.id.start);
-        startBtn.setTag(FLOATING_BTN_TYPES.GREEN_BTN);
     }
 
     private void startBtnAnimations(){
         Animation anim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.shake);
-        //cancelBtn.startAnimation(anim);
-        //startBtn.startAnimation(anim);
-
-        //AnimationUtils.pulseImage(cancelBtn);
-        //AnimationUtils.pulseImage(startBtn);
-        //stopRipple=(RippleBackground)findViewById(R.id.stop_ripple);
         goRipple=(RippleBackground)findViewById(R.id.go_ripple);
-        //stopRipple.startRippleAnimation();
         goRipple.startRippleAnimation();
         goRipple.startAnimation(anim);
-
-
     }
 
     private void startVibrations(){
@@ -151,13 +145,8 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
         VibrationUtils.stopVibration(this);
     }
 
-
-    ArrayList<View> targets = new ArrayList<View>();
-
     private void setupHandlesForSwipeBtnContainers() {
         goRipple.setOnTouchListener(this);
-        targets.add(startBtn);
-        targets.add(cancelBtn);
     }
 
     public boolean onTouch(View v, MotionEvent event) {
@@ -179,20 +168,20 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                         .y(event.getRawY() + dY)
                         .setDuration(0)
                         .start();
-                Integer viewPos = findViewPos(event.getX() + dX, event.getY()+ dY);
-                if(v.getX() > startX + 10 && v.getY() > startY - 5 && v.getY() > startY + 5){
+                if(startBtnRectRelativeToScreen.contains((int)(event.getRawX()), (int)(event.getRawY()))){
+                    // Inside start button region
                     stopVibrations();
-                    CameraUtils.shootSound(this);
                     if(isPhotoTaken == false) {
+                        CameraUtils.shootSound(this);
                         mCameraPreview.takePhotoManually(instnce, originalSenz);
                         isPhotoTaken = true;
                     }
-                }else if(v.getX() < startX - 10 && v.getY() > startY - 5 && v.getY() > startY + 5){
+                }else if(cancelBtnRectRelativeToScreen.contains((int)(event.getRawX()), (int)(event.getRawY()))){
+                    // Inside cancel button region
                     stopVibrations();
                     this.finish();
                 }
                 break;
-
             case (MotionEvent.ACTION_UP):
                 v.animate()
                         .x(startX)
@@ -204,19 +193,6 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
                 break;
         }
         return true;
-    }
-
-    private Integer findViewPos(float x, float y)
-    {
-        final int count = targets.size();
-        for (int i = 0; i < count; i++) {
-            final View target = targets.get(i);
-            if (target.getRight() > x && target.getTop() < y
-                    && target.getBottom() > y && target.getLeft() < x) {
-                return i;
-            }
-        }
-        return null;
     }
 
 
@@ -256,62 +232,16 @@ public class PhotoActivity extends AppCompatActivity implements View.OnTouchList
 
             }
         }.start();
-
     }
-
-    // service interface
-    private ISenzService senzService = null;
-
-    // service connection
-    private ServiceConnection senzServiceConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d("TAG", "Connected with senz service");
-            senzService = ISenzService.Stub.asInterface(service);
-        }
-
-        public void onServiceDisconnected(ComponentName className) {
-            senzService = null;
-            Log.d("TAG", "Disconnected from senz service");
-        }
-    };
 
     public void onStart() {
         super.onStart();
-        // bind to senz service
-        if (!isServiceBound) {
-            Intent intent = new Intent();
-            intent.setClassName("com.score.chatz", "com.score.chatz.services.RemoteSenzService");
-            this.bindService(intent, senzServiceConnection, Context.BIND_AUTO_CREATE);
-            isServiceBound = true;
-        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-
-        // Unbind from the service
-        if (isServiceBound) {
-            this.unbindService(senzServiceConnection);
-            isServiceBound = false;
-        }
     }
 
-    private void setupCloseBtn() {
-        closeBtn = (ImageView) findViewById(R.id.close_btn);
-        closeBtn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                goBack();
 
-            }
-        });
-    }
-
-    private void goBack(){
-        this.finish();
-    }
-
-    enum FLOATING_BTN_TYPES{
-        GREEN_BTN, RED_BTN
-    }
 }
